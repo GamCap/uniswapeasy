@@ -1,0 +1,27 @@
+# Dependency directories
+node_modules/
+yarn.lock
+
+# Build directories
+dist/
+lib/
+es/
+
+# IDE files
+.vscode/
+.idea/
+
+# Compiled output
+*.log
+*.tsbuildinfo
+*.map
+
+# Environment files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Misc
+.DS_Store
+Thumbs.db
