@@ -43,7 +43,7 @@ export const defaultTheme = {
 const ThemeContext = createContext<DefaultTheme>(toDefaultTheme(defaultTheme));
 
 export function Provider({ theme, children }: PropsWithChildren<ThemeProps>) {
-  const themeCtx = createContext(ThemeContext);
+  const themeCtx = useContext(ThemeContext);
   const value = useMemo(() => {
     return toDefaultTheme({
       ...theme,
