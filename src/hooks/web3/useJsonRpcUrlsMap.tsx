@@ -2,8 +2,8 @@ import {
   JsonRpcProvider,
   StaticJsonRpcProvider,
 } from "@ethersproject/providers";
-import { SupportedChainId } from "../../constants/chains";
-import { JSON_RPC_FALLBACK_ENDPOINTS } from "../../constants/jsonRpcEndpoints";
+import { SupportedChainId } from "constants/chains";
+import { JSON_RPC_FALLBACK_ENDPOINTS } from "constants/jsonRpcEndpoints";
 import { createContext, PropsWithChildren, useContext, useMemo } from "react";
 
 export type JsonRpcConnectionMap = {

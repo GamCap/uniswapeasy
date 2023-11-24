@@ -11,17 +11,11 @@ import { MetaMask } from "@web3-react/metamask";
 import { Network } from "@web3-react/network";
 import { Connector, Provider as Eip1193Provider } from "@web3-react/types";
 import { WalletConnect } from "@web3-react/walletconnect-v2";
-import {
-  L1_CHAIN_IDS,
-  L2_CHAIN_IDS,
-  SupportedChainId,
-} from "@/constants/chains";
-import { MetaMaskConnectionError } from "@/errors";
+import { L1_CHAIN_IDS, L2_CHAIN_IDS, SupportedChainId } from "constants/chains";
 import { PropsWithChildren, useEffect, useMemo, useRef } from "react";
-import { Layer } from "@/theme";
-import JsonRpcConnector from "@/utils/JsonRpcConnector";
-import { supportedChainId } from "@/utils/supportedChainId";
-import { WalletConnectQR } from "@/utils/WalletConnect";
+import JsonRpcConnector from "utils/JsonRpcConnector";
+import { supportedChainId } from "utils/supportedChainId";
+import { WalletConnectQR } from "utils/WalletConnect";
 
 import { Provider as ConnectorsProvider } from "./useConnectors";
 import {
@@ -206,7 +200,7 @@ function useWeb3ReactConnectors({
     () =>
       initializeWeb3ReactConnector(MetaMask, {
         onError: () => {
-          throw new MetaMaskConnectionError();
+          throw new Error("MetaMask is not available");
         },
       }),
     []
@@ -226,7 +220,7 @@ function useWeb3ReactConnectors({
       ],
       qrModalOptions: {
         themeVariables: {
-          "--w3m-z-index": Layer.DIALOG.toString(),
+          "--w3m-z-index": "1000",
         },
       },
     }),

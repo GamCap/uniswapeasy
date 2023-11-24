@@ -6,6 +6,7 @@ yarn.lock
 dist/
 lib/
 es/
+dts/
 
 # IDE files
 .vscode/

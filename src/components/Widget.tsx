@@ -3,8 +3,8 @@ import WidgetContainer, { WidgetContainerProps } from "./WidgetContainer";
 import {
   Provider as Web3Provider,
   ProviderProps as Web3Props,
-} from "@/hooks/web3";
-import { Provider as ThemeProvider, Theme } from "../theme";
+} from "hooks/web3";
+import { Provider as ThemeProvider, Theme } from "theme";
 
 export interface WidgetProps extends WidgetContainerProps, Web3Props {
   theme: Theme;
