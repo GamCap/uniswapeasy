@@ -7,7 +7,9 @@ dist/
 lib/
 es/
 dts/
-abis/types/
+
+# Generated types
+src/abis/types/
 
 # IDE files
 .vscode/
