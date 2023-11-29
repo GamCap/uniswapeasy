@@ -1,6 +1,5 @@
 module.exports = {
   compact:false,
-  sourceType: "unambiguous",
     presets: [
       '@babel/preset-env',
       '@babel/preset-react',
