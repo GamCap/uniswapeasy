@@ -1,11 +1,14 @@
 module.exports = {
+  compact:false,
+  sourceType: "unambiguous",
     presets: [
       '@babel/preset-env',
       '@babel/preset-react',
-      '@babel/preset-typescript',
+      ['@babel/preset-typescript', { isTSX: true, allExtensions: true }],
     ],
     plugins: [
       '@babel/plugin-transform-runtime',
+      'macros',
       [
         'module-resolver',
         {

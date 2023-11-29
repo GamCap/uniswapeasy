@@ -11,6 +11,7 @@ const json = require('@rollup/plugin-json')
 const { nodeResolve: resolve } = require('@rollup/plugin-node-resolve')
 const { default: dts } = require('rollup-plugin-dts')
 const url = require('@rollup/plugin-url')
+const externals = require('rollup-plugin-node-externals')
 
 const EXTENSIONS = ['.js', '.jsx', '.ts', '.tsx']
 
@@ -22,14 +23,14 @@ const transpile = {
     return source.startsWith('@ethersproject/')
   },
   plugins: [
+    externals({ deps: true, peerDeps: true }), // excludes all node_modules from the bundle
     // Dependency resolution
-    resolve({ extensions: EXTENSIONS }), // resolves third-party modules within node_modules/
+    resolve({ extensions: EXTENSIONS, preferBuiltins:false, browser:true }), // resolves third-party modules within node_modules/
 
     // Source code transformation
     json(), // imports json as ES6; doing so enables module resolution
     url({ include: ['**/*.png', '**/*.svg'], limit: Infinity }), // imports assets as data URIs
     commonjs(), // transforms cjs dependencies into tree-shakeable ES modules
-
     babel({
       babelHelpers: 'runtime',
       extensions: EXTENSIONS,

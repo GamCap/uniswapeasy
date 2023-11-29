@@ -3,7 +3,7 @@ import 'setimmediate'
 import { URI_AVAILABLE, WalletConnect, WalletConnectConstructorArgs } from '@web3-react/walletconnect-v2'
 import QRCode from 'qrcode'
 
-export class WalletConnectQR extends WalletConnect {
+class WalletConnectQR extends WalletConnect {
   static SVG_AVAILABLE = 'svg_available'
 
   svg?: string
@@ -36,4 +36,4 @@ export class WalletConnectQR extends WalletConnect {
   }
 }
 
-module.exports = WalletConnectQR;
+export { WalletConnectQR }
