@@ -95,4 +95,8 @@ export const JSON_RPC_FALLBACK_ENDPOINTS: Record<SupportedChainId, string[]> = {
     'https://1rpc.io/base',
     'https://base.meowrpc.com',
   ],
+  [SupportedChainId.CONDUIT_TESTNET]: [
+    // "Safe" URLs
+    'https://l2-uniswap-v4-hook-sandbox-6tl5qq8i4d.t.conduit.xyz/',
+  ],
 }

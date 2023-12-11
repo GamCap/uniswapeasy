@@ -17,6 +17,6 @@ export function isWalletConnect(connector: Connector) {
 
 const connector = initializeConnector<WalletConnect>(
   (actions) =>
-    new WalletConnect({actions, options: {rpc: { 1: JSON_RPC_URL },}})
+    new WalletConnect({actions, options: {rpc: { 111: JSON_RPC_URL },}})
 )
 export default toWeb3Connector(connector)

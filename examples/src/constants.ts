@@ -1,1 +1,1 @@
-export const JSON_RPC_URL = 'https://cloudflare-eth.com'
+export const JSON_RPC_URL = 'https://l2-uniswap-v4-hook-sandbox-6tl5qq8i4d.t.conduit.xyz/'

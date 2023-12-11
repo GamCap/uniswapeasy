@@ -60,9 +60,9 @@ const App = () => {
               large: "2rem",
             },
           }}
-          defaultChainId={1}
+          defaultChainId={111}
           jsonRpcUrlMap={{
-            1: JSON_RPC_URL,
+            111: JSON_RPC_URL,
           }}
           provider={provider}
         />
