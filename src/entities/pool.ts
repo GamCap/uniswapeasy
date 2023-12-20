@@ -60,6 +60,7 @@ export class Pool {
    * @param fee The fee in hundredths of a bips of the input amount of every swap that is collected by the pool
    * @param sqrtRatioX96 The sqrt of the current ratio of amounts of token1 to token0
    * @param liquidity The current value of in range liquidity
+   * @param tickSpacing The spacing between ticks
    * @param tickCurrent The current tick of the pool
    * @param ticks The current state of the pool ticks or a data provider that can return tick data
    */

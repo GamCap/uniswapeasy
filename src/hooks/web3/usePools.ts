@@ -93,7 +93,7 @@ export function usePools(
 
   //TODO
   // look into pool state interface and find v4 equivalent
-  // getSlot0 , getLiquidity
+  // getSlot0 , getLiquidity, multiCall
   // const slot0s = useMultipleContractSingleData(poolKeyList, POOL_STATE_INTERFACE, 'slot0')
   // const liquidities = useMultipleContractSingleData(poolKeyList, POOL_STATE_INTERFACE, 'liquidity')
   
@@ -138,7 +138,7 @@ export function usePool(
     currencyB: Currency | undefined,
     feeAmount: BigNumberish | undefined,
     tickSpacing: BigNumberish | undefined,
-    hooks: string
+    hooks: string | undefined
 ): [PoolState, Pool | null] {
     const poolKeys: [Currency | undefined, Currency | undefined, BigNumberish | undefined, BigNumberish | undefined, string | undefined
     ][] = useMemo(
