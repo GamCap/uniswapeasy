@@ -1,4 +1,10 @@
-import { Currency, CurrencyAmount, Price, Token } from "@uniswap/sdk-core";
+import {
+  Currency,
+  CurrencyAmount,
+  Price,
+  Rounding,
+  Token,
+} from "@uniswap/sdk-core";
 import { Pool } from "../../entities/pool";
 import { PoolState, usePool } from "../../hooks/web3/usePools";
 import { ReactNode, useCallback, useMemo } from "react";
@@ -13,6 +19,7 @@ import { tryConvertBigNumberishToNumber, tryParseTick } from "./utils";
 import {
   Bound,
   Field,
+  setFullRange,
   typeInput,
   typeLeftRangeInput,
   typeRightRangeInput,
@@ -23,6 +30,7 @@ import { useAppDispatch, useAppSelector } from "../hooks";
 import tryParseCurrencyAmount from "../../utils/tryParseCurrencyAmount";
 import { tickToPrice } from "../../utils/priceTickConversions";
 import { Position } from "../../entities/position";
+import { PoolKeyStruct } from "../../abis/types/PoolManager";
 
 export function useV4MintState(): AppState["mintV4"] {
   return useAppSelector((state) => state.mintV4);
@@ -92,12 +100,7 @@ export function useV4PoolActionHandlers(noLiquidity: boolean | undefined): {
   };
 }
 export function useV4PoolInfo(
-  currency0?: Currency,
-  currency1?: Currency,
-  baseCurrency?: Currency,
-  fee?: BigNumberish,
-  tickSpacing?: BigNumberish,
-  hooks?: string
+  poolKey?: PoolKeyStruct
   //existingPosition?: Position,
 ): {
   pool?: Pool | null;
@@ -114,7 +117,7 @@ export function useV4PoolInfo(
   currencyBalances: { [field in Field]?: CurrencyAmount<Currency> };
   dependentField: Field;
   parsedAmounts: { [field in Field]?: CurrencyAmount<Currency> };
-  // position?: Position
+  position?: Position;
   noLiquidity?: boolean;
   errorMessage?: ReactNode;
   invalidPool: boolean;
@@ -125,6 +128,9 @@ export function useV4PoolInfo(
   invertPrice: boolean;
   ticksAtLimit: { [bound in Bound]?: boolean | undefined };
 } {
+  const { currency0, currency1, baseCurrency, fee, tickSpacing, hooks } =
+    parsePoolKey(poolKey);
+
   const { account } = useWeb3React();
 
   const {
@@ -176,8 +182,32 @@ export function useV4PoolInfo(
   //   )
   // );
   const balances: CurrencyAmount<Currency>[] = [
-    CurrencyAmount.fromRawAmount(token0!, JSBI.BigInt(0)),
-    CurrencyAmount.fromRawAmount(token1!, JSBI.BigInt(0)),
+    CurrencyAmount.fromRawAmount(
+      token0
+        ? token0
+        : new Token(
+            1,
+            "0x0000000000000000000000000000000000000001",
+            18,
+            undefined,
+            undefined,
+            true
+          ),
+      JSBI.BigInt(0)
+    ),
+    CurrencyAmount.fromRawAmount(
+      token1
+        ? token1
+        : new Token(
+            1,
+            "0x0000000000000000000000000000000000000002",
+            18,
+            undefined,
+            undefined,
+            true
+          ),
+      JSBI.BigInt(0)
+    ),
   ];
 
   const currencyBalances: { [field in Field]?: CurrencyAmount<Currency> } = {
@@ -628,7 +658,7 @@ export function useV4PoolInfo(
     price,
     pricesAtTicks,
     pricesAtLimit,
-    //position,
+    position,
     noLiquidity,
     errorMessage,
     invalidPool,
@@ -638,5 +668,162 @@ export function useV4PoolInfo(
     depositBDisabled,
     invertPrice,
     ticksAtLimit,
+  };
+}
+
+function parsePoolKey(poolKey?: PoolKeyStruct): {
+  currency0?: Currency;
+  currency1?: Currency;
+  baseCurrency?: Currency;
+  fee?: BigNumberish;
+  tickSpacing?: BigNumberish;
+  hooks?: string;
+} {
+  const { chainId } = useWeb3React();
+  if (!chainId || !poolKey) {
+    return {};
+  }
+  return {
+    currency0: new Token(chainId!, poolKey.currency0, 18),
+    currency1: new Token(chainId!, poolKey.currency1, 18),
+    baseCurrency: new Token(chainId!, poolKey.currency0, 18),
+    fee: poolKey.fee,
+    tickSpacing: poolKey.tickSpacing,
+    hooks: poolKey.hooks,
+  };
+}
+
+export function useRangeHopCallbacks(
+  baseCurrency: Currency | undefined,
+  quoteCurrency: Currency | undefined,
+  feeAmount: BigNumberish | undefined,
+  tickSpacing: BigNumberish | undefined,
+  tickLower: number | undefined,
+  tickUpper: number | undefined,
+  pool?: Pool | undefined | null
+) {
+  const dispatch = useAppDispatch();
+
+  const baseToken = useMemo(() => baseCurrency?.wrapped, [baseCurrency]);
+  const quoteToken = useMemo(() => quoteCurrency?.wrapped, [quoteCurrency]);
+
+  const getDecrementLower = useCallback(() => {
+    if (baseToken && quoteToken && typeof tickLower === "number" && feeAmount) {
+      const newPrice = tickToPrice(
+        baseToken,
+        quoteToken,
+        tickLower - parseFloat(tickSpacing?.toString() ?? "0")
+      );
+      return newPrice.toSignificant(5, undefined);
+    }
+    // use pool current tick as starting tick if we have pool but no tick input
+    if (
+      !(typeof tickLower === "number") &&
+      baseToken &&
+      quoteToken &&
+      feeAmount &&
+      pool
+    ) {
+      const newPrice = tickToPrice(
+        baseToken,
+        quoteToken,
+        pool.tickCurrent - parseFloat(tickSpacing?.toString() ?? "0")
+      );
+      return newPrice.toSignificant(5, undefined, Rounding.ROUND_UP);
+    }
+    return "";
+  }, [baseToken, quoteToken, tickLower, feeAmount, pool]);
+
+  const getIncrementLower = useCallback(() => {
+    if (baseToken && quoteToken && typeof tickLower === "number" && feeAmount) {
+      const newPrice = tickToPrice(
+        baseToken,
+        quoteToken,
+        tickLower + parseFloat(tickSpacing?.toString() ?? "0")
+      );
+      return newPrice.toSignificant(5, undefined, Rounding.ROUND_UP);
+    }
+    // use pool current tick as starting tick if we have pool but no tick input
+    if (
+      !(typeof tickLower === "number") &&
+      baseToken &&
+      quoteToken &&
+      feeAmount &&
+      pool
+    ) {
+      const newPrice = tickToPrice(
+        baseToken,
+        quoteToken,
+        pool.tickCurrent + parseFloat(tickSpacing?.toString() ?? "0")
+      );
+      return newPrice.toSignificant(5, undefined, Rounding.ROUND_UP);
+    }
+    return "";
+  }, [baseToken, quoteToken, tickLower, feeAmount, pool]);
+
+  const getDecrementUpper = useCallback(() => {
+    if (baseToken && quoteToken && typeof tickUpper === "number" && feeAmount) {
+      const newPrice = tickToPrice(
+        baseToken,
+        quoteToken,
+        tickUpper - parseFloat(tickSpacing?.toString() ?? "0")
+      );
+      return newPrice.toSignificant(5, undefined, Rounding.ROUND_UP);
+    }
+    // use pool current tick as starting tick if we have pool but no tick input
+    if (
+      !(typeof tickUpper === "number") &&
+      baseToken &&
+      quoteToken &&
+      feeAmount &&
+      pool
+    ) {
+      const newPrice = tickToPrice(
+        baseToken,
+        quoteToken,
+        pool.tickCurrent - parseFloat(tickSpacing?.toString() ?? "0")
+      );
+      return newPrice.toSignificant(5, undefined, Rounding.ROUND_UP);
+    }
+    return "";
+  }, [baseToken, quoteToken, tickUpper, feeAmount, pool]);
+
+  const getIncrementUpper = useCallback(() => {
+    if (baseToken && quoteToken && typeof tickUpper === "number" && feeAmount) {
+      const newPrice = tickToPrice(
+        baseToken,
+        quoteToken,
+        tickUpper + parseFloat(tickSpacing?.toString() ?? "0")
+      );
+      return newPrice.toSignificant(5, undefined, Rounding.ROUND_UP);
+    }
+    // use pool current tick as starting tick if we have pool but no tick input
+    if (
+      !(typeof tickUpper === "number") &&
+      baseToken &&
+      quoteToken &&
+      feeAmount &&
+      pool
+    ) {
+      const newPrice = tickToPrice(
+        baseToken,
+        quoteToken,
+        pool.tickCurrent + parseFloat(tickSpacing?.toString() ?? "0")
+      );
+      return newPrice.toSignificant(5, undefined, Rounding.ROUND_UP);
+    }
+    return "";
+  }, [baseToken, quoteToken, tickUpper, feeAmount, pool]);
+
+  const getSetFullRange = useCallback(() => {
+    dispatch(setFullRange());
+  }, [dispatch]);
+
+  return {
+    getDecrementLower,
+    getIncrementLower,
+    getDecrementUpper,
+    getIncrementUpper,
+    getSetFullRange,
   };
 }

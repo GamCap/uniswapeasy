@@ -3,7 +3,8 @@ import {
   DefaultTheme,
   ThemeProvider as StyledThemeProvider,
 } from "styled-components";
-import type { BorderRadius, Colors, Theme } from "./theme";
+import type { BorderRadius, Colors, Gaps, Theme } from "./theme";
+import { borderRadius } from "polished";
 export type { Color, Colors, Theme } from "./theme";
 
 export interface ThemeProps {
@@ -29,13 +30,22 @@ export const darkTheme: Colors = {
 };
 
 const defaultBorderRadius: BorderRadius = {
-  xsmall: "",
-  small: "",
-  medium: "",
-  large: "",
+  xsmall: 0.5,
+  small: 0.75,
+  medium: 1,
+  large: 1.5,
+};
+
+const gapValues: Gaps = {
+  xs: "4px",
+  sm: "8px",
+  md: "12px",
+  lg: "24px",
+  xl: "32px",
 };
 
 export const defaultTheme = {
+  grids: gapValues,
   ...lightTheme,
   borderRadius: defaultBorderRadius,
 };
@@ -52,7 +62,7 @@ export function Provider({ theme, children }: PropsWithChildren<ThemeProps>) {
   }, [theme, themeCtx]);
   return (
     <ThemeContext.Provider value={value}>
-      <StyledThemeProvider theme={theme}>{children}</StyledThemeProvider>
+      <StyledThemeProvider theme={value}>{children}</StyledThemeProvider>
     </ThemeContext.Provider>
   );
 }
@@ -60,5 +70,9 @@ export function Provider({ theme, children }: PropsWithChildren<ThemeProps>) {
 function toDefaultTheme(theme: Required<Theme>): DefaultTheme {
   return {
     ...theme,
+    borderRadius: theme.borderRadius
+      ? (theme.borderRadius as BorderRadius)
+      : defaultBorderRadius,
+    grids: theme.grids ? (theme.grids as Gaps) : gapValues,
   };
 }

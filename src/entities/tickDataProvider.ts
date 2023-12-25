@@ -1,4 +1,5 @@
 import { BigintIsh } from '@uniswap/sdk-core'
+import { BigNumberish } from 'ethers'
 
 /**
  * Provides information about ticks
@@ -16,7 +17,7 @@ export interface TickDataProvider {
    * @param lte Whether the next tick should be lte the current tick
    * @param tickSpacing The tick spacing of the pool
    */
-  nextInitializedTickWithinOneWord(tick: number, lte: boolean, tickSpacing: number): Promise<[number, boolean]>
+  nextInitializedTickWithinOneWord(tick: number, lte: boolean, tickSpacing: BigNumberish): Promise<[number, boolean]>
 }
 
 /**

@@ -171,7 +171,7 @@ export class Pool {
     const outputToken = zeroForOne ? this.token1 : this.token0
     return [
       CurrencyAmount.fromRawAmount(outputToken, JSBI.multiply(outputAmount, NEGATIVE_ONE)),
-      new Pool(this.token0, this.token1, BigNumber.from(this.fee.toString()), sqrtRatioX96, liquidity,BigNumber.from(this.tickSpacing.toString()), tickCurrent, this.tickDataProvider)
+      new Pool(this.token0, this.token1, BigNumber.from(this.fee.toString() ?? "0"), sqrtRatioX96, liquidity,BigNumber.from(this.tickSpacing.toString() ?? "0"), tickCurrent, this.tickDataProvider)
     ]
   }
 
@@ -197,7 +197,7 @@ export class Pool {
     const inputToken = zeroForOne ? this.token0 : this.token1
     return [
       CurrencyAmount.fromRawAmount(inputToken, inputAmount),
-      new Pool(this.token0, this.token1, BigNumber.from(this.fee.toString()), sqrtRatioX96, liquidity,BigNumber.from(this.tickSpacing.toString()), tickCurrent, this.tickDataProvider)
+      new Pool(this.token0, this.token1, BigNumber.from(this.fee.toString() ?? "0"), sqrtRatioX96, liquidity,BigNumber.from(this.tickSpacing.toString() ?? "0"), tickCurrent, this.tickDataProvider)
     ]
   }
 
@@ -254,7 +254,7 @@ export class Pool {
       ;[step.tickNext, step.initialized] = await this.tickDataProvider.nextInitializedTickWithinOneWord(
         state.tick,
         zeroForOne,
-        BigNumber.from(this.tickSpacing.toString())
+        BigNumber.from(this.tickSpacing.toString() ?? "0")
       )
 
       if (step.tickNext && step.tickNext < TickMath.MIN_TICK) {

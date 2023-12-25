@@ -1,5 +1,6 @@
 import { useCallback, useRef } from "react";
 import { UniswapEasy } from "uniswapeasy";
+// import {UniswapEasy} from "../../src/index";
 import { useActiveProvider } from "./connectors";
 import { JSON_RPC_URL } from "./constants";
 import Web3Connectors from "./components/Web3Connectors";
@@ -53,18 +54,21 @@ const App = () => {
             background: "#f7f8fa",
             text: "#1a1a1a",
             textInverted: "#f7f8fa",
-            borderRadius: {
-              xsmall: "0.25rem",
-              small: "0.5rem",
-              medium: "1rem",
-              large: "2rem",
-            },
           }}
-          defaultChainId={111}
+          defaultChainId={1}
           jsonRpcUrlMap={{
             111: JSON_RPC_URL,
           }}
           provider={provider}
+          poolKeys={[
+            {
+              currency0: "0x0000000000000000000000000000000000000001",
+              currency1: "0x0000000000000000000000000000000000000002",
+              fee: 300,
+              tickSpacing: 50,
+              hooks: "0x0",
+            },
+          ]}
         />
       </div>
     </div>

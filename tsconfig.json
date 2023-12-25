@@ -29,5 +29,5 @@
     "useUnknownInCatchVariables": false,
   },
   "exclude": ["node_modules", "dist", "examples"],
-  "include": ["src/**/*.d.ts", "src/index.tsx"]
+  "include": ["src/**/*.ts","src/**/*.d.ts", "src/index.tsx"]
 }

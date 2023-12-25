@@ -163,19 +163,19 @@ export class Position {
     const poolLower = new Pool(
       this.pool.token0,
       this.pool.token1,
-      BigNumber.from(this.pool.fee.toString()),
+      BigNumber.from(this.pool.fee.toString() ?? "0"),
       sqrtRatioX96Lower,
       0 /* liquidity doesn't matter */,
-      BigNumber.from(this.pool.tickSpacing.toString()),
+      BigNumber.from(this.pool.tickSpacing.toString() ?? "0"),
       TickMath.getTickAtSqrtRatio(sqrtRatioX96Lower)
     )
     const poolUpper = new Pool(
       this.pool.token0,
       this.pool.token1,
-      BigNumber.from(this.pool.fee.toString()),
+      BigNumber.from(this.pool.fee.toString() ?? "0"),
       sqrtRatioX96Upper,
       0 /* liquidity doesn't matter */,
-      BigNumber.from(this.pool.tickSpacing.toString()),
+      BigNumber.from(this.pool.tickSpacing.toString() ?? "0"),
       TickMath.getTickAtSqrtRatio(sqrtRatioX96Upper)
     )
 
@@ -221,19 +221,19 @@ export class Position {
     const poolLower = new Pool(
       this.pool.token0,
       this.pool.token1,
-      BigNumber.from(this.pool.fee.toString()),
+      BigNumber.from(this.pool.fee.toString() ?? "0"),
       sqrtRatioX96Lower,
       0 /* liquidity doesn't matter */,
-      BigNumber.from(this.pool.tickSpacing.toString()),
+      BigNumber.from(this.pool.tickSpacing.toString() ?? "0"),
       TickMath.getTickAtSqrtRatio(sqrtRatioX96Lower)
     )
     const poolUpper = new Pool(
       this.pool.token0,
       this.pool.token1,
-      BigNumber.from(this.pool.fee.toString()),
+      BigNumber.from(this.pool.fee.toString() ?? "0"),
       sqrtRatioX96Upper,
       0 /* liquidity doesn't matter */,
-      BigNumber.from(this.pool.tickSpacing.toString()),
+      BigNumber.from(this.pool.tickSpacing.toString() ?? "0"),
       TickMath.getTickAtSqrtRatio(sqrtRatioX96Upper)
     )
 
