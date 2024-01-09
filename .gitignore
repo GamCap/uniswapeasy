@@ -29,3 +29,6 @@ src/abis/types/
 # Misc
 .DS_Store
 Thumbs.db
+
+# Test files
+*.tgz

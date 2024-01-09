@@ -20,7 +20,7 @@ const transpile = {
   input: 'src/index.tsx',
   external: (source) => {
     // @ethersproject/* modules are provided by ethers
-    return source.startsWith('@ethersproject/');
+    return source.startsWith('@ethersproject/') || source === 'react' || source === 'react-dom' || source === 'styled-components';
   },
   plugins: [
     externals({ deps: true, peerDeps: true }), // excludes all node_modules from the bundle

@@ -83,6 +83,7 @@ export default function LiquidityChartRangeInput({
   currencyA,
   currencyB,
   feeAmount,
+  tickSpacing,
   ticksAtLimit,
   price,
   priceLower,
@@ -94,6 +95,7 @@ export default function LiquidityChartRangeInput({
   currencyA?: Currency;
   currencyB?: Currency;
   feeAmount?: BigNumberish;
+  tickSpacing?: BigNumberish;
   ticksAtLimit: { [bound in Bound]?: boolean | undefined };
   price?: number;
   priceLower?: Price<Token, Token>;
@@ -117,6 +119,7 @@ export default function LiquidityChartRangeInput({
     currencyA,
     currencyB,
     feeAmount,
+    tickSpacing,
   });
 
   const onBrushDomainChangeEnded = useCallback(
@@ -192,11 +195,8 @@ export default function LiquidityChartRangeInput({
     !currencyA || !currencyB || (formattedData === undefined && !isLoading);
 
   useEffect(() => {
-    if (theme) console.log("theme is", theme);
-    else console.log("theme is undefined");
-
-    console.error("theme is", theme);
-  }, [theme]);
+    console.log("formattedData", formattedData);
+  }, [formattedData]);
   return (
     <AutoColumn style={{ minHeight: "200px" }}>
       {isUninitialized ? (
@@ -227,12 +227,12 @@ export default function LiquidityChartRangeInput({
             margins={{ top: 10, right: 2, bottom: 20, left: 0 }}
             styles={{
               area: {
-                selection: "#fff",
+                selection: "#44FF9A",
               },
               brush: {
                 handle: {
-                  west: "#ccc",
-                  east: "#ddd",
+                  west: "#FF8A00",
+                  east: "#FF8A00",
                 },
               },
             }}
@@ -241,10 +241,10 @@ export default function LiquidityChartRangeInput({
             brushDomain={brushDomain}
             onBrushDomainChange={onBrushDomainChangeEnded}
             zoomLevels={{
-              initialMin: 0.999,
-              initialMax: 1.001,
+              initialMin: 0.5,
+              initialMax: 2,
               min: 0.00001,
-              max: 1.5,
+              max: 20,
             }} // TODO: change this depending on fee amount
             ticksAtLimit={ticksAtLimit}
           />

@@ -1,10 +1,11 @@
 import { Currency } from '@uniswap/sdk-core'
 // import { TickProcessed, usePoolActiveLiquidity } from '../../hooks/web3/usePoolTickData'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { ChartEntry } from './types'
 import { BigNumberish } from 'ethers'
 import JSBI from 'jsbi'
-import mockTicks from './mockTicks.json'
+import { usePoolActiveLiquidity } from 'hooks/web3/usePoolTickData'
+
 type TickProcessed = {
   tick: number
   liquidityActive: JSBI
@@ -24,8 +25,9 @@ export function useDensityChartData({
     tickSpacing?: BigNumberish
     hooks?: string
 }) {
-  // const { isLoading, error, data } = usePoolActiveLiquidity(currencyA, currencyB, feeAmount, tickSpacing, hooks)
-  const data = mockTicks.ticks.map((tick) => ({tick: Number(tick.tickIdx), liquidityActive: JSBI.BigInt(tick.liquidityGross), liquidityNet: JSBI.BigInt(tick.liquidityNet), price0: tick.price0} as TickProcessed))
+  
+  const { isLoading, error, data } = usePoolActiveLiquidity(currencyA, currencyB, feeAmount, tickSpacing, hooks)
+  // const data = mockTicks.ticks.map((tick) => ({tick: Number(tick.tickIdx), liquidityActive: JSBI.BigInt(tick.liquidityGross), liquidityNet: JSBI.BigInt(tick.liquidityNet), price0: tick.price0} as TickProcessed))
   const formatData = useCallback(() => {
     if (!data?.length) {
       return undefined
@@ -51,10 +53,8 @@ export function useDensityChartData({
 
   return useMemo(() => {
     return {
-      // isLoading,
-      // error,
-      isLoading: false,
-      error: undefined,
+      isLoading,
+      error,
       formattedData: true ? formatData() : undefined,
     }
   }, [ formatData])

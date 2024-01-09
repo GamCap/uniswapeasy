@@ -12,12 +12,13 @@ export interface ThemeProps {
 }
 
 export const lightTheme: Colors = {
-  primary: "",
-  secondary: "",
-  tertiary: "",
-  background: "",
-  text: "",
-  textInverted: "",
+  primary: "#FFFFFF", // pure white for primary elements
+  secondary: "#2ecc71", // a light green for secondary elements
+  tertiary: "#f1c40f", // a muted yellow for tertiary accents
+  background: "#12131A", // a dark gray for backgrounds
+  background2: "#323232", // a very light gray for backgrounds
+  text: "#34495e", // a darker gray for regular text, ensuring good readability
+  textInverted: "#ffffff", // pure white for text on dark backgrounds
 };
 
 export const darkTheme: Colors = {
@@ -25,6 +26,7 @@ export const darkTheme: Colors = {
   secondary: "",
   tertiary: "",
   background: "",
+  background2: "",
   text: "",
   textInverted: "",
 };

@@ -42,7 +42,7 @@ export const BaseButton = styled(RebassButton)<BaseButtonProps>`
   border-radius: ${({ $borderRadius }) => $borderRadius ?? "16px"};
   outline: none;
   border: 1px solid transparent;
-  color: ${({ theme }) => theme.neutral1};
+  color: ${({ theme }) => theme.primary};
   text-decoration: none;
   display: flex;
   justify-content: center;
@@ -71,35 +71,35 @@ export const BaseButton = styled(RebassButton)<BaseButtonProps>`
 `;
 
 export const ButtonPrimary = styled(BaseButton)<BaseButtonProps>`
-  background-color: ${({ theme }) => theme.accent1};
+  background-color: ${({ theme }) => theme.primary};
   font-size: 20px;
   font-weight: 535;
   padding: 16px;
   color: ${({ theme }) => theme.white};
   &:focus {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.05, theme.accent1)};
-    background-color: ${({ theme }) => darken(0.05, theme.accent1)};
+    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.05, theme.primary)};
+    background-color: ${({ theme }) => darken(0.05, theme.primary)};
   }
   &:hover {
-    background-color: ${({ theme }) => darken(0.05, theme.accent1)};
+    background-color: ${({ theme }) => darken(0.05, theme.primary)};
   }
   &:active {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.1, theme.accent1)};
-    background-color: ${({ theme }) => darken(0.1, theme.accent1)};
+    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.1, theme.primary)};
+    background-color: ${({ theme }) => darken(0.1, theme.primary)};
   }
   &:disabled {
     background-color: ${({ theme, altDisabledStyle, disabled }) =>
       altDisabledStyle
         ? disabled
-          ? theme.accent1
-          : theme.surface3
-        : theme.surface3};
+          ? theme.primary
+          : theme.primary
+        : theme.primary};
     color: ${({ altDisabledStyle, disabled, theme }) =>
       altDisabledStyle
         ? disabled
-          ? theme.white
-          : theme.neutral2
-        : theme.neutral2};
+          ? theme.primary
+          : theme.secondary
+        : theme.secondary};
     cursor: auto;
     box-shadow: none;
     border: 1px solid transparent;
@@ -116,32 +116,34 @@ export const SmallButtonPrimary = styled(ButtonPrimary)<BaseButtonProps>`
 `;
 
 const BaseButtonLight = styled(BaseButton)`
-  background-color: ${({ theme }) => theme.accent2};
-  color: ${({ theme }) => theme.accent1};
+  background-color: ${({ theme }) => theme.secondary};
+  color: ${({ theme }) => theme.primary};
   font-size: 20px;
   font-weight: 535;
 
   &:focus {
-    box-shadow: 0 0 0 1pt ${({ theme, disabled }) => !disabled && theme.accent2};
-    background-color: ${({ theme, disabled }) => !disabled && theme.accent2};
+    box-shadow: 0 0 0 1pt
+      ${({ theme, disabled }) => !disabled && theme.secondary};
+    background-color: ${({ theme, disabled }) => !disabled && theme.secondary};
   }
   &:hover {
-    background-color: ${({ theme, disabled }) => !disabled && theme.accent2};
+    background-color: ${({ theme, disabled }) => !disabled && theme.secondary};
   }
   &:active {
-    box-shadow: 0 0 0 1pt ${({ theme, disabled }) => !disabled && theme.accent2};
-    background-color: ${({ theme, disabled }) => !disabled && theme.accent2};
+    box-shadow: 0 0 0 1pt
+      ${({ theme, disabled }) => !disabled && theme.secondary};
+    background-color: ${({ theme, disabled }) => !disabled && theme.secondary};
   }
 
   :hover {
     ${ButtonOverlay} {
-      background-color: ${({ theme }) => theme.deprecated_stateOverlayHover};
+      background-color: ${({ theme }) => theme.background};
     }
   }
 
   :active {
     ${ButtonOverlay} {
-      background-color: ${({ theme }) => theme.deprecated_stateOverlayPressed};
+      background-color: ${({ theme }) => theme.background};
     }
   }
 
@@ -159,39 +161,39 @@ const BaseButtonLight = styled(BaseButton)`
 
 export const ButtonGray = styled(BaseButton)`
   background-color: ${({ theme }) => theme.surface1};
-  color: ${({ theme }) => theme.neutral2};
-  border: 1px solid ${({ theme }) => theme.surface3};
+  color: ${({ theme }) => theme.secondary};
+  border: 1px solid ${({ theme }) => theme.primary};
   font-size: 16px;
   font-weight: 535;
 
   &:hover {
     background-color: ${({ theme, disabled }) =>
-      !disabled && darken(0.05, theme.surface2)};
+      !disabled && darken(0.05, theme.secondary)};
   }
   &:active {
     background-color: ${({ theme, disabled }) =>
-      !disabled && darken(0.1, theme.surface2)};
+      !disabled && darken(0.1, theme.secondary)};
   }
 `;
 
 export const ButtonSecondary = styled(BaseButton)<BaseButtonProps>`
-  border: 1px solid ${({ theme }) => theme.accent2};
-  color: ${({ theme }) => theme.accent1};
+  border: 1px solid ${({ theme }) => theme.secondary};
+  color: ${({ theme }) => theme.primary};
   background-color: transparent;
   font-size: 16px;
   border-radius: 12px;
   padding: ${({ padding }) => (padding ? padding : "10px")};
 
   &:focus {
-    box-shadow: 0 0 0 1pt ${({ theme }) => theme.accent2};
-    border: 1px solid ${({ theme }) => theme.accent1};
+    box-shadow: 0 0 0 1pt ${({ theme }) => theme.secondary};
+    border: 1px solid ${({ theme }) => theme.primary};
   }
   &:hover {
-    border: 1px solid ${({ theme }) => theme.accent1};
+    border: 1px solid ${({ theme }) => theme.primary};
   }
   &:active {
-    box-shadow: 0 0 0 1pt ${({ theme }) => theme.accent2};
-    border: 1px solid ${({ theme }) => theme.accent1};
+    box-shadow: 0 0 0 1pt ${({ theme }) => theme.secondary};
+    border: 1px solid ${({ theme }) => theme.primary};
   }
   &:disabled {
     opacity: 50%;
@@ -203,17 +205,17 @@ export const ButtonSecondary = styled(BaseButton)<BaseButtonProps>`
 `;
 
 export const ButtonOutlined = styled(BaseButton)`
-  border: 1px solid ${({ theme }) => theme.surface3};
+  border: 1px solid ${({ theme }) => theme.primary};
   background-color: transparent;
   color: ${({ theme }) => theme.neutral1};
   &:focus {
-    box-shadow: 0 0 0 1px ${({ theme }) => theme.surface3};
+    box-shadow: 0 0 0 1px ${({ theme }) => theme.primary};
   }
   &:hover {
     box-shadow: 0 0 0 1px ${({ theme }) => theme.neutral3};
   }
   &:active {
-    box-shadow: 0 0 0 1px ${({ theme }) => theme.surface3};
+    box-shadow: 0 0 0 1px ${({ theme }) => theme.primary};
   }
   &:disabled {
     opacity: 50%;
@@ -223,7 +225,7 @@ export const ButtonOutlined = styled(BaseButton)`
 
 export const ButtonEmpty = styled(BaseButton)`
   background-color: transparent;
-  color: ${({ theme }) => theme.accent1};
+  color: ${({ theme }) => theme.primary};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -264,39 +266,39 @@ export const ButtonText = styled(BaseButton)`
 `;
 
 const ButtonConfirmedStyle = styled(BaseButton)`
-  background-color: ${({ theme }) => theme.surface2};
+  background-color: ${({ theme }) => theme.secondary};
   color: ${({ theme }) => theme.neutral1};
   /* border: 1px solid ${({ theme }) => theme.success}; */
 
   &:disabled {
     opacity: 50%;
-    background-color: ${({ theme }) => theme.surface3};
-    color: ${({ theme }) => theme.neutral2};
+    background-color: ${({ theme }) => theme.primary};
+    color: ${({ theme }) => theme.secondary};
     cursor: auto;
   }
 `;
 
 const ButtonErrorStyle = styled(BaseButton)`
-  background-color: ${({ theme }) => theme.critical};
-  border: 1px solid ${({ theme }) => theme.critical};
+  background-color: ${({ theme }) => theme.seconary};
+  border: 1px solid ${({ theme }) => theme.seconary};
 
   &:focus {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.05, theme.critical)};
-    background-color: ${({ theme }) => darken(0.05, theme.critical)};
+    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.05, theme.seconary)};
+    background-color: ${({ theme }) => darken(0.05, theme.seconary)};
   }
   &:hover {
-    background-color: ${({ theme }) => darken(0.05, theme.critical)};
+    background-color: ${({ theme }) => darken(0.05, theme.seconary)};
   }
   &:active {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.1, theme.critical)};
-    background-color: ${({ theme }) => darken(0.1, theme.critical)};
+    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.1, theme.seconary)};
+    background-color: ${({ theme }) => darken(0.1, theme.seconary)};
   }
   &:disabled {
     opacity: 50%;
     cursor: auto;
     box-shadow: none;
-    background-color: ${({ theme }) => theme.critical};
-    border: 1px solid ${({ theme }) => theme.critical};
+    background-color: ${({ theme }) => theme.seconary};
+    border: 1px solid ${({ theme }) => theme.seconary};
   }
 `;
 
@@ -381,14 +383,14 @@ export function ButtonDropdownLight({
 
 const ActiveOutlined = styled(ButtonOutlined)`
   border: 1px solid;
-  border-color: ${({ theme }) => theme.accent1};
+  border-color: ${({ theme }) => theme.primary};
 `;
 
 const Circle = styled.div`
   height: 17px;
   width: 17px;
   border-radius: 50%;
-  background-color: ${({ theme }) => theme.accent1};
+  background-color: ${({ theme }) => theme.primary};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -476,21 +478,21 @@ function pickThemeButtonBackgroundColor({
 }) {
   switch (emphasis) {
     case ButtonEmphasis.high:
-      return theme.accent1;
+      return theme.primary;
     case ButtonEmphasis.promotional:
     case ButtonEmphasis.highSoft:
-      return theme.accent2;
+      return theme.secondary;
     case ButtonEmphasis.low:
       return "transparent";
     case ButtonEmphasis.warning:
-      return theme.deprecated_accentWarningSoft;
+      return theme.primary;
     case ButtonEmphasis.destructive:
-      return theme.critical;
+      return theme.secondary;
     case ButtonEmphasis.failure:
-      return theme.deprecated_accentFailureSoft;
+      return theme.primary;
     case ButtonEmphasis.medium:
     default:
-      return theme.surface3;
+      return theme.primary;
   }
 }
 function pickThemeButtonFontSize({ size }: { size: ButtonSize }) {
@@ -539,20 +541,20 @@ function pickThemeButtonTextColor({
   switch (emphasis) {
     case ButtonEmphasis.high:
     case ButtonEmphasis.promotional:
-      return theme.accent1;
+      return theme.primary;
     case ButtonEmphasis.highSoft:
-      return theme.accent1;
+      return theme.primary;
     case ButtonEmphasis.low:
-      return theme.neutral2;
+      return theme.secondary;
     case ButtonEmphasis.warning:
-      return theme.deprecated_accentWarning;
+      return theme.secondary;
     case ButtonEmphasis.destructive:
-      return theme.neutral1;
+      return theme.primary;
     case ButtonEmphasis.failure:
-      return theme.critical;
+      return theme.secondary;
     case ButtonEmphasis.medium:
     default:
-      return theme.neutral1;
+      return theme.primary;
   }
 }
 
@@ -577,17 +579,17 @@ const BaseThemeButton = styled.button<BaseThemeButtonProps>`
 
   :active {
     ${ButtonOverlay} {
-      background-color: ${({ theme }) => theme.deprecated_stateOverlayPressed};
+      background-color: ${({ theme }) => theme.background};
     }
   }
   :focus {
     ${ButtonOverlay} {
-      background-color: ${({ theme }) => theme.deprecated_stateOverlayPressed};
+      background-color: ${({ theme }) => theme.background};
     }
   }
   :hover {
     ${ButtonOverlay} {
-      background-color: ${({ theme }) => theme.deprecated_stateOverlayHover};
+      background-color: ${({ theme }) => theme.background};
     }
   }
   :disabled {

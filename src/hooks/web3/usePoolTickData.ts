@@ -8,7 +8,7 @@ import { PoolState, usePool } from './usePools'
 import { BigNumberish } from 'ethers'
 import { tickToPrice } from '../../utils/priceTickConversions'
 import computeSurroundingTicks from '../../utils/computeSurroundingTicks'
-
+import mockTicks from './mockTicks.json'
 const PRICE_FIXED_DIGITS = 8
 
 // Tick with fields parsed to JSBIs, and active liquidity computed.
@@ -32,7 +32,7 @@ function useTicksFromSubgraph(
   //return a mock data
   return {
     data: {
-      ticks: []
+      ticks: mockTicks.ticks
   },
   error: undefined,
     loading: false
@@ -40,6 +40,13 @@ function useTicksFromSubgraph(
 
 }
 
+interface TickData {
+  tick: number
+  liquidityGross: string
+  liquidityNet: string
+  price0: string
+  price1: string
+}
 // Fetches all ticks for a given pool
 function useAllV4Ticks(
     currencyA: Currency | undefined,
@@ -48,21 +55,27 @@ function useAllV4Ticks(
 ): {
   isLoading: boolean
   error: unknown
-  ticks?: any[]
+  ticks?: TickData[]
 } {
   const [subgraphTickData, setSubgraphTickData] = useState<any[]>([])
   const { data, error, loading: isLoading } = useTicksFromSubgraph(currencyA, currencyB, feeAmount)
 
-  useEffect(() => {
-    if (data?.ticks.length) {
-      setSubgraphTickData((tickData) => [...tickData, ...data.ticks])
-    }
-  }, [data?.ticks])
+  // useEffect(() => {
+  //   if (data?.ticks.length) {
+  //     setSubgraphTickData((tickData) => [...tickData, ...data.ticks])
+  //   }
+  // }, [data?.ticks])
 
   return {
     isLoading: isLoading,
     error,
-    ticks: subgraphTickData,
+    ticks: data.ticks.map((t) => ({
+      tick: Number(t.tickIdx),
+      liquidityGross: t.liquidityGross,
+      liquidityNet: t.liquidityNet,
+      price0: t.price0,
+      price1: t.price1,
+    })),
   }
 }
 

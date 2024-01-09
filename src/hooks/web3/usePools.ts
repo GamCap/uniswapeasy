@@ -99,10 +99,10 @@ export function usePools(
   
   //mock data
   const slot0s = poolTokens.map((_value) => {
-    return { result: { sqrtPriceX96: JSBI.BigInt(0), tick: 0, tickSpacing: 0 }, loading: false, valid: true }
+    return { result: { sqrtPriceX96: JSBI.BigInt("34127063508144082157086714069057263"), tick: 259478, tickSpacing: 60 }, loading: false, valid: true }
   })
   const liquidities = poolTokens.map((_value) => {
-    return { result: [JSBI.BigInt(0), JSBI.BigInt(0), JSBI.BigInt(0)], loading: false, valid: true }
+    return { result: [JSBI.BigInt("904643433375596462")], loading: false, valid: true }
   })
 
   return useMemo(() => {
@@ -120,7 +120,7 @@ export function usePools(
       if (!tokens || !slot0Valid || !liquidityValid) return [PoolState.INVALID, null]
       if (slot0Loading || liquidityLoading) return [PoolState.LOADING, null]
       if (!slot0 || !liquidity) return [PoolState.NOT_EXISTS, null]
-      if (!slot0.sqrtPriceX96 || JSBI.EQ(slot0.sqrtPriceX96,0)) return [PoolState.NOT_EXISTS, null]
+      // if (!slot0.sqrtPriceX96 || JSBI.EQ(slot0.sqrtPriceX96,0)) return [PoolState.NOT_EXISTS, null]
 
       try {
         const pool = PoolCache.getPool(token0, token1, fee, slot0.sqrtPriceX96, liquidity[0],slot0.tickSpacing, slot0.tick)

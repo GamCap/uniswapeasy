@@ -140,23 +140,39 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
   }, [maxPrice, onRightRangeInput]);
 
   return (
-    <LiquidityChartRangeInput
-      currencyA={currencies.CURRENCY_0}
-      currencyB={currencies.CURRENCY_1}
-      feeAmount={
-        pool?.fee ? BigNumber.from(pool?.fee.toString() ?? "0") : undefined
-      }
-      price={
-        price
-          ? parseFloat((invertPrice ? price.invert() : price).toSignificant(6))
-          : undefined
-      }
-      priceLower={priceLower}
-      priceUpper={priceUpper}
-      ticksAtLimit={ticksAtLimit}
-      onLeftRangeInput={onLeftRangeInput}
-      onRightRangeInput={onRightRangeInput}
-      interactive={true}
-    />
+    <>
+      {!account ? (
+        <div>Connect Wallet</div>
+      ) : invalidPool ? (
+        <div>Invalid Pool</div>
+      ) : (
+        <LiquidityChartRangeInput
+          currencyA={currencies.CURRENCY_0}
+          currencyB={currencies.CURRENCY_1}
+          feeAmount={
+            pool?.fee ? BigNumber.from(pool?.fee.toString() ?? "0") : undefined
+          }
+          tickSpacing={
+            pool?.tickSpacing
+              ? BigNumber.from(pool?.tickSpacing.toString() ?? "0")
+              : undefined
+          }
+          price={
+            // price
+            //   ? parseFloat(
+            //       (invertPrice ? price.invert() : price).toSignificant(6)
+            //     )
+            //   : undefined
+            159085938358.4664
+          }
+          priceLower={priceLower}
+          priceUpper={priceUpper}
+          ticksAtLimit={ticksAtLimit}
+          onLeftRangeInput={onLeftRangeInput}
+          onRightRangeInput={onRightRangeInput}
+          interactive={true}
+        />
+      )}
+    </>
   );
 }

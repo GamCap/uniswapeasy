@@ -14,7 +14,7 @@ const StyledGroup = styled.g`
   }
 
   text {
-    color: ${({ theme }) => theme.neutral2};
+    color: ${({ theme }) => theme.secondary};
     transform: translateY(5px);
   }
 `;

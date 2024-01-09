@@ -3,6 +3,7 @@ export interface Colors {
     secondary: string;
     tertiary: string;
     background: string;
+    background2: string;
     text: string;
     textInverted: string; 
 }

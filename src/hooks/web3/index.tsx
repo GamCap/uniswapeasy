@@ -235,7 +235,7 @@ function useWeb3ReactConnectors({
         options: {
           ...walletConnectDefaultOptions,
           showQrModal: true,
-        },
+        } as any,
         defaultChainId,
         onError: console.error,
       }),
@@ -247,7 +247,7 @@ function useWeb3ReactConnectors({
         options: {
           ...walletConnectDefaultOptions,
           showQrModal: false,
-        },
+        } as any,
         defaultChainId,
         onError: console.error,
       }),

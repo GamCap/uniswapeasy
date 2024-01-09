@@ -4,8 +4,10 @@ import styled from "styled-components";
 const StyledWidgetContainer = styled.div`
   display: flex;
   flex-direction: column;
+  gap: ${({ theme }) => theme.grids["md"]};
   height: 100%;
   width: 100%;
+  background-color: ${({ theme }) => theme.background};
 `;
 
 export interface WidgetContainerProps {
