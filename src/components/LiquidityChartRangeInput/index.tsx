@@ -6,13 +6,13 @@ import { ReactNode, useCallback, useEffect, useMemo } from "react";
 // import { BarChart2, CloudOff, Inbox } from 'react-feather'
 import { Bound } from "../../state/v4/actions";
 import styled, { useTheme } from "styled-components";
-import { Text, TextProps as TextPropsOriginal } from "rebass";
 import formatDelta from "../../utils/formatDelta";
 
 import { Chart } from "./Chart";
 import { useDensityChartData } from "./hooks";
 // import { ZoomLevels } from "./types";
 import { BigNumberish } from "ethers";
+import { ThemedText } from "../../theme/components";
 
 // const ZOOM_LEVELS: Record<FeeAmount, ZoomLevels> = {
 //   [FeeAmount.LOWEST]: {
@@ -44,36 +44,22 @@ import { BigNumberish } from "ethers";
 const ChartWrapper = styled.div`
   position: relative;
   width: 100%;
-  max-height: 200px;
   justify-content: center;
   align-content: center;
 `;
-
-type TextProps = Omit<TextPropsOriginal, "css">;
-
-const TextWrapper = styled(Text).withConfig({
-  shouldForwardProp: (prop) => prop !== "color",
-})<{ color: keyof string }>`
-  color: ${({ color, theme }) => (theme as any)[color]};
-`;
-const ThemedText = {
-  DeprecatedMediumHeader(props: TextProps) {
-    return <TextWrapper fontWeight={535} fontSize={20} {...props} />;
-  },
-};
 
 function InfoBox({ message, icon }: { message?: ReactNode; icon: ReactNode }) {
   return (
     <ColumnCenter style={{ height: "100%", justifyContent: "center" }}>
       {icon}
       {message && (
-        <ThemedText.DeprecatedMediumHeader
+        <ThemedText.MediumHeader
           padding={10}
           marginTop="20px"
           textAlign="center"
         >
           {message}
-        </ThemedText.DeprecatedMediumHeader>
+        </ThemedText.MediumHeader>
       )}
     </ColumnCenter>
   );
@@ -198,7 +184,7 @@ export default function LiquidityChartRangeInput({
     console.log("formattedData", formattedData);
   }, [formattedData]);
   return (
-    <AutoColumn style={{ minHeight: "200px" }}>
+    <>
       {isUninitialized ? (
         <InfoBox
           message={"Your position will appear here."}
@@ -250,6 +236,6 @@ export default function LiquidityChartRangeInput({
           />
         </ChartWrapper>
       )}
-    </AutoColumn>
+    </>
   );
 }

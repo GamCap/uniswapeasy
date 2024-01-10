@@ -2,6 +2,7 @@ import { createContext, useContext, PropsWithChildren, useMemo } from "react";
 import {
   DefaultTheme,
   ThemeProvider as StyledThemeProvider,
+  createGlobalStyle,
 } from "styled-components";
 import type { BorderRadius, Colors, Gaps, Theme } from "./theme";
 import { borderRadius } from "polished";
@@ -15,9 +16,11 @@ export const lightTheme: Colors = {
   primary: "#FFFFFF", // pure white for primary elements
   secondary: "#2ecc71", // a light green for secondary elements
   tertiary: "#f1c40f", // a muted yellow for tertiary accents
-  background: "#12131A", // a dark gray for backgrounds
-  background2: "#323232", // a very light gray for backgrounds
+  background: "#12131A", // a dark blue for backgrounds
+  backgroundSecondary: "#273345", // a slightly lighter blue for backgrounds
+  backgroundTertiary: "#323232", // a very light gray for backgrounds
   text: "#34495e", // a darker gray for regular text, ensuring good readability
+  textActive: "#44FF9A", // a light green for active text
   textInverted: "#ffffff", // pure white for text on dark backgrounds
 };
 
@@ -26,8 +29,10 @@ export const darkTheme: Colors = {
   secondary: "",
   tertiary: "",
   background: "",
-  background2: "",
+  backgroundSecondary: "",
+  backgroundTertiary: "",
   text: "",
+  textActive: "",
   textInverted: "",
 };
 
@@ -46,7 +51,12 @@ const gapValues: Gaps = {
   xl: "32px",
 };
 
+const defaultFont = {
+  family: "'Inter', sans-serif",
+};
+
 export const defaultTheme = {
+  font: defaultFont,
   grids: gapValues,
   ...lightTheme,
   borderRadius: defaultBorderRadius,
@@ -54,6 +64,12 @@ export const defaultTheme = {
 
 const ThemeContext = createContext<DefaultTheme>(toDefaultTheme(defaultTheme));
 
+// Create a Global Style component
+const GlobalStyle = createGlobalStyle`
+  body {
+    font-family: ${(props) => props.theme.font.family};
+  }
+`;
 export function Provider({ theme, children }: PropsWithChildren<ThemeProps>) {
   const themeCtx = useContext(ThemeContext);
   const value = useMemo(() => {
@@ -64,12 +80,16 @@ export function Provider({ theme, children }: PropsWithChildren<ThemeProps>) {
   }, [theme, themeCtx]);
   return (
     <ThemeContext.Provider value={value}>
-      <StyledThemeProvider theme={value}>{children}</StyledThemeProvider>
+      <StyledThemeProvider theme={value}>
+        <GlobalStyle />
+        {children}
+      </StyledThemeProvider>
     </ThemeContext.Provider>
   );
 }
 
 function toDefaultTheme(theme: Required<Theme>): DefaultTheme {
+  // default font is Inter
   return {
     ...theme,
     borderRadius: theme.borderRadius

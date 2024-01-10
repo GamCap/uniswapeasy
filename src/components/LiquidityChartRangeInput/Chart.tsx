@@ -8,6 +8,7 @@ import { Brush } from "./Brush";
 import { Line } from "./Line";
 import { ChartEntry, LiquidityChartRangeInputProps } from "./types";
 import Zoom, { ZoomOverlay } from "./Zoom";
+import { StyledBoxSecondary } from "theme/components";
 
 const xAccessor = (d: ChartEntry) => d.price0;
 const yAccessor = (d: ChartEntry) => d.activeLiquidity;
@@ -102,76 +103,80 @@ export function Chart({
         )}
         zoomLevels={zoomLevels}
       />
-      <svg
-        width="100%"
-        height="100%"
-        viewBox={`0 0 ${width} ${height}`}
-        style={{ overflow: "visible" }}
-      >
-        <defs>
-          <clipPath id={`${id}-chart-clip`}>
-            <rect x="0" y="0" width={innerWidth} height={height} />
-          </clipPath>
-
-          {brushDomain && (
-            // mask to highlight selected area
-            <mask id={`${id}-chart-area-mask`}>
-              <rect
-                fill="white"
-                x={xScale(brushDomain[0])}
-                y="0"
-                width={xScale(brushDomain[1]) - xScale(brushDomain[0])}
-                height={innerHeight}
-              />
-            </mask>
-          )}
-        </defs>
-
-        <g transform={`translate(${margins.left},${margins.top})`}>
-          <g clipPath={`url(#${id}-chart-clip)`}>
-            <Area
-              series={series}
-              xScale={xScale}
-              yScale={yScale}
-              xValue={xAccessor}
-              yValue={yAccessor}
-            />
+      <StyledBoxSecondary>
+        <svg
+          width="100%"
+          height="100%"
+          viewBox={`0 0 ${width} ${height}`}
+          style={{ overflow: "visible" }}
+        >
+          <defs>
+            <clipPath id={`${id}-chart-clip`}>
+              <rect x="0" y="0" width={innerWidth} height={height} />
+            </clipPath>
 
             {brushDomain && (
-              // duplicate area chart with mask for selected area
-              <g mask={`url(#${id}-chart-area-mask)`}>
-                <Area
-                  series={series}
-                  xScale={xScale}
-                  yScale={yScale}
-                  xValue={xAccessor}
-                  yValue={yAccessor}
-                  fill={styles.area.selection}
+              // mask to highlight selected area
+              <mask id={`${id}-chart-area-mask`}>
+                <rect
+                  fill="white"
+                  x={xScale(brushDomain[0])}
+                  y="0"
+                  width={xScale(brushDomain[1]) - xScale(brushDomain[0])}
+                  height={innerHeight}
                 />
-              </g>
+              </mask>
             )}
+          </defs>
 
-            <Line value={current} xScale={xScale} innerHeight={innerHeight} />
+          <g transform={`translate(${margins.left},${margins.top})`}>
+            <g clipPath={`url(#${id}-chart-clip)`}>
+              <Area
+                series={series}
+                xScale={xScale}
+                yScale={yScale}
+                xValue={xAccessor}
+                yValue={yAccessor}
+                //style is area.selection but 30% opacity
+                fill={styles.area.selection + "4D"}
+              />
 
-            <AxisBottom xScale={xScale} innerHeight={innerHeight} />
+              {brushDomain && (
+                // duplicate area chart with mask for selected area
+                <g mask={`url(#${id}-chart-area-mask)`}>
+                  <Area
+                    series={series}
+                    xScale={xScale}
+                    yScale={yScale}
+                    xValue={xAccessor}
+                    yValue={yAccessor}
+                    fill={styles.area.selection}
+                  />
+                </g>
+              )}
+
+              <Line value={current} xScale={xScale} innerHeight={innerHeight} />
+
+              <AxisBottom xScale={xScale} innerHeight={innerHeight} />
+            </g>
+
+            <ZoomOverlay width={innerWidth} height={height} ref={zoomRef} />
+
+            <Brush
+              id={id}
+              xScale={xScale}
+              interactive={interactive}
+              brushLabelValue={brushLabels}
+              brushExtent={brushDomain ?? (xScale.domain() as [number, number])}
+              innerWidth={innerWidth}
+              innerHeight={innerHeight}
+              setBrushExtent={onBrushDomainChange}
+              westHandleColor={styles.brush.handle.west}
+              eastHandleColor={styles.brush.handle.east}
+            />
           </g>
-
-          <ZoomOverlay width={innerWidth} height={height} ref={zoomRef} />
-
-          <Brush
-            id={id}
-            xScale={xScale}
-            interactive={interactive}
-            brushLabelValue={brushLabels}
-            brushExtent={brushDomain ?? (xScale.domain() as [number, number])}
-            innerWidth={innerWidth}
-            innerHeight={innerHeight}
-            setBrushExtent={onBrushDomainChange}
-            westHandleColor={styles.brush.handle.west}
-            eastHandleColor={styles.brush.handle.east}
-          />
-        </g>
-      </svg>
+        </svg>
+      </StyledBoxSecondary>
     </>
   );
 }

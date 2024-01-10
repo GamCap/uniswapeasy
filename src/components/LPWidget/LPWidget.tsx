@@ -11,10 +11,45 @@ import { BigNumber, BigNumberish } from "ethers";
 import usePoolManager from "../../hooks/web3/usePoolManager";
 import { Bound } from "../../state/v4/actions";
 import LiquidityChartRangeInput from "../LiquidityChartRangeInput";
+import Column, { AutoColumn } from "components/Column";
+import { Header } from "../Header";
+import styled from "styled-components";
+import Row from "components/Row";
+import { ButtonText } from "components/Button";
+import { ThemedText } from "theme/components";
+import PoolKeySelect from "../PoolKeySelect";
+import PriceRangeManual from "../PriceRangeManual";
+
+interface BodyWrapperProps {
+  $maxWidth?: string;
+}
+
+const BodyWrapper = styled.div<BodyWrapperProps>`
+  position: relative;
+  max-width: ${({ $maxWidth }) => $maxWidth ?? "420px"};
+  width: 100%;
+  background: ${({ theme }) => theme.background};
+  border-radius: 16px;
+`;
+
+const StyledBoddyWrapper = styled(BodyWrapper)<{
+  $hasExistingPosition: boolean;
+}>`
+  padding: ${({ $hasExistingPosition }) =>
+    $hasExistingPosition ? "10px" : "0"};
+  max-width: 640px;
+`;
+
+const MediumOnly = styled.div`
+  @media (max-width: 960px) {
+    display: none;
+  }
+`;
 
 export type LPWidgetProps = {
   poolKeys: PoolKeyStruct[];
 };
+
 export default function LPWidget({ poolKeys }: LPWidgetProps) {
   const { account, chainId, provider } = useWeb3React();
   //TODO: add a check for existing position
@@ -115,6 +150,9 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
   const [minPrice, setMinPrice] = useState<string | undefined>();
   const [maxPrice, setMaxPrice] = useState<string | undefined>();
 
+  //TODO: add existing position check
+  const hasExistingPosition = false;
+
   const handleSetFullRange = useCallback(() => {
     getSetFullRange();
     const tempMinPrice = pricesAtLimit[Bound.LOWER];
@@ -146,32 +184,75 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
       ) : invalidPool ? (
         <div>Invalid Pool</div>
       ) : (
-        <LiquidityChartRangeInput
-          currencyA={currencies.CURRENCY_0}
-          currencyB={currencies.CURRENCY_1}
-          feeAmount={
-            pool?.fee ? BigNumber.from(pool?.fee.toString() ?? "0") : undefined
-          }
-          tickSpacing={
-            pool?.tickSpacing
-              ? BigNumber.from(pool?.tickSpacing.toString() ?? "0")
-              : undefined
-          }
-          price={
-            // price
-            //   ? parseFloat(
-            //       (invertPrice ? price.invert() : price).toSignificant(6)
-            //     )
-            //   : undefined
-            159085938358.4664
-          }
-          priceLower={priceLower}
-          priceUpper={priceUpper}
-          ticksAtLimit={ticksAtLimit}
-          onLeftRangeInput={onLeftRangeInput}
-          onRightRangeInput={onRightRangeInput}
-          interactive={true}
-        />
+        <StyledBoddyWrapper $hasExistingPosition={hasExistingPosition}>
+          {/* Header */}
+          <Header adding={true} creating={false}>
+            {!hasExistingPosition && (
+              <Row
+                justify="flex-end"
+                style={{ width: "fit-content", minWidth: "fit-content" }}
+              >
+                <MediumOnly>
+                  <ButtonText onClick={clearAll}>
+                    <ThemedText.SmallActiveGreen>
+                      Clear all
+                    </ThemedText.SmallActiveGreen>
+                  </ButtonText>
+                </MediumOnly>
+              </Row>
+            )}
+          </Header>
+          <Column gap="xl" style={{ padding: "32px" }}>
+            {/* Pool Key Selection */}
+            <AutoColumn gap="md" justify="start" grow>
+              <ThemedText.SubHeader>Select Pool</ThemedText.SubHeader>
+              <PoolKeySelect
+                poolKeys={poolKeys}
+                selectedPoolKey={poolKey}
+                onSelect={setPoolKey}
+              />
+            </AutoColumn>
+
+            {/* Chart Range Input */}
+            <AutoColumn gap="md" justify="start" grow>
+              <ThemedText.SubHeader>Select Range</ThemedText.SubHeader>
+              <LiquidityChartRangeInput
+                currencyA={currencies.CURRENCY_0}
+                currencyB={currencies.CURRENCY_1}
+                feeAmount={
+                  pool?.fee
+                    ? BigNumber.from(pool?.fee.toString() ?? "0")
+                    : undefined
+                }
+                tickSpacing={
+                  pool?.tickSpacing
+                    ? BigNumber.from(pool?.tickSpacing.toString() ?? "0")
+                    : undefined
+                }
+                price={
+                  // price
+                  //   ? parseFloat(
+                  //       (invertPrice ? price.invert() : price).toSignificant(6)
+                  //     )
+                  //   : undefined
+                  159085938358.4664
+                }
+                priceLower={priceLower}
+                priceUpper={priceUpper}
+                ticksAtLimit={ticksAtLimit}
+                onLeftRangeInput={onLeftRangeInput}
+                onRightRangeInput={onRightRangeInput}
+                interactive={true}
+              />
+              {/* Price Range Component (Manual) */}
+              <PriceRangeManual />
+            </AutoColumn>
+
+            {/* Deposit Amounts */}
+            {/* Transaction Info */}
+            {/* Buttons */}
+          </Column>
+        </StyledBoddyWrapper>
       )}
     </>
   );

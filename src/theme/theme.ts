@@ -3,8 +3,10 @@ export interface Colors {
     secondary: string;
     tertiary: string;
     background: string;
-    background2: string;
+    backgroundSecondary: string;
+    backgroundTertiary: string;
     text: string;
+    textActive: string;
     textInverted: string; 
 }
 export interface Gaps  {

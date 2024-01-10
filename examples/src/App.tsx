@@ -1,6 +1,5 @@
 import { useCallback, useRef } from "react";
 import { UniswapEasy } from "uniswapeasy";
-// import {UniswapEasy} from "../../src/index";
 import { useActiveProvider } from "./connectors";
 import { JSON_RPC_URL } from "./constants";
 import Web3Connectors from "./components/Web3Connectors";
@@ -12,15 +11,15 @@ const App = () => {
     <div
       style={{
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "space-evenly",
-        margin: "2rem 0",
         gap: "1rem",
       }}
     >
       <div
         style={{
-          alignSelf: "flex-start",
+          alignSelf: "center",
           borderRadius: "1em",
         }}
         ref={connectors}
@@ -38,39 +37,32 @@ const App = () => {
       >
         Connect Wallet
       </button>
-      <div
-        style={{
-          backgroundColor: "#f7f8fa",
-          borderRadius: "1rem",
-          height: "356px",
-          width: "360px",
+      <UniswapEasy
+        theme={
+          {
+            // primary: "#1a1a1a",
+            // secondary: "#1a1a1a",
+            // tertiary: "#1a1a1a",
+            // background: "#f7f8fa",
+            // text: "#1a1a1a",
+            // textInverted: "#f7f8fa",
+          }
+        }
+        defaultChainId={1}
+        jsonRpcUrlMap={{
+          111: JSON_RPC_URL,
         }}
-      >
-        <UniswapEasy
-          theme={{
-            primary: "#1a1a1a",
-            secondary: "#1a1a1a",
-            tertiary: "#1a1a1a",
-            background: "#f7f8fa",
-            text: "#1a1a1a",
-            textInverted: "#f7f8fa",
-          }}
-          defaultChainId={1}
-          jsonRpcUrlMap={{
-            111: JSON_RPC_URL,
-          }}
-          provider={provider}
-          poolKeys={[
-            {
-              currency0: "0x0000000000000000000000000000000000000001",
-              currency1: "0x0000000000000000000000000000000000000002",
-              fee: 3000,
-              tickSpacing: 60,
-              hooks: "0x0",
-            },
-          ]}
-        />
-      </div>
+        provider={provider}
+        poolKeys={[
+          {
+            currency0: "0x0000000000000000000000000000000000000001",
+            currency1: "0x0000000000000000000000000000000000000002",
+            fee: 3000,
+            tickSpacing: 60,
+            hooks: "0x0",
+          },
+        ]}
+      />
     </div>
   );
 };

@@ -24,6 +24,7 @@ function Connector({ web3Connector }: { web3Connector: Web3Connector }) {
         gridAutoFlow: "column",
         alignItems: "center",
         columnGap: "1rem",
+        background: isActive ? "#e6f4ea" : "#f4f4f4",
       }}
     >
       <label>{getConnectorName(connector)}</label>
