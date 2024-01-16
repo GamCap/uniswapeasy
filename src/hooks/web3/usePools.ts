@@ -3,8 +3,10 @@ import { useWeb3React } from '@web3-react/core'
 import JSBI from 'jsbi'
 import { useMemo } from 'react'
 import { PoolKeyStruct } from '../../abis/types/PoolManager'
-import type { BigNumberish } from 'ethers'
+import { BigNumber, type BigNumberish } from 'ethers'
 import { Pool } from '../../entities/pool'
+import { useSingleContractMultipleData } from "../../hooks/web3/multicall"
+import { useTestnetContract } from "../../hooks/web3/useContract"
 
 // Classes are expensive to instantiate, so this caches the recently instantiated pools.
 // This avoids re-instantiating pools as the other pools in the same request are loaded.
@@ -87,23 +89,34 @@ export function usePools(
     })
   }, [chainId, poolKeys])
 
-  const poolKeyList: (PoolKeyStruct | undefined)[] = useMemo(() => {
-    return poolTokens.map((value) => value && { currency0: value[0].address, currency1: value[1].address, fee: value[2], tickSpacing: value[3], hooks: value[4] })
-  }, [chainId, poolTokens])
+
 
   //TODO
   // look into pool state interface and find v4 equivalent
-  // getSlot0 , getLiquidity, multiCall
-  // const slot0s = useMultipleContractSingleData(poolKeyList, POOL_STATE_INTERFACE, 'slot0')
+  // const slot0s = useSingleContractMultiData(poolKeyList, POOL_STATE_INTERFACE, 'slot0')
   // const liquidities = useMultipleContractSingleData(poolKeyList, POOL_STATE_INTERFACE, 'liquidity')
-  
+
+  // map poolKeyList to fit the useSingleContractMultipleData callInputs
+  const poolKeyList: ((string | BigNumber)[] | undefined)[] =  useMemo(() => {
+    return poolTokens.map((value) => value && [
+      value[0].address,
+      value[1].address,
+      BigNumber.from(value[2]),
+      BigNumber.from(value[3]),
+      value[4]
+    ])
+  }, [chainId, poolTokens])
+
+  const poolManager = useTestnetContract()
+  const slot0s = useSingleContractMultipleData(poolManager, 'slot0', poolKeyList)
+  const liquidities = useSingleContractMultipleData(poolManager, 'liquidity', poolKeyList)
   //mock data
-  const slot0s = poolTokens.map((_value) => {
-    return { result: { sqrtPriceX96: JSBI.BigInt("34127063508144082157086714069057263"), tick: 259478, tickSpacing: 60 }, loading: false, valid: true }
-  })
-  const liquidities = poolTokens.map((_value) => {
-    return { result: [JSBI.BigInt("904643433375596462")], loading: false, valid: true }
-  })
+  // const slot0s = poolTokens.map((_value) => {
+  //   return { result: { sqrtPriceX96: JSBI.BigInt("34127063508144082157086714069057263"), tick: 259478, tickSpacing: 60 }, loading: false, valid: true }
+  // })
+  // const liquidities = poolTokens.map((_value) => {
+  //   return { result: [JSBI.BigInt("904643433375596462")], loading: false, valid: true }
+  // })
 
   return useMemo(() => {
     return poolKeys.map((_key, index) => {
@@ -120,10 +133,12 @@ export function usePools(
       if (!tokens || !slot0Valid || !liquidityValid) return [PoolState.INVALID, null]
       if (slot0Loading || liquidityLoading) return [PoolState.LOADING, null]
       if (!slot0 || !liquidity) return [PoolState.NOT_EXISTS, null]
-      // if (!slot0.sqrtPriceX96 || JSBI.EQ(slot0.sqrtPriceX96,0)) return [PoolState.NOT_EXISTS, null]
+      if (!slot0.sqrtPriceX96 || JSBI.EQ(slot0.sqrtPriceX96,0)) return [PoolState.NOT_EXISTS, null]
 
       try {
-        const pool = PoolCache.getPool(token0, token1, fee, slot0.sqrtPriceX96, liquidity[0],slot0.tickSpacing, slot0.tick)
+        //TODO
+        //slot0 doesn't return tickSpacing, look into this
+        const pool = PoolCache.getPool(token0, token1, fee, slot0.sqrtPriceX96, liquidity[0],_key[3] ?? 60, slot0.tick)
         return [PoolState.EXISTS, pool]
       } catch (error) {
         console.error('Error when constructing the pool', error)
