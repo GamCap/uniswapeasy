@@ -2,6 +2,9 @@ import { Contract } from '@ethersproject/contracts'
 import { useWeb3React } from '@web3-react/core'
 import { useMemo } from 'react'
 import { getContract } from '../../utils/getContract'
+import  PoolManagerJson  from "../../abis/PoolManager.json";
+
+const {abi : PoolManagerABI} = PoolManagerJson
 
 export function useContract<T extends Contract = Contract>(
     addressOrAddressMap: string | { [chainId: number]: string } | undefined,
@@ -23,4 +26,9 @@ export function useContract<T extends Contract = Contract>(
         return null
       }
     }, [addressOrAddressMap, ABI, provider, chainId, withSignerIfPossible, account]) as T
+  }
+
+
+  export function useTestnetContract(){
+    return useContract("0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",PoolManagerABI, false);
   }

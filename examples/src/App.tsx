@@ -27,7 +27,7 @@ const App = () => {
       >
         <Web3Connectors />
       </div>
-      <button
+      {/* <button
         style={{
           padding: "1rem",
           borderRadius: "1em",
@@ -36,7 +36,7 @@ const App = () => {
         onClick={focusConnectors}
       >
         Connect Wallet
-      </button>
+      </button> */}
       <UniswapEasy
         theme={
           {
