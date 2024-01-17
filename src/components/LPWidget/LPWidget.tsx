@@ -216,7 +216,7 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
             {/* Chart Range Input */}
             <AutoColumn gap="md" justify="start" grow>
               <ThemedText.SubHeader>Select Range</ThemedText.SubHeader>
-              <LiquidityChartRangeInput
+              {/* <LiquidityChartRangeInput
                 currencyA={currencies.CURRENCY_0}
                 currencyB={currencies.CURRENCY_1}
                 feeAmount={
@@ -230,12 +230,11 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
                     : undefined
                 }
                 price={
-                  // price
-                  //   ? parseFloat(
-                  //       (invertPrice ? price.invert() : price).toSignificant(6)
-                  //     )
-                  //   : undefined
-                  159085938358.4664
+                  price
+                    ? parseFloat(
+                        (invertPrice ? price.invert() : price).toSignificant(6)
+                      )
+                    : undefined
                 }
                 priceLower={priceLower}
                 priceUpper={priceUpper}
@@ -243,7 +242,7 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
                 onLeftRangeInput={onLeftRangeInput}
                 onRightRangeInput={onRightRangeInput}
                 interactive={true}
-              />
+              /> */}
               {/* Price Range Component (Manual) */}
               <PriceRangeManual />
             </AutoColumn>

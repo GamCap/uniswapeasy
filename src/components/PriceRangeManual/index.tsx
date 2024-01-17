@@ -1,4 +1,3 @@
-import { PoolKeyStruct } from "../../abis/types/PoolManager";
 import { StyledBoxSecondary } from "../../theme/components";
 import { RowBetween } from "../Row";
 
