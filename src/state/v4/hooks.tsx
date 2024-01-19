@@ -30,7 +30,7 @@ import { useAppDispatch, useAppSelector } from "../hooks";
 import tryParseCurrencyAmount from "../../utils/tryParseCurrencyAmount";
 import { tickToPrice } from "../../utils/priceTickConversions";
 import { Position } from "../../entities/position";
-import { PoolKeyStruct } from "../../abis/types/PoolManager";
+import { useCurrencyBalances } from "hooks/web3/useCurrencyBalances";
 
 export function useV4MintState(): AppState["mintV4"] {
   return useAppSelector((state) => state.mintV4);
@@ -99,8 +99,17 @@ export function useV4PoolActionHandlers(noLiquidity: boolean | undefined): {
     onStartPriceInput,
   };
 }
+
+export type PoolKey = {
+  currency0: Currency;
+  currency1: Currency;
+  fee: BigNumberish;
+  tickSpacing: BigNumberish;
+  hooks: string;
+};
+
 export function useV4PoolInfo(
-  poolKey?: PoolKeyStruct
+  poolKey?: PoolKey
   //existingPosition?: Position,
 ): {
   pool?: Pool | null;
@@ -174,41 +183,13 @@ export function useV4PoolInfo(
   //v3 uses peripery and multicall to get balances
   //which is not implemented yet, so we need some clarification on how to get balances
   //for now we just return 0
-  // const balances = useCurrencyBalances(
-  //   account ?? undefined,
-  //   useMemo(
-  //     () => [currencies[Field.CURRENCY_0], currencies[Field.CURRENCY_1]],
-  //     [currencies]
-  //   )
-  // );
-  const balances: CurrencyAmount<Currency>[] = [
-    CurrencyAmount.fromRawAmount(
-      token0
-        ? token0
-        : new Token(
-            1,
-            "0x0000000000000000000000000000000000000001",
-            18,
-            undefined,
-            undefined,
-            true
-          ),
-      JSBI.BigInt(0)
-    ),
-    CurrencyAmount.fromRawAmount(
-      token1
-        ? token1
-        : new Token(
-            1,
-            "0x0000000000000000000000000000000000000002",
-            18,
-            undefined,
-            undefined,
-            true
-          ),
-      JSBI.BigInt(0)
-    ),
-  ];
+  const balances = useCurrencyBalances(
+    account ?? undefined,
+    useMemo(
+      () => [currencies[Field.CURRENCY_0], currencies[Field.CURRENCY_1]],
+      [currencies]
+    )
+  );
 
   const currencyBalances: { [field in Field]?: CurrencyAmount<Currency> } = {
     [Field.CURRENCY_0]: balances[0],
@@ -670,8 +651,9 @@ export function useV4PoolInfo(
     ticksAtLimit,
   };
 }
-
-function parsePoolKey(poolKey?: PoolKeyStruct): {
+//TODO
+//look into baseCurrency and how it's determined
+function parsePoolKey(poolKey?: PoolKey): {
   currency0?: Currency;
   currency1?: Currency;
   baseCurrency?: Currency;
@@ -684,9 +666,9 @@ function parsePoolKey(poolKey?: PoolKeyStruct): {
     return {};
   }
   return {
-    currency0: new Token(chainId!, poolKey.currency0, 18),
-    currency1: new Token(chainId!, poolKey.currency1, 18),
-    baseCurrency: new Token(chainId!, poolKey.currency0, 18),
+    currency0: poolKey.currency0,
+    currency1: poolKey.currency1,
+    baseCurrency: poolKey.currency0,
     fee: poolKey.fee,
     tickSpacing: poolKey.tickSpacing,
     hooks: poolKey.hooks,

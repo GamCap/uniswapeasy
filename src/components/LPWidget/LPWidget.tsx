@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import {
+  PoolKey,
   useRangeHopCallbacks,
   useV4MintState,
   useV4PoolActionHandlers,
   useV4PoolInfo,
 } from "../../state/v4/hooks";
-import { PoolKeyStruct } from "../../abis/types/PoolManager";
 import { useWeb3React } from "@web3-react/core";
-import { BigNumber, BigNumberish } from "ethers";
+import { BigNumber } from "ethers";
 import usePoolManager from "../../hooks/web3/usePoolManager";
 import { Bound } from "../../state/v4/actions";
 import LiquidityChartRangeInput from "../LiquidityChartRangeInput";
@@ -47,16 +47,14 @@ const MediumOnly = styled.div`
 `;
 
 export type LPWidgetProps = {
-  poolKeys: PoolKeyStruct[];
+  poolKeys: PoolKey[];
 };
 
 export default function LPWidget({ poolKeys }: LPWidgetProps) {
   const { account, chainId, provider } = useWeb3React();
   //TODO: add a check for existing position
 
-  const [poolKey, setPoolKey] = useState<PoolKeyStruct | undefined>(
-    poolKeys[0]
-  );
+  const [poolKey, setPoolKey] = useState<PoolKey | undefined>(poolKeys[0]);
 
   const { independentField, typedValue, startPriceTypedValue } =
     useV4MintState();

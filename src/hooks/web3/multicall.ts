@@ -2,9 +2,6 @@ import { useWeb3React } from '@web3-react/core'
 import useBlockNumber from './useBlockNumber'
 import multicall from '../../state/multicall'
 
-export type { CallStateResult } from '@uniswap/redux-multicall' // re-export for convenience
-export { NEVER_RELOAD } from '@uniswap/redux-multicall' // re-export for convenience
-
 // Create wrappers for hooks so consumers don't need to get latest block themselves
 type TupleSplit<T, N extends number, O extends readonly any[] = readonly []> = O['length'] extends N
   ? [O, T]
@@ -21,6 +18,13 @@ export function useSingleContractMultipleData(
 ) {
   const { chainId, latestBlock } = useCallContext()
   return multicall.hooks.useSingleContractMultipleData(chainId, latestBlock, ...args)
+}
+
+export function useMultipleContractSingleData(
+  ...args: SkipFirstTwoParams<typeof multicall.hooks.useMultipleContractSingleData>
+) {
+  const { chainId, latestBlock } = useCallContext()
+  return multicall.hooks.useMultipleContractSingleData(chainId, latestBlock, ...args)
 }
 
 function useCallContext() {
