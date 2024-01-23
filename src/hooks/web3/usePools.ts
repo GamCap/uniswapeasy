@@ -1,12 +1,14 @@
 import type { BigintIsh, Currency, Token } from '@uniswap/sdk-core'
 import { useWeb3React } from '@web3-react/core'
 import JSBI from 'jsbi'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { PoolKeyStruct } from '../../abis/types/PoolManager'
 import { BigNumber, type BigNumberish } from 'ethers'
 import { Pool } from '../../entities/pool'
 import { useSingleContractMultipleData } from "../../hooks/web3/multicall"
 import { useTestnetContract } from "../../hooks/web3/useContract"
+import { keccak256, defaultAbiCoder, Result } from 'ethers/lib/utils'
+import usePoolManager from './usePoolManager'
 
 // Classes are expensive to instantiate, so this caches the recently instantiated pools.
 // This avoids re-instantiating pools as the other pools in the same request are loaded.
@@ -68,86 +70,6 @@ export enum PoolState {
   INVALID,
 }
 
-export function usePools(
-  poolKeys: [Currency | undefined, Currency | undefined, BigNumberish | undefined, BigNumberish | undefined, string | undefined
-][]
-): [PoolState, Pool | null][] {
-  const { chainId } = useWeb3React()
-
-  const poolTokens: ([Token, Token, BigNumberish, BigNumberish, string] | undefined)[] = useMemo(() => {
-    if (!chainId) return new Array(poolKeys.length)
-
-    return poolKeys.map(([currencyA, currencyB, feeAmount]) => {
-      if (currencyA && currencyB && feeAmount) {
-        const tokenA = currencyA.wrapped
-        const tokenB = currencyB.wrapped
-        if (tokenA.equals(tokenB)) return undefined
-
-        return tokenA.sortsBefore(tokenB) ? [tokenA, tokenB, feeAmount] : [tokenB, tokenA, feeAmount]
-      }
-      return undefined
-    })
-  }, [chainId, poolKeys])
-
-
-
-  //TODO
-  // look into pool state interface and find v4 equivalent
-  // const slot0s = useSingleContractMultiData(poolKeyList, POOL_STATE_INTERFACE, 'slot0')
-  // const liquidities = useMultipleContractSingleData(poolKeyList, POOL_STATE_INTERFACE, 'liquidity')
-
-  // map poolKeyList to fit the useSingleContractMultipleData callInputs
-  const poolKeyList: ((string | BigNumber)[] | undefined)[] =  useMemo(() => {
-    return poolTokens.map((value) => value && [
-      value[0].address,
-      value[1].address,
-      BigNumber.from(value[2]),
-      BigNumber.from(value[3]),
-      value[4]
-    ])
-  }, [chainId, poolTokens])
-
-  const poolManager = useTestnetContract()
-  const slot0s = useSingleContractMultipleData(poolManager, 'slot0', poolKeyList)
-  const liquidities = useSingleContractMultipleData(poolManager, 'liquidity', poolKeyList)
-  //mock data
-  // const slot0s = poolTokens.map((_value) => {
-  //   return { result: { sqrtPriceX96: JSBI.BigInt("34127063508144082157086714069057263"), tick: 259478, tickSpacing: 60 }, loading: false, valid: true }
-  // })
-  // const liquidities = poolTokens.map((_value) => {
-  //   return { result: [JSBI.BigInt("904643433375596462")], loading: false, valid: true }
-  // })
-
-  return useMemo(() => {
-    return poolKeys.map((_key, index) => {
-      const tokens = poolTokens[index]
-      if (!tokens) return [PoolState.INVALID, null]
-      const [token0, token1, fee] = tokens
-
-      if (!slot0s[index]) return [PoolState.INVALID, null]
-      const { result: slot0, loading: slot0Loading, valid: slot0Valid } = slot0s[index]
-
-      if (!liquidities[index]) return [PoolState.INVALID, null]
-      const { result: liquidity, loading: liquidityLoading, valid: liquidityValid } = liquidities[index]
-
-      if (!tokens || !slot0Valid || !liquidityValid) return [PoolState.INVALID, null]
-      if (slot0Loading || liquidityLoading) return [PoolState.LOADING, null]
-      if (!slot0 || !liquidity) return [PoolState.NOT_EXISTS, null]
-      if (!slot0.sqrtPriceX96 || JSBI.EQ(slot0.sqrtPriceX96,0)) return [PoolState.NOT_EXISTS, null]
-
-      try {
-        //TODO
-        //slot0 doesn't return tickSpacing, look into this
-        const pool = PoolCache.getPool(token0, token1, fee, slot0.sqrtPriceX96, liquidity[0],_key[3] ?? 60, slot0.tick)
-        return [PoolState.EXISTS, pool]
-      } catch (error) {
-        console.error('Error when constructing the pool', error)
-        return [PoolState.NOT_EXISTS, null]
-      }
-    })
-  }, [liquidities, poolKeys, slot0s, poolTokens])
-}
-
 export function usePool(
     currencyA: Currency | undefined,
     currencyB: Currency | undefined,
@@ -155,19 +77,111 @@ export function usePool(
     tickSpacing: BigNumberish | undefined,
     hooks: string | undefined
 ): [PoolState, Pool | null] {
-    const poolKeys: [Currency | undefined, Currency | undefined, BigNumberish | undefined, BigNumberish | undefined, string | undefined
-    ][] = useMemo(
-        () => [
-            
-                [currencyA,
-                currencyB,
-                feeAmount,
-                tickSpacing,
-                hooks]
-            
-        ],
-        [currencyA, currencyB, feeAmount, tickSpacing, hooks]
-    )
 
-    return usePools(poolKeys)[0]
+    const { chainId, provider } = useWeb3React()
+
+    const [slot0, setSlot0] = useState<undefined | {result : Result | undefined, loading: boolean, valid: boolean}>(undefined);
+    
+    const [liquidity, setLiquidity] = useState<undefined | {result : Result | undefined, loading: boolean, valid: boolean}>(undefined);
+
+    const poolToken: ([Token, Token, BigNumberish, BigNumberish, string] | undefined) = useMemo(() => {
+      if (!chainId) return undefined
+      if (currencyA && currencyB && feeAmount && tickSpacing && hooks) {
+          const tokenA = currencyA.wrapped
+          const tokenB = currencyB.wrapped
+          if (tokenA.equals(tokenB)) return undefined
+  
+          return tokenA.sortsBefore(tokenB) ? [tokenA, tokenB, feeAmount, tickSpacing, hooks] : [tokenB, tokenA, feeAmount, tickSpacing, hooks]
+      }
+      return undefined
+    }, [chainId, currencyA, currencyB, feeAmount, tickSpacing, hooks])
+  
+    const poolKey: (PoolKeyStruct | undefined) =  useMemo(() => {
+      return poolToken && {
+        currency0: poolToken[0].address,
+          currency1: poolToken[1].address,
+          fee: poolToken[2],
+          tickSpacing: poolToken[3],
+          hooks: poolToken[4]
+      }
+    }, [chainId, poolToken])
+
+    const id = useMemo (() => {
+      return toId(poolKey)
+    }, [poolKey, chainId])
+  
+    const poolManagerContract = useTestnetContract()
+  
+    useEffect(() => {
+      if (!poolManagerContract || !id) {
+        setSlot0(undefined);
+        setLiquidity(undefined);
+        return;
+      }
+      console.log("poolManagerContract", poolManagerContract)
+      console.log("id", id)
+      
+      const slot0Data = poolManagerContract.interface.encodeFunctionData('getSlot0', [id]);
+      const liquidityData = poolManagerContract.interface.encodeFunctionData('getLiquidity(bytes32)', [id]);
+      setSlot0({result: undefined, loading: true, valid: true});
+      setLiquidity({result: undefined, loading: true, valid: true});
+      
+      const s0 = slot0Data ? provider?.call({to: poolManagerContract?.address, data: slot0Data}) : undefined;
+      const lts = liquidityData ? provider?.call({to: poolManagerContract?.address, data: liquidityData}) : undefined;
+
+      Promise.all([s0, lts]).then(([resolvedSlot0, resolvedLiquidity]) => {
+        const resolvedSlot0Decoded = resolvedSlot0 ? poolManagerContract?.interface.decodeFunctionResult('getSlot0', resolvedSlot0)  : undefined;
+        const resolvedLiquidityDecoded = resolvedLiquidity ? poolManagerContract?.interface.decodeFunctionResult('getLiquidity(bytes32)', resolvedLiquidity)  : undefined;
+        console.log("resolvedSlot0", resolvedSlot0)
+        console.log("resolvedLiquidity", resolvedLiquidity)
+        console.log("resolvedSlot0Decoded", resolvedSlot0Decoded);
+        console.log("resolvedLiquidityDecoded", resolvedLiquidityDecoded);
+        setSlot0( {result: resolvedSlot0Decoded, loading: false, valid: true});
+        setLiquidity({result: resolvedLiquidityDecoded, loading: false, valid: true});
+      }).catch((error) => {
+        console.error('Error when constructing the pool', error)
+        setSlot0({result: undefined, loading: false, valid: false});
+        setLiquidity({result: undefined, loading: false, valid: false});
+      }
+      );
+  
+    }, [poolKey, poolManagerContract]);
+  
+
+    return useMemo(() => {
+        if (!poolToken) return [PoolState.INVALID, null]
+        const [token0, token1, fee] = poolToken
+  
+        if (!slot0) return [PoolState.INVALID, null]
+        const { result: slot0d, loading: slot0Loading, valid: slot0Valid } = slot0
+  
+        if (!liquidity) return [PoolState.INVALID, null]
+        const { result: liquidityd, loading: liquidityLoading, valid: liquidityValid } = liquidity
+  
+          if (!poolToken || !slot0Valid || !liquidityValid) return [PoolState.INVALID, null]
+          if (slot0Loading || liquidityLoading) return [PoolState.LOADING, null]
+          if (!slot0d || !liquidityd) return [PoolState.NOT_EXISTS, null]
+          if (!slot0d.sqrtPriceX96 || JSBI.EQ(slot0d.sqrtPriceX96,0)) return [PoolState.NOT_EXISTS, null]
+    
+          try {
+            //TODO
+            //slot0 doesn't return tickSpacing, look into this
+            const pool = PoolCache.getPool(token0, token1, fee, JSBI.BigInt(slot0d.sqrtPriceX96), JSBI.BigInt(liquidityd), poolKey?.tickSpacing ?? 60, slot0d.tick)
+            return [PoolState.EXISTS, pool]
+          } catch (error) {
+            console.error('Error when constructing the pool', error)
+            return [PoolState.NOT_EXISTS, null]
+          
+        }
+    }, [liquidity, poolKey, slot0, poolToken])
+}
+
+function toId(poolKey?: PoolKeyStruct): string | undefined {
+
+  if (!poolKey) return undefined;
+
+  const params = defaultAbiCoder.encode(["address", "address", "uint24", "uint24", "address"], [poolKey.currency0, poolKey.currency1, poolKey.fee, poolKey.tickSpacing, poolKey.hooks]);
+  const hash = keccak256(params);
+
+  return hash;
 }

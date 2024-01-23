@@ -99,4 +99,12 @@ export const JSON_RPC_FALLBACK_ENDPOINTS: Record<SupportedChainId, string[]> = {
     // "Safe" URLs
     'https://l2-uniswap-v4-hook-sandbox-6tl5qq8i4d.t.conduit.xyz/',
   ],
+
+  [SupportedChainId.ETHEREUM_SEPOLIA]: [
+    // "Safe" URLs
+    'https://sepolia.drpc.org',
+     'https://rpc2.sepolia.org',
+     'https://eth-sepolia.g.alchemy.com/v2/demo',
+     'https://ethereum-sepolia.blockpi.network/v1/rpc/public'
+  ],
 }

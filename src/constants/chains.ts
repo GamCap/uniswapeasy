@@ -25,6 +25,7 @@ export enum SupportedChainId {
     BASE = 8453,
 
     CONDUIT_TESTNET = 111,
+    ETHEREUM_SEPOLIA = 11155111
   }
   
   export enum ChainName {
@@ -44,6 +45,7 @@ export enum SupportedChainId {
     BNB = 'bnb',
     BASE = 'base',
     CONDUIT_TESTNET = 'conduit-testnet',
+    ETHEREUM_SEPOLIA = 'ethereum-sepolia'
   }
   
   export const CHAIN_NAMES_TO_IDS: { [chainName: string]: SupportedChainId } = {
@@ -63,6 +65,7 @@ export enum SupportedChainId {
     [ChainName.BNB]: SupportedChainId.BNB,
     [ChainName.BASE]: SupportedChainId.BASE,
     [ChainName.CONDUIT_TESTNET]: SupportedChainId.CONDUIT_TESTNET,
+    [ChainName.ETHEREUM_SEPOLIA]: SupportedChainId.ETHEREUM_SEPOLIA
   }
   
   /**
@@ -110,6 +113,7 @@ export enum SupportedChainId {
     SupportedChainId.OPTIMISM_GOERLI,
     SupportedChainId.BASE,
     SupportedChainId.CONDUIT_TESTNET,
+    SupportedChainId.ETHEREUM_SEPOLIA
     
   ] as const
   

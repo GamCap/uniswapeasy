@@ -4,7 +4,6 @@ import { useWeb3React } from '@web3-react/core'
 import ERC20ABI from 'abis/erc20.json'
 import { Erc20Interface } from 'abis/types/Erc20'
 import JSBI from 'jsbi'
-import { useMultipleContractSingleData } from './multicall'
 import { useMemo } from 'react'
 
 import { isAddress } from 'utils/addresses'
@@ -61,14 +60,22 @@ export function useTokenBalancesWithLoadingIndicator(
   )
   const validatedTokenAddresses = useMemo(() => validatedTokens.map((vt) => vt.address), [validatedTokens])
 
-  const balances = useMultipleContractSingleData(
-    validatedTokenAddresses,
-    ERC20Interface,
-    'balanceOf',
-    useMemo(() => [address], [address]),
-    tokenBalancesGasRequirement
+  // const balances = useMultipleContractSingleData(
+  //   validatedTokenAddresses,
+  //   ERC20Interface,
+  //   'balanceOf',
+  //   useMemo(() => [address], [address]),
+  //   tokenBalancesGasRequirement
+  // )
+  // mock data
+  const balances = validatedTokenAddresses.map((address) => {
+    return {
+      result: [JSBI.BigInt(0)],
+      loading: false,
+      error: undefined,
+    }
+  }
   )
-
   const anyLoading: boolean = useMemo(() => balances.some((callState) => callState.loading), [balances])
 
   return useMemo(

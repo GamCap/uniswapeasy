@@ -65,6 +65,9 @@ function toJsonRpcMap<T>(
     [SupportedChainId.CONDUIT_TESTNET]: getChainConnections(
       SupportedChainId.CONDUIT_TESTNET
     ),
+    [SupportedChainId.ETHEREUM_SEPOLIA]: getChainConnections(
+      SupportedChainId.ETHEREUM_SEPOLIA
+    ),
   };
 }
 

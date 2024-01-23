@@ -30,5 +30,5 @@ export function useContract<T extends Contract = Contract>(
 
 
   export function useTestnetContract(){
-    return useContract("0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",PoolManagerABI, false);
+    return useContract("0x64255ed21366DB43d89736EE48928b890A84E2Cb",PoolManagerABI, false);
   }

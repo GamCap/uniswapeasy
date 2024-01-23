@@ -4,7 +4,7 @@ import PoolManagerABI from "../../abis/PoolManager.json";
 import useConnectors from "./useConnectors";
 import { PoolManager } from "../../abis/types/PoolManager";
 
-const POOL_MANAGER_ADDRESS = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
+const POOL_MANAGER_ADDRESS = "0x64255ed21366DB43d89736EE48928b890A84E2Cb";
 
 function usePoolManager() {
   const connectors = useConnectors();
@@ -16,8 +16,8 @@ function usePoolManager() {
         POOL_MANAGER_ADDRESS,
         PoolManagerABI.abi,
         connectors.user.provider as any
-      );
-      setPoolManager(poolManagerContract as any as PoolManager);
+      ) as PoolManager;
+      setPoolManager(poolManagerContract);
     }
   }, [connectors]);
 
