@@ -3,8 +3,9 @@ import { Currency, CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { useWeb3React } from '@web3-react/core'
 import ERC20ABI from 'abis/erc20.json'
 import { Erc20Interface } from 'abis/types/Erc20'
+import { Result } from 'ethers/lib/utils'
 import JSBI from 'jsbi'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { isAddress } from 'utils/addresses'
 
@@ -44,7 +45,6 @@ import { isAddress } from 'utils/addresses'
 // }
 
 const ERC20Interface = new Interface(ERC20ABI) as Erc20Interface
-const tokenBalancesGasRequirement = { gasRequired: 185_000 }
 
 /**
  * Returns a map of token addresses to their eventually consistent token balances for a single account.
@@ -59,23 +59,14 @@ export function useTokenBalancesWithLoadingIndicator(
     [chainId, tokens]
   )
   const validatedTokenAddresses = useMemo(() => validatedTokens.map((vt) => vt.address), [validatedTokens])
+  useEffect(() => {
+    console.log("address",address);
+    console.log("tokens",tokens);
+    console.log("validatedTokens",validatedTokens);
+    console.log("validatedTokenAddresses", validatedTokenAddresses)
 
-  // const balances = useMultipleContractSingleData(
-  //   validatedTokenAddresses,
-  //   ERC20Interface,
-  //   'balanceOf',
-  //   useMemo(() => [address], [address]),
-  //   tokenBalancesGasRequirement
-  // )
-  // mock data
-  const balances = validatedTokenAddresses.map((address) => {
-    return {
-      result: [JSBI.BigInt(0)],
-      loading: false,
-      error: undefined,
-    }
-  }
-  )
+  } , [address, tokens, validatedTokens, validatedTokenAddresses])
+  const balances = getCurrencyBalances(validatedTokenAddresses, address)
   const anyLoading: boolean = useMemo(() => balances.some((callState) => callState.loading), [balances])
 
   return useMemo(
@@ -151,4 +142,57 @@ export default function useCurrencyBalance(
     account,
     useMemo(() => [currency], [currency])
   )[0]
+}
+
+function getCurrencyBalances(
+  validatedTokenAddresses: string[],
+  address?: string
+) {
+
+  const {provider} = useWeb3React()
+  const [results, setResults] = useState<Result[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<Error | undefined>(undefined)
+
+  //TODO
+  //cancel promises on unmount
+  useEffect(() => {
+    if (!provider || !address) return
+    setLoading(true)
+    setError(undefined)
+
+    const calls = validatedTokenAddresses.map((tokenAddress) => {
+      return  provider?.call({
+        to: tokenAddress,
+        data: ERC20Interface.encodeFunctionData('balanceOf', [address]),
+      })
+    })
+
+    Promise.all(calls).then((results) => {
+      const balances = results.map((result) => {
+        return  ERC20Interface.decodeFunctionResult('balanceOf', result)  
+      })
+      console.log("balances", balances)
+      setResults(balances)
+      setLoading(false)
+      setError(undefined)
+    }).catch((error) => {
+      console.error('Error when getting balances', error)
+      setLoading(false)
+      setError(error)
+    })
+
+  }, [validatedTokenAddresses, address,  provider])
+
+  return useMemo(
+    () => results.map((result) => {
+      return {
+        result: result,
+        loading: loading,
+        error: error
+      }
+    }
+  ), [results, loading, error]
+  )
+
 }
