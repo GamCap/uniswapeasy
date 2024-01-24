@@ -180,9 +180,6 @@ export default function LiquidityChartRangeInput({
   const isUninitialized =
     !currencyA || !currencyB || (formattedData === undefined && !isLoading);
 
-  useEffect(() => {
-    console.log("formattedData", formattedData);
-  }, [formattedData]);
   return (
     <>
       {isUninitialized ? (

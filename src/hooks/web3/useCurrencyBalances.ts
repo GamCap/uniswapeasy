@@ -59,13 +59,6 @@ export function useTokenBalancesWithLoadingIndicator(
     [chainId, tokens]
   )
   const validatedTokenAddresses = useMemo(() => validatedTokens.map((vt) => vt.address), [validatedTokens])
-  useEffect(() => {
-    console.log("address",address);
-    console.log("tokens",tokens);
-    console.log("validatedTokens",validatedTokens);
-    console.log("validatedTokenAddresses", validatedTokenAddresses)
-
-  } , [address, tokens, validatedTokens, validatedTokenAddresses])
   const balances = getCurrencyBalances(validatedTokenAddresses, address)
   const anyLoading: boolean = useMemo(() => balances.some((callState) => callState.loading), [balances])
 
@@ -172,7 +165,6 @@ function getCurrencyBalances(
       const balances = results.map((result) => {
         return  ERC20Interface.decodeFunctionResult('balanceOf', result)  
       })
-      console.log("balances", balances)
       setResults(balances)
       setLoading(false)
       setError(undefined)

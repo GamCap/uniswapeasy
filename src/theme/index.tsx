@@ -17,11 +17,13 @@ export const lightTheme: Colors = {
   secondary: "#2ecc71", // a light green for secondary elements
   tertiary: "#f1c40f", // a muted yellow for tertiary accents
   background: "#12131A", // a dark blue for backgrounds
-  backgroundSecondary: "#273345", // a slightly lighter blue for backgrounds
+  backgroundSecondary: "#191D26", // a slightly lighter blue for backgrounds
   backgroundTertiary: "#323232", // a very light gray for backgrounds
   text: "#34495e", // a darker gray for regular text, ensuring good readability
   textActive: "#44FF9A", // a light green for active text
   textInverted: "#ffffff", // pure white for text on dark backgrounds
+  textTertiary: "#9CA3AF", // a light gray for text on dark backgrounds
+  border: "#273345",
 };
 
 export const darkTheme: Colors = {
@@ -34,6 +36,8 @@ export const darkTheme: Colors = {
   text: "",
   textActive: "",
   textInverted: "",
+  textTertiary: "",
+  border: "",
 };
 
 const defaultBorderRadius: BorderRadius = {

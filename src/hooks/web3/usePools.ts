@@ -3,12 +3,10 @@ import { useWeb3React } from '@web3-react/core'
 import JSBI from 'jsbi'
 import { useEffect, useMemo, useState } from 'react'
 import { PoolKeyStruct } from '../../abis/types/PoolManager'
-import { BigNumber, type BigNumberish } from 'ethers'
+import { type BigNumberish } from 'ethers'
 import { Pool } from '../../entities/pool'
-import { useSingleContractMultipleData } from "../../hooks/web3/multicall"
 import { useTestnetContract } from "../../hooks/web3/useContract"
 import { keccak256, defaultAbiCoder, Result } from 'ethers/lib/utils'
-import usePoolManager from './usePoolManager'
 
 // Classes are expensive to instantiate, so this caches the recently instantiated pools.
 // This avoids re-instantiating pools as the other pools in the same request are loaded.
@@ -118,8 +116,6 @@ export function usePool(
         setLiquidity(undefined);
         return;
       }
-      console.log("poolManagerContract", poolManagerContract)
-      console.log("id", id)
       
       const slot0Data = poolManagerContract.interface.encodeFunctionData('getSlot0', [id]);
       const liquidityData = poolManagerContract.interface.encodeFunctionData('getLiquidity(bytes32)', [id]);
@@ -132,10 +128,6 @@ export function usePool(
       Promise.all([s0, lts]).then(([resolvedSlot0, resolvedLiquidity]) => {
         const resolvedSlot0Decoded = resolvedSlot0 ? poolManagerContract?.interface.decodeFunctionResult('getSlot0', resolvedSlot0)  : undefined;
         const resolvedLiquidityDecoded = resolvedLiquidity ? poolManagerContract?.interface.decodeFunctionResult('getLiquidity(bytes32)', resolvedLiquidity)  : undefined;
-        console.log("resolvedSlot0", resolvedSlot0)
-        console.log("resolvedLiquidity", resolvedLiquidity)
-        console.log("resolvedSlot0Decoded", resolvedSlot0Decoded);
-        console.log("resolvedLiquidityDecoded", resolvedLiquidityDecoded);
         setSlot0( {result: resolvedSlot0Decoded, loading: false, valid: true});
         setLiquidity({result: resolvedLiquidityDecoded, loading: false, valid: true});
       }).catch((error) => {

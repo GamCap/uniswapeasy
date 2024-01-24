@@ -19,23 +19,35 @@ export const ThemedText = {
   SubHeader(props: TextProps) {
     return (
       <TextWrapper
-        fontWeight={700}
-        fontSize={12}
+        fontWeight={500}
+        fontSize={16}
         color={"primary"}
         {...props}
       />
     );
   },
+  SmallText(props: TextProps) {
+    return <TextWrapper fontSize={12} fontWeight={500} color="textTertiary" />;
+  },
 };
 
-export const StyledBoxSecondary = styled.div<{
+export const Box = styled.div<{
   $padding?: string;
+  $radius?: string;
+  $border?: string;
 }>`
-  padding: ${({ $padding }) => $padding ?? "12px 16px 12px 16px"};
+  padding: ${({ $padding }) => $padding ?? "0px"};
+  border: ${({ $border }) => $border ?? "none"};
   width: 100%;
   height: fit-content;
   box-sizing: border-box;
+  border-radius: ${({ $radius }) => $radius ?? "0px"};
+`;
+
+export const BoxPrimary = styled(Box)`
+  background: ${({ theme }) => theme.background};
+`;
+
+export const BoxSecondary = styled(Box)`
   background: ${({ theme }) => theme.backgroundSecondary};
-  border-radius: 15px;
-  justify-content: space-between;
 `;

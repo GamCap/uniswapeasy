@@ -3,14 +3,12 @@ import localForage from 'localforage'
 import { PersistConfig, persistReducer } from 'redux-persist'
 
 import mintV4 from './v4/reducer'
-import multicall from './multicall'
 
 const persistedReducers = {
 }
 
 const appReducer = combineReducers({
   mintV4,
-  multicall: multicall.reducer,
  
 })
 
@@ -29,7 +27,7 @@ const persistConfig: PersistConfig<AppState> = {
   // We need unserialized storage for inspectable db entries for debugging.
   // @ts-ignore
   deserialize: false,
-  debug: process.env.NODE_ENV === 'development',
+  debug: true,
 }
 
 const persistedReducer = persistReducer(persistConfig, appReducer)

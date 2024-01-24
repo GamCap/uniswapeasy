@@ -8,6 +8,8 @@ export interface Colors {
     text: string;
     textActive: string;
     textInverted: string; 
+    textTertiary: string;
+    border: string;
 }
 export interface Gaps  {
     xs: string;

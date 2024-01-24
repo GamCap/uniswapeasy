@@ -8,7 +8,7 @@ import { Brush } from "./Brush";
 import { Line } from "./Line";
 import { ChartEntry, LiquidityChartRangeInputProps } from "./types";
 import Zoom, { ZoomOverlay } from "./Zoom";
-import { StyledBoxSecondary } from "theme/components";
+import { BoxSecondary } from "theme/components";
 
 const xAccessor = (d: ChartEntry) => d.price0;
 const yAccessor = (d: ChartEntry) => d.activeLiquidity;
@@ -103,7 +103,7 @@ export function Chart({
         )}
         zoomLevels={zoomLevels}
       />
-      <StyledBoxSecondary>
+      <BoxSecondary>
         <svg
           width="100%"
           height="100%"
@@ -176,7 +176,7 @@ export function Chart({
             />
           </g>
         </svg>
-      </StyledBoxSecondary>
+      </BoxSecondary>
     </>
   );
 }
