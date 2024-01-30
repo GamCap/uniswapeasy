@@ -174,6 +174,7 @@ function toId(poolKey?: PoolKeyStruct): string | undefined {
 
   const params = defaultAbiCoder.encode(["address", "address", "uint24", "uint24", "address"], [poolKey.currency0, poolKey.currency1, poolKey.fee, poolKey.tickSpacing, poolKey.hooks]);
   const hash = keccak256(params);
+  console.log("hash", hash);
 
   return hash;
 }

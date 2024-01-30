@@ -58,20 +58,20 @@ const App = () => {
         poolKeys={[
           {
             currency0: new Token(
-              11155111,
-              "0x4a97B63b27576d774b6BD288Fa6aAe24F086B84c",
+              5,
+              "0x981d8acaf6af3a46785e7741d22fbe81b25ebf1e",
+              18,
+              "UNI"
+            ),
+            currency1: new Token(
+              5,
+              "0x9FD21bE27A2B059a288229361E2fA632D8D2d074",
               6,
               "USDC"
             ),
-            currency1: new Token(
-              11155111,
-              "0x697aC93c9263346c5Ad0412F9356D5789a3AA687",
-              8,
-              "WBTC"
-            ),
-            fee: 12582912,
+            fee: 5000,
             tickSpacing: 60,
-            hooks: "0x846b2F2fe5fad0131E84A110900a4561099452e4",
+            hooks: "0x0000000000000000000000000000000000000000",
           },
         ]}
       />

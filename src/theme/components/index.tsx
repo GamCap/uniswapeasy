@@ -27,7 +27,14 @@ export const ThemedText = {
     );
   },
   SmallText(props: TextProps) {
-    return <TextWrapper fontSize={12} fontWeight={500} color="textTertiary" />;
+    return (
+      <TextWrapper
+        fontSize={12}
+        fontWeight={500}
+        color="textTertiary"
+        {...props}
+      />
+    );
   },
 };
 

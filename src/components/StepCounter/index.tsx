@@ -4,7 +4,7 @@ import { type BigNumberish } from "ethers";
 import { BoxSecondary } from "../../theme/components";
 import { AutoColumn } from "../Column";
 import { Input as NumericalInput } from "../NumericalInput";
-import React from "react";
+
 const InputRow = styled.div`
   display: flex;
   flex-direction: row;
@@ -108,10 +108,15 @@ const StepCounter = ({
   }, [localValue, useLocalValue, value]);
 
   return (
-    <BoxSecondary $padding="12px" onFocus={handleOnFocus} onBlur={handleOnBlur}>
+    <BoxSecondary
+      $radius="8px"
+      $padding="12px"
+      onFocus={handleOnFocus}
+      onBlur={handleOnBlur}
+    >
       <InputRow>
         <InputColumn justify="flex-start">
-          <InputTitle textAlign="center">{title}</InputTitle>
+          <InputTitle textAlign="left">{title}</InputTitle>
           <StyledInput
             className="rate-input-0"
             value={localValue}
@@ -146,10 +151,10 @@ const StepCounter = ({
               onClick={handleDecrement}
               disabled={decrementDisabled}
             >
-              {/* minus icon with size 12px */}
-              <svg width="12" height="2" viewBox="0 0 12 2">
+              {/* minus icon with size 12x12px */}
+              <svg width="12" height="12" viewBox="0 0 12 12">
                 <path
-                  d="M0 1C0 0.724 0.224 0.5 0.5 0.5H11.5C11.776 0.5 12 0.724 12 1C12 1.276 11.776 1.5 11.5 1.5H0.5C0.224 1.5 0 1.276 0 1Z"
+                  d="M11.5 5.5H0.5C0.224 5.5 0 5.724 0 6C0 6.276 0.224 6.5 0.5 6.5H11.5C11.776 6.5 12 6.276 12 6C12 5.724 11.776 5.5 11.5 5.5Z"
                   fill="#D1D5DB"
                 />
               </svg>

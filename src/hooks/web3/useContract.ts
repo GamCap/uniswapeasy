@@ -3,7 +3,8 @@ import { useWeb3React } from '@web3-react/core'
 import { useMemo } from 'react'
 import { getContract } from '../../utils/getContract'
 import  PoolManagerJson  from "../../abis/PoolManager.json";
-
+import ERC20_ABI from "../../abis/erc20.json";
+import { Erc20 } from '../../abis/types'
 const {abi : PoolManagerABI} = PoolManagerJson
 
 export function useContract<T extends Contract = Contract>(
@@ -30,5 +31,9 @@ export function useContract<T extends Contract = Contract>(
 
 
   export function useTestnetContract(){
-    return useContract("0x64255ed21366DB43d89736EE48928b890A84E2Cb",PoolManagerABI, false);
+    return useContract("0x3A9D48AB9751398BbFa63ad67599Bb04e4BdF98b",PoolManagerABI, false);
+  }
+
+  export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean) {
+    return useContract(tokenAddress, ERC20_ABI, withSignerIfPossible)
   }

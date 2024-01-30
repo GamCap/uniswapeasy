@@ -18,7 +18,7 @@ export const lightTheme: Colors = {
   tertiary: "#f1c40f", // a muted yellow for tertiary accents
   background: "#12131A", // a dark blue for backgrounds
   backgroundSecondary: "#191D26", // a slightly lighter blue for backgrounds
-  backgroundTertiary: "#323232", // a very light gray for backgrounds
+  backgroundTertiary: "#273345", // a very light gray for backgrounds
   text: "#34495e", // a darker gray for regular text, ensuring good readability
   textActive: "#44FF9A", // a light green for active text
   textInverted: "#ffffff", // pure white for text on dark backgrounds

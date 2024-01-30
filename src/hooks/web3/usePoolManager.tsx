@@ -3,7 +3,7 @@ import { Contract } from "@ethersproject/contracts";
 import PoolManagerABI from "../../abis/PoolManager.json";
 import useConnectors from "./useConnectors";
 
-const POOL_MANAGER_ADDRESS = "0x64255ed21366DB43d89736EE48928b890A84E2Cb";
+const POOL_MANAGER_ADDRESS = "0x3A9D48AB9751398BbFa63ad67599Bb04e4BdF98b";
 
 function usePoolManager() {
   const connectors = useConnectors();

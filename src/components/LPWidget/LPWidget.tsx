@@ -9,6 +9,7 @@ import {
 import { useWeb3React } from "@web3-react/core";
 import { BigNumber } from "ethers";
 import usePoolManager from "../../hooks/web3/usePoolManager";
+import usePoolModifyPosition from "../../hooks/web3/usePoolModifiyPosition";
 import { Bound, Field } from "../../state/v4/actions";
 import LiquidityChartRangeInput from "../LiquidityChartRangeInput";
 import Column, { AutoColumn } from "components/Column";
@@ -23,17 +24,12 @@ import { IPoolManager, PoolKeyStruct } from "abis/types/PoolManager";
 import { toHex } from "utils/toHex";
 import CurrencyInput from "components/CurrencyInput";
 import { Currency, CurrencyAmount } from "@uniswap/sdk-core";
+import { useTokenContract } from "hooks/web3/useContract";
+import { parseUnits } from "ethers/lib/utils";
 
 interface BodyWrapperProps {
   $maxWidth?: string;
 }
-/**
- * Header is styled Box with these inputs
- *    $padding="24px 32px 24px 32px"
-                style={{
-                  borderBottom: `1px solid ${theme.border}`,
-                }}
- */
 
 const SubHeader = styled(Box)`
   padding: 24px 32px 24px 32px;
@@ -103,6 +99,8 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
     //existingPosition
   );
 
+  const { poolModifyPosition } = usePoolModifyPosition();
+
   const formattedPrice = useMemo(() => {
     return price
       ? (invertPrice ? price.invert() : price).toSignificant(6)
@@ -148,52 +146,144 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
   const { poolManager } = usePoolManager();
 
   //TODO: transaction approval callbacks
+  const c0contract = useTokenContract(
+    currencies?.CURRENCY_0?.isToken ? currencies.CURRENCY_0.address : undefined
+  );
+  const c1contract = useTokenContract(
+    currencies?.CURRENCY_1?.isToken ? currencies.CURRENCY_1.address : undefined
+  );
 
   async function onAdd() {
-    if (!chainId || !provider || !account || !poolManager) return;
+    if (
+      !chainId ||
+      !provider ||
+      !account ||
+      !poolManager ||
+      !poolModifyPosition
+    )
+      return;
     if (!poolKey) return;
+    if (!currencies.CURRENCY_0 || !currencies.CURRENCY_1) return;
+    if (!c0contract || !c1contract) return;
     if (position && account) {
-      //TODO
-      // for native currency, value has to be set
-      // we'll most likely need a method to create transaction data/value
-      const data = poolManager?.interface.encodeFunctionData("modifyPosition", [
-        {
-          currency0: poolKey.currency0.isToken
-            ? poolKey.currency0.address
-            : "0x",
-          currency1: poolKey.currency1.isToken
-            ? poolKey.currency1.address
-            : "0x",
-          fee: poolKey.fee,
-          tickSpacing: poolKey.tickSpacing,
-          hooks: poolKey.hooks,
-        } as PoolKeyStruct,
-        {
-          tickLower: BigNumber.from(position.tickLower),
-          tickUpper: BigNumber.from(position.tickUpper),
-          liquidityDelta: BigNumber.from(position.liquidity.toString()),
-        } as IPoolManager.ModifyPositionParamsStruct,
-        "0x",
+      //Approve erc20 tokens to poolmodifyposition contract
+      //don't use .approve() method, instead encode function data and send transaction via provider
+      //if transaction fails, revert approval
+      //if they are successful, send transaction to poolmodifyposition contract
+
+      //formattedAMounts are not in wei, so we need to convert them considering the decimals
+
+      const c0data = c0contract?.interface.encodeFunctionData("approve", [
+        poolModifyPosition.address,
+        parseUnits(
+          formattedAmounts[Field.CURRENCY_0],
+          currencies.CURRENCY_0.decimals
+        ),
       ]);
 
-      const tx: { to: string; data: string; value: string } = {
-        to: poolManager.address,
-        data: data,
+      const c1data = c1contract?.interface.encodeFunctionData("approve", [
+        poolModifyPosition.address,
+        parseUnits(
+          formattedAmounts[Field.CURRENCY_1],
+          currencies.CURRENCY_1.decimals
+        ),
+      ]);
+
+      const c0tx: {
+        to: string;
+        data: string;
+        value: string;
+        gasLimit: BigNumber;
+      } = {
+        to: c0contract?.address ?? "0x",
+        data: c0data ?? "0x",
         value: toHex(0),
+        gasLimit: BigNumber.from(500000),
+      };
+
+      const c1tx: {
+        to: string;
+        data: string;
+        value: string;
+        gasLimit: BigNumber;
+      } = {
+        to: c1contract?.address ?? "0x",
+        data: c1data ?? "0x",
+        value: toHex(0),
+        gasLimit: BigNumber.from(500000),
       };
 
       provider
         .getSigner()
-        .estimateGas(tx)
-        .then((gasLimit) => {
-          //add gas limit to tx with margin
-          const updatedTx = { ...tx, gasLimit: gasLimit.mul(120).div(100) };
-          return provider
-            .getSigner()
-            .sendTransaction(updatedTx)
-            .then((response) => {
-              console.log(response);
-            });
+        .sendTransaction(c0tx)
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.error("Failed to send transaction", error);
+          if (error?.code !== 4001) {
+            console.error(error);
+          }
+        });
+
+      provider
+        .getSigner()
+        .sendTransaction(c1tx)
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.error("Failed to send transaction", error);
+          if (error?.code !== 4001) {
+            console.error(error);
+          }
+        });
+
+      //TODO
+      // for native currency, value has to be set
+      // we'll most likely need a method to create transaction data/value
+      // give value array according to the functionfragment
+
+      const data = poolModifyPosition?.interface.encodeFunctionData(
+        "modifyPosition",
+        [
+          {
+            currency0: poolKey.currency0.isToken
+              ? poolKey.currency0.address
+              : "0x",
+            currency1: poolKey.currency1.isToken
+              ? poolKey.currency1.address
+              : "0x",
+            fee: poolKey.fee,
+            tickSpacing: poolKey.tickSpacing,
+            hooks: poolKey.hooks,
+          } as PoolKeyStruct,
+          {
+            tickLower: BigNumber.from(position.tickLower),
+            tickUpper: BigNumber.from(position.tickUpper),
+            liquidityDelta: BigNumber.from(position.liquidity.toString()),
+          } as IPoolManager.ModifyPositionParamsStruct,
+          "0x",
+        ]
+      );
+
+      const tx: {
+        to: string;
+        data: string;
+        value: string;
+        gasLimit: BigNumber;
+      } = {
+        to: poolModifyPosition.address,
+        data: data,
+        value: toHex(0),
+        gasLimit: BigNumber.from(500000),
+      };
+
+      provider
+        .getSigner()
+        .sendTransaction(tx)
+        .then((response) => {
+          console.log(response);
         })
         .catch((error) => {
           console.error("Failed to send transaction", error);
@@ -265,6 +355,11 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
     }
   }, [maxPrice, onRightRangeInput]);
 
+  useEffect(() => {
+    console.log("pool", pool);
+    console.log("position", position);
+  }, [pool, position]);
+
   return (
     <>
       {!account ? (
@@ -294,9 +389,9 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
             {/* Pool Key Selection */}
             <Section>
               <AutoColumn gap="md" justify="start" grow>
-                <SubHeader>
+                {/* <SubHeader>
                   <ThemedText.SubHeader>Select Pool</ThemedText.SubHeader>
-                </SubHeader>
+                </SubHeader> */}
                 <Box $padding="24px 32px 24px 32px">
                   <PoolKeySelect
                     poolKeys={poolKeys}
@@ -434,6 +529,7 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
                 style={{
                   color: theme.primary,
                   border: `1px solid ${theme.border}`,
+                  backgroundColor: theme.background,
                   borderRadius: "1000px",
                   padding: "12px",
                   fontSize: "16px",

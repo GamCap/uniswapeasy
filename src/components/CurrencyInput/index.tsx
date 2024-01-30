@@ -24,6 +24,7 @@ const CurrencyContainer = styled.div`
   display: flex;
   flex-direction: row;
   background-color: #273345;
+  align-items: center;
 `;
 
 const CurrencyLogo = styled.div`
@@ -37,7 +38,7 @@ const CurrencyText = styled.p`
   margin: 0px;
   font-size: 12px;
   font-weight: 500;
-  color: #d1d5db;
+  color: ${({ theme }) => theme.textTertiary};
 `;
 
 const InputContainer = styled.div`
