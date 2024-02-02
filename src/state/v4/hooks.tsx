@@ -299,6 +299,8 @@ export function useV4PoolInfo(
 
   // parse typed range values and determine closest ticks
   // lower should always be a smaller tick
+  //TODO
+  //Look into this while implementing the existing position
   const ticks = useMemo(() => {
     return {
       [Bound.LOWER]:

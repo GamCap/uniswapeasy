@@ -75,6 +75,8 @@ export class Pool {
     tickCurrent: number,
     ticks: TickDataProvider | (Tick | TickConstructorArgs)[] = NO_TICK_DATA_PROVIDER_DEFAULT
   ) {
+    //TODO
+    //fix the issues with the invariant
     // invariant(Number.isInteger(fee) &&   JSBI.lessThan(JSBI.BigInt(fee.toString()), JSBI.BigInt(1_000_000)), 'FEE')
 
     // const tickCurrentSqrtRatioX96 = TickMath.getSqrtRatioAtTick(tickCurrent)

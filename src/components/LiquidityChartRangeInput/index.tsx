@@ -1,45 +1,15 @@
 import { Currency, Price, Token } from "@uniswap/sdk-core";
 import { AutoColumn, ColumnCenter } from "../Column";
 import Loader from "../Icons/LoadingSpinner";
-// import { saturate } from "polished";
-import { ReactNode, useCallback, useEffect, useMemo } from "react";
-// import { BarChart2, CloudOff, Inbox } from 'react-feather'
+import { ReactNode, useCallback, useMemo } from "react";
 import { Bound } from "../../state/v4/actions";
 import styled, { useTheme } from "styled-components";
 import formatDelta from "../../utils/formatDelta";
 
 import { Chart } from "./Chart";
 import { useDensityChartData } from "./hooks";
-// import { ZoomLevels } from "./types";
 import { BigNumberish } from "ethers";
 import { ThemedText } from "../../theme/components";
-
-// const ZOOM_LEVELS: Record<FeeAmount, ZoomLevels> = {
-//   [FeeAmount.LOWEST]: {
-//     initialMin: 0.999,
-//     initialMax: 1.001,
-//     min: 0.00001,
-//     max: 1.5,
-//   },
-//   [FeeAmount.LOW]: {
-//     initialMin: 0.999,
-//     initialMax: 1.001,
-//     min: 0.00001,
-//     max: 1.5,
-//   },
-//   [FeeAmount.MEDIUM]: {
-//     initialMin: 0.5,
-//     initialMax: 2,
-//     min: 0.00001,
-//     max: 20,
-//   },
-//   [FeeAmount.HIGH]: {
-//     initialMin: 0.5,
-//     initialMax: 2,
-//     min: 0.00001,
-//     max: 20,
-//   },
-// }
 
 const ChartWrapper = styled.div`
   position: relative;
@@ -179,14 +149,14 @@ export default function LiquidityChartRangeInput({
 
   const isUninitialized =
     !currencyA || !currencyB || (formattedData === undefined && !isLoading);
-
+  //TODO
+  //Add Icons and get colors from theme
   return (
     <>
       {isUninitialized ? (
         <InfoBox
           message={"Your position will appear here."}
           icon={<div>Inbox</div>}
-          // icon={<Inbox size={56} stroke={theme.neutral1} />}
         />
       ) : isLoading ? (
         <InfoBox icon={<Loader size="40px" stroke={"#fff"} />} />
@@ -194,13 +164,11 @@ export default function LiquidityChartRangeInput({
         <InfoBox
           message={"Liquidity data not available."}
           icon={<div>CloudOff</div>}
-          // icon={<CloudOff size={56} stroke={theme.neutral2} />}
         />
       ) : !formattedData || formattedData.length === 0 || !price ? (
         <InfoBox
           message={"There is no liquidity data."}
           icon={<div>BarChart2</div>}
-          // icon={<BarChart2 size={56} stroke={theme.neutral2} />}
         />
       ) : (
         <ChartWrapper>

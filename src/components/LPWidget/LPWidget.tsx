@@ -166,12 +166,9 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
     if (!currencies.CURRENCY_0 || !currencies.CURRENCY_1) return;
     if (!c0contract || !c1contract) return;
     if (position && account) {
-      //Approve erc20 tokens to poolmodifyposition contract
-      //don't use .approve() method, instead encode function data and send transaction via provider
-      //if transaction fails, revert approval
-      //if they are successful, send transaction to poolmodifyposition contract
-
-      //formattedAMounts are not in wei, so we need to convert them considering the decimals
+      //TODO
+      //Clean up this code
+      //Possibly refactor this into a function
 
       const c0data = c0contract?.interface.encodeFunctionData("approve", [
         poolModifyPosition.address,
