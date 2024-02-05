@@ -8,7 +8,6 @@ import { PoolState, usePool } from './usePools'
 import { BigNumberish } from 'ethers'
 import { tickToPrice } from '../../utils/priceTickConversions'
 import computeSurroundingTicks from '../../utils/computeSurroundingTicks'
-import mockTicks from './mockTicks.json'
 const PRICE_FIXED_DIGITS = 8
 
 // Tick with fields parsed to JSBIs, and active liquidity computed.
@@ -32,7 +31,15 @@ function useTicksFromSubgraph(
   //return a mock data
   return {
     data: {
-      ticks: mockTicks.ticks
+      ticks: [
+        {
+          tickIdx: 0,
+          liquidityGross: "0",
+          liquidityNet: "0",
+          price0: "0",
+          price1: "0"
+        }
+      ]
   },
   error: undefined,
     loading: false
