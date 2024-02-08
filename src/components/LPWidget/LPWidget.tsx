@@ -7,7 +7,7 @@ import {
   useV4PoolInfo,
 } from "../../state/v4/hooks";
 import { useWeb3React } from "@web3-react/core";
-import { BigNumber } from "ethers";
+import { BigNumber, Contract } from "ethers";
 import usePoolManager from "../../hooks/web3/usePoolManager";
 import usePoolModifyPosition from "../../hooks/web3/usePoolModifiyPosition";
 import { Bound, Field } from "../../state/v4/actions";
@@ -153,6 +153,8 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
     currencies?.CURRENCY_1?.isToken ? currencies.CURRENCY_1.address : undefined
   );
 
+  //TODO
+  //Look into native currency handling
   async function onAdd() {
     if (
       !chainId ||
@@ -160,88 +162,81 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
       !account ||
       !poolManager ||
       !poolModifyPosition
-    )
+    ) {
       return;
-    if (!poolKey) return;
-    if (!currencies.CURRENCY_0 || !currencies.CURRENCY_1) return;
-    if (!c0contract || !c1contract) return;
-    if (position && account) {
+    }
+    if (
+      !poolKey ||
+      !currencies.CURRENCY_0 ||
+      !currencies.CURRENCY_1 ||
+      !c0contract ||
+      !c1contract
+    ) {
+      return;
+    }
+    if (!position || !account) {
+      return;
+    }
+
+    const approveAndSendTransaction = async (
+      contract: Contract,
+      spender: string,
+      amount: BigNumber
+    ) => {
       //TODO
-      //Clean up this code
-      //Possibly refactor this into a function
+      //decide on slippage
+      const slippage = 1;
+      const slippageAmount = amount.mul(100 + slippage).div(100);
 
-      const c0data = c0contract?.interface.encodeFunctionData("approve", [
-        poolModifyPosition.address,
-        parseUnits(
-          formattedAmounts[Field.CURRENCY_0],
-          currencies.CURRENCY_0.decimals
-        ),
+      const data = contract.interface.encodeFunctionData("approve", [
+        spender,
+        slippageAmount,
       ]);
 
-      const c1data = c1contract?.interface.encodeFunctionData("approve", [
-        poolModifyPosition.address,
-        parseUnits(
-          formattedAmounts[Field.CURRENCY_1],
-          currencies.CURRENCY_1.decimals
-        ),
-      ]);
-
-      const c0tx: {
+      const tx: {
         to: string;
         data: string;
         value: string;
         gasLimit: BigNumber;
       } = {
-        to: c0contract?.address ?? "0x",
-        data: c0data ?? "0x",
+        to: contract.address,
+        data: data,
         value: toHex(0),
         gasLimit: BigNumber.from(500000),
       };
 
-      const c1tx: {
-        to: string;
-        data: string;
-        value: string;
-        gasLimit: BigNumber;
-      } = {
-        to: c1contract?.address ?? "0x",
-        data: c1data ?? "0x",
-        value: toHex(0),
-        gasLimit: BigNumber.from(500000),
-      };
+      try {
+        const response = await provider.getSigner().sendTransaction(tx);
+        console.log(response);
+      } catch (error) {
+        console.error("Failed to send transaction", error);
+        if (error?.code !== 4001) {
+          console.error(error);
+        }
+      }
+    };
 
-      provider
-        .getSigner()
-        .sendTransaction(c0tx)
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.error("Failed to send transaction", error);
-          if (error?.code !== 4001) {
-            console.error(error);
-          }
-        });
+    try {
+      await Promise.all([
+        approveAndSendTransaction(
+          c0contract,
+          poolModifyPosition.address,
+          parseUnits(
+            formattedAmounts[Field.CURRENCY_0],
+            currencies.CURRENCY_0.decimals
+          )
+        ),
+        approveAndSendTransaction(
+          c1contract,
+          poolModifyPosition.address,
+          parseUnits(
+            formattedAmounts[Field.CURRENCY_1],
+            currencies.CURRENCY_1.decimals
+          )
+        ),
+      ]);
 
-      provider
-        .getSigner()
-        .sendTransaction(c1tx)
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.error("Failed to send transaction", error);
-          if (error?.code !== 4001) {
-            console.error(error);
-          }
-        });
-
-      //TODO
-      // for native currency, value has to be set
-      // we'll most likely need a method to create transaction data/value
-      // give value array according to the functionfragment
-
-      const data = poolModifyPosition?.interface.encodeFunctionData(
+      const data = poolModifyPosition.interface.encodeFunctionData(
         "modifyPosition",
         [
           {
@@ -276,20 +271,17 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
         gasLimit: BigNumber.from(500000),
       };
 
-      provider
-        .getSigner()
-        .sendTransaction(tx)
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.error("Failed to send transaction", error);
-          if (error?.code !== 4001) {
-            console.error(error);
-          }
-        });
-    } else {
-      return;
+      try {
+        const response = await provider.getSigner().sendTransaction(tx);
+        console.log(response);
+      } catch (error) {
+        console.error("Failed to send transaction", error);
+        if (error?.code !== 4001) {
+          console.error(error);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to approve and send transactions", error);
     }
   }
 
