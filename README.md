@@ -16,27 +16,27 @@ Before building, ensure you have all peer dependencies installed. Your project s
 
 To build the package from source:
 
-- Clone the repository:
-  ```bash
-  git clone https://github.com/GamCap/uniswapeasy.git
-  ```
-- Navigate to the project directory:
-  ```bash
-  cd uniswapeasy
-  ```
-- Install dependencies:
-  ```bash
-  yarn install
-  ```
-- Run the prebuild script which includes ABI type generation:
-  ```bash
-  yarn prebuild
-  ```
-- Build the package:
-  ```bash
-  yarn build
-  ```
-  The build artifacts will be outputted to the `dist` directory.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/GamCap/uniswapeasy.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd uniswapeasy
+   ```
+3. Install dependencies:
+   ```bash
+   yarn install
+   ```
+4. Run the prebuild script which includes ABI type generation:
+   ```bash
+   yarn prebuild
+   ```
+5. Build the package:
+   ```bash
+   yarn build
+   ```
+   The build artifacts will be outputted to the `dist` directory.
 
 ## Usage
 
