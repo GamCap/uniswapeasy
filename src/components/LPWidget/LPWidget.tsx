@@ -174,23 +174,28 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
     ) {
       return;
     }
-    if (!position || !account) {
+    if (
+      !position ||
+      !account ||
+      !parsedAmounts[Field.CURRENCY_0] ||
+      !parsedAmounts[Field.CURRENCY_1]
+    ) {
       return;
     }
 
     const approveAndSendTransaction = async (
       contract: Contract,
       spender: string,
-      amount: BigNumber
+      amount: CurrencyAmount<Currency>
     ) => {
       //TODO
       //decide on slippage
-      const slippage = 1;
-      const slippageAmount = amount.mul(100 + slippage).div(100);
+      // const slippage = 1;
+      // const slippageAmount = amount.mul(100 + slippage).div(100);
 
       const data = contract.interface.encodeFunctionData("approve", [
         spender,
-        slippageAmount,
+        toHex(amount.quotient),
       ]);
 
       const tx: {
@@ -221,18 +226,12 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
         approveAndSendTransaction(
           c0contract,
           poolModifyPosition.address,
-          parseUnits(
-            formattedAmounts[Field.CURRENCY_0],
-            currencies.CURRENCY_0.decimals
-          )
+          parsedAmounts[Field.CURRENCY_0]
         ),
         approveAndSendTransaction(
           c1contract,
           poolModifyPosition.address,
-          parseUnits(
-            formattedAmounts[Field.CURRENCY_1],
-            currencies.CURRENCY_1.decimals
-          )
+          parsedAmounts[Field.CURRENCY_1]
         ),
       ]);
 
