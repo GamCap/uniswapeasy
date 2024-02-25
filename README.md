@@ -59,6 +59,19 @@ To customize the pool via the poolKeys input, pass an array of pool configuratio
 />
 ```
 
+## Additional Resources
+
+Below are links to the smart contracts on the Goerli testnet and other resources that are used by this widget:
+
+- **PoolModifyPositionTest Contract**: [View on Etherscan](https://goerli.etherscan.io/address/0x83feDBeD11B3667f40263a88e8435fca51A03F8C#code)
+- **PoolManager Contract**: [View on Etherscan](https://goerli.etherscan.io/address/0x3A9D48AB9751398BbFa63ad67599Bb04e4BdF98b#code)
+- **Example Pool ID**: `0x81c2aeb9580f893f1bd130ea78633f476604312c9122e3d3988a8dd72e3494dd`
+- **UNI Token Contract**: [View on Etherscan](https://goerli.etherscan.io/address/0x981d8acaf6af3a46785e7741d22fbe81b25ebf1e)
+- **USDC Token Contract**: [View on Etherscan](https://goerli.etherscan.io/token/0x9fd21be27a2b059a288229361e2fa632d8d2d074)
+- **Aave Faucet**: [Access the Faucet](https://staging.aave.com/faucet/)
+
+These resources are essential for developers looking to understand the underlying contracts and for testing purposes using the Goerli testnet.
+
 ## License
 
 This project is licensed under the MIT License - see the `LICENSE` file for details.
