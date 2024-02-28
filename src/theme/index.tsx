@@ -5,8 +5,7 @@ import {
   createGlobalStyle,
 } from "styled-components";
 import type { BorderRadius, Colors, Gaps, Theme } from "./theme";
-import { borderRadius } from "polished";
-export type { Color, Colors, Theme } from "./theme";
+export type { Color, Colors, Theme, ThemeV2, ColorsV2 } from "./theme";
 
 export interface ThemeProps {
   theme: Theme;
