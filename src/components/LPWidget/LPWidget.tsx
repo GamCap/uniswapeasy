@@ -13,7 +13,7 @@ import usePoolModifyPosition from "../../hooks/web3/usePoolModifiyPosition";
 import { Bound, Field } from "../../state/v4/actions";
 import LiquidityChartRangeInput from "../LiquidityChartRangeInput";
 import Column, { AutoColumn } from "components/Column";
-import { Header } from "../Header";
+import { PositionHeader } from "../PositionHeader";
 import styled, { useTheme } from "styled-components";
 import Row from "components/Row";
 import { ButtonText } from "components/Button";
@@ -47,6 +47,7 @@ const Section = styled.div`
   flex-direction: column;
   align-items: flex-start;
   align-self: stretch;
+  gap: ${({ theme }) => theme.grids.md};
   border: 1px solid ${({ theme }) => theme.borders.borders};
   border-radius: 24px;
   background: ${({ theme }) => theme.surfacesAndElevation.elevation1};
@@ -368,7 +369,7 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
         <StyledBoddyWrapper $hasExistingPosition={hasExistingPosition}>
           <Column gap="xl">
             {/* Header */}
-            <Header adding={true} creating={false}>
+            <PositionHeader adding={true} creating={false}>
               {!hasExistingPosition && (
                 <Row
                   justify="flex-end"
@@ -383,7 +384,7 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
                   </MediumOnly>
                 </Row>
               )}
-            </Header>
+            </PositionHeader>
             <ContentColumn gap="lg">
               {/* Pool Key Selection */}
               <Section>

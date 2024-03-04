@@ -46,7 +46,7 @@ export default function PoolKeySelect({
   onSelect?: (poolKey: PoolKey) => void;
 }) {
   return (
-    <Row gap="md">
+    <Row gap="md" padding="24px 32px">
       <LogoWrapper>
         {/* 
         TODO: Replace with actual currency logos

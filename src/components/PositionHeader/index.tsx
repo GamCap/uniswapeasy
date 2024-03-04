@@ -8,7 +8,7 @@ const Tabs = styled.div`
   flex-flow: row nowrap;
   align-items: center;
   padding: 24px 32px 24px 32px;
-  justify-content: space-evenly;
+  justify-content: space-between;
   border-bottom: 1px solid #181b24;
 `;
 
@@ -20,7 +20,7 @@ const TitleText = styled.div`
   margin: auto;
 `;
 
-export function Header({
+export function PositionHeader({
   adding,
   creating,
   children,
