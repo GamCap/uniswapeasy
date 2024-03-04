@@ -31,6 +31,11 @@ interface BodyWrapperProps {
   $maxWidth?: string;
 }
 
+const ContentColumn = styled(Column)`
+  width: 100%;
+  max-width: 692px;
+`;
+
 const SubHeader = styled(Box)`
   padding: 24px 32px 24px 32px;
   border-bottom: 1px solid ${({ theme }) => theme.border};
@@ -374,28 +379,29 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
                 </Row>
               )}
             </Header>
-            {/* Pool Key Selection */}
-            <Section>
-              <AutoColumn gap="md" justify="start" grow>
-                {/* <SubHeader>
+            <ContentColumn gap="lg">
+              {/* Pool Key Selection */}
+              <Section>
+                <AutoColumn gap="md" justify="start" grow>
+                  {/* <SubHeader>
                   <ThemedText.SubHeader>Select Pool</ThemedText.SubHeader>
                 </SubHeader> */}
-                <Box $padding="24px 32px 24px 32px">
-                  <PoolKeySelect
-                    poolKeys={poolKeys}
-                    selectedPoolKey={poolKey}
-                    onSelect={setPoolKey}
-                  />
-                </Box>
-              </AutoColumn>
-            </Section>
-            {/* Chart Range Input */}
-            <Section>
-              <AutoColumn gap="md" justify="start" grow>
-                <SubHeader>
-                  <ThemedText.SubHeader>Price Range</ThemedText.SubHeader>
-                </SubHeader>
-                {/* <LiquidityChartRangeInput
+                  <Box $padding="24px 32px 24px 32px">
+                    <PoolKeySelect
+                      poolKeys={poolKeys}
+                      selectedPoolKey={poolKey}
+                      onSelect={setPoolKey}
+                    />
+                  </Box>
+                </AutoColumn>
+              </Section>
+              {/* Chart Range Input */}
+              <Section>
+                <AutoColumn gap="md" justify="start" grow>
+                  <SubHeader>
+                    <ThemedText.SubHeader>Price Range</ThemedText.SubHeader>
+                  </SubHeader>
+                  {/* <LiquidityChartRangeInput
                 currencyA={currencies.CURRENCY_0}
                 currencyB={currencies.CURRENCY_1}
                 feeAmount={
@@ -422,112 +428,115 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
                 onRightRangeInput={onRightRangeInput}
                 interactive={true}
               /> */}
-                {/* Price Range Component (Manual) */}
+                  {/* Price Range Component (Manual) */}
+                  <Box $padding="24px 32px 24px 32px">
+                    <BoxSecondary $radius="8px" $padding="12px">
+                      <Column
+                        gap="md"
+                        style={{
+                          alignItems: "flex-start",
+                        }}
+                      >
+                        <ThemedText.SubHeader>
+                          Current Price
+                        </ThemedText.SubHeader>
+                        <ThemedText.SmallText>
+                          {formattedPrice}
+                        </ThemedText.SmallText>
+                      </Column>
+                    </BoxSecondary>
+                  </Box>
+                  <Box $padding="24px 32px 24px 32px">
+                    <PriceRangeManual
+                      priceLower={priceLower}
+                      priceUpper={priceUpper}
+                      getDecrementLower={getDecrementLower}
+                      getIncrementLower={getIncrementLower}
+                      getDecrementUpper={getDecrementUpper}
+                      getIncrementUpper={getIncrementUpper}
+                      onLeftRangeInput={onLeftRangeInput}
+                      onRightRangeInput={onRightRangeInput}
+                      currencyA={currencies.CURRENCY_0}
+                      currencyB={currencies.CURRENCY_1}
+                      feeAmount={
+                        pool?.fee
+                          ? BigNumber.from(pool?.fee.toString() ?? "0")
+                          : undefined
+                      }
+                      ticksAtLimit={ticksAtLimit}
+                    />
+                  </Box>
+                </AutoColumn>
+              </Section>
+              {/* Deposit Amounts */}
+              <Section>
+                {/* border bottom and get color from theme */}
+                <SubHeader>
+                  <ThemedText.SubHeader>Deposit Amounts</ThemedText.SubHeader>
+                </SubHeader>
                 <Box $padding="24px 32px 24px 32px">
-                  <BoxSecondary $radius="8px" $padding="12px">
-                    <Column
-                      gap="md"
-                      style={{
-                        alignItems: "flex-start",
+                  <Row gap="md">
+                    <CurrencyInput
+                      value={formattedAmounts[Field.CURRENCY_0]}
+                      onUserInput={onFieldAInput}
+                      onMax={() => {
+                        onFieldAInput(
+                          maxAmounts[Field.CURRENCY_0]?.toExact() ?? ""
+                        );
                       }}
-                    >
-                      <ThemedText.SubHeader>Current Price</ThemedText.SubHeader>
-                      <ThemedText.SmallText>
-                        {formattedPrice}
-                      </ThemedText.SmallText>
-                    </Column>
-                  </BoxSecondary>
+                      showMaxButton={!atMaxAmounts[Field.CURRENCY_0]}
+                      currency={currencies[Field.CURRENCY_0] ?? null}
+                      id="add-liquidity-input-token0"
+                      showCommonBases
+                      locked={depositADisabled}
+                    />
+                    <CurrencyInput
+                      value={formattedAmounts[Field.CURRENCY_1]}
+                      onUserInput={onFieldBInput}
+                      onMax={() => {
+                        onFieldBInput(
+                          maxAmounts[Field.CURRENCY_1]?.toExact() ?? ""
+                        );
+                      }}
+                      showMaxButton={!atMaxAmounts[Field.CURRENCY_1]}
+                      currency={currencies[Field.CURRENCY_1] ?? null}
+                      id="add-liquidity-input-token1"
+                      showCommonBases
+                      locked={depositBDisabled}
+                    />
+                  </Row>
                 </Box>
-                <Box $padding="24px 32px 24px 32px">
-                  <PriceRangeManual
-                    priceLower={priceLower}
-                    priceUpper={priceUpper}
-                    getDecrementLower={getDecrementLower}
-                    getIncrementLower={getIncrementLower}
-                    getDecrementUpper={getDecrementUpper}
-                    getIncrementUpper={getIncrementUpper}
-                    onLeftRangeInput={onLeftRangeInput}
-                    onRightRangeInput={onRightRangeInput}
-                    currencyA={currencies.CURRENCY_0}
-                    currencyB={currencies.CURRENCY_1}
-                    feeAmount={
-                      pool?.fee
-                        ? BigNumber.from(pool?.fee.toString() ?? "0")
-                        : undefined
-                    }
-                    ticksAtLimit={ticksAtLimit}
-                  />
-                </Box>
-              </AutoColumn>
-            </Section>
-            {/* Deposit Amounts */}
-            <Section>
-              {/* border bottom and get color from theme */}
-              <SubHeader>
-                <ThemedText.SubHeader>Deposit Amounts</ThemedText.SubHeader>
-              </SubHeader>
-              <Box $padding="24px 32px 24px 32px">
-                <Row gap="md">
-                  <CurrencyInput
-                    value={formattedAmounts[Field.CURRENCY_0]}
-                    onUserInput={onFieldAInput}
-                    onMax={() => {
-                      onFieldAInput(
-                        maxAmounts[Field.CURRENCY_0]?.toExact() ?? ""
-                      );
-                    }}
-                    showMaxButton={!atMaxAmounts[Field.CURRENCY_0]}
-                    currency={currencies[Field.CURRENCY_0] ?? null}
-                    id="add-liquidity-input-token0"
-                    showCommonBases
-                    locked={depositADisabled}
-                  />
-                  <CurrencyInput
-                    value={formattedAmounts[Field.CURRENCY_1]}
-                    onUserInput={onFieldBInput}
-                    onMax={() => {
-                      onFieldBInput(
-                        maxAmounts[Field.CURRENCY_1]?.toExact() ?? ""
-                      );
-                    }}
-                    showMaxButton={!atMaxAmounts[Field.CURRENCY_1]}
-                    currency={currencies[Field.CURRENCY_1] ?? null}
-                    id="add-liquidity-input-token1"
-                    showCommonBases
-                    locked={depositBDisabled}
-                  />
-                </Row>
-              </Box>
-            </Section>
-            {/* Transaction Info */}
-            {/* Buttons */}
-            <Section>
-              <button
-                onClick={onAdd}
-                disabled={
-                  !isValid ||
-                  !poolKey ||
-                  !pool ||
-                  !poolManager ||
-                  !account ||
-                  !provider ||
-                  !chainId ||
-                  !position
-                }
-                style={{
-                  color: theme.primary,
-                  border: `1px solid ${theme.border}`,
-                  backgroundColor: theme.background,
-                  borderRadius: "1000px",
-                  padding: "12px",
-                  fontSize: "16px",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                }}
-              >
-                Add Liquidity
-              </button>
-            </Section>
+              </Section>
+              {/* Transaction Info */}
+              {/* Buttons */}
+              <Section>
+                <button
+                  onClick={onAdd}
+                  disabled={
+                    !isValid ||
+                    !poolKey ||
+                    !pool ||
+                    !poolManager ||
+                    !account ||
+                    !provider ||
+                    !chainId ||
+                    !position
+                  }
+                  style={{
+                    color: theme.primary,
+                    border: `1px solid ${theme.border}`,
+                    backgroundColor: theme.background,
+                    borderRadius: "1000px",
+                    padding: "12px",
+                    fontSize: "16px",
+                    fontWeight: 500,
+                    cursor: "pointer",
+                  }}
+                >
+                  Add Liquidity
+                </button>
+              </Section>
+            </ContentColumn>
           </Column>
         </StyledBoddyWrapper>
       )}
