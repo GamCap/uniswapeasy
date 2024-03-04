@@ -1,12 +1,33 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { UniswapEasy } from "uniswapeasy";
 import { useActiveProvider } from "./connectors";
 import { JSON_RPC_URL } from "./constants";
 import Web3Connectors from "./components/Web3Connectors";
 import { Token } from "@uniswap/sdk-core";
+
+const ThemeNames = [
+  "tealDark",
+  "tealLight",
+  "orangeDark",
+  "orangeLight",
+] as const;
 const App = () => {
   const connectors = useRef<HTMLDivElement>(null);
   const focusConnectors = useCallback(() => connectors.current?.focus(), []);
+  const [themeName, setThemeName] = useState<
+    "tealDark" | "tealLight" | "orangeDark" | "orangeLight"
+  >("tealDark");
+  useEffect(() => {
+    //when theme changes, find the first body element and set its background color
+    const body = document.querySelector("body");
+    if (body) {
+      body.style.backgroundColor =
+        themeName == "tealDark" || themeName == "orangeDark"
+          ? "black"
+          : "white";
+    }
+  }, [themeName]);
+
   const provider = useActiveProvider();
   return (
     <div
@@ -16,8 +37,25 @@ const App = () => {
         alignItems: "center",
         justifyContent: "space-evenly",
         gap: "1rem",
+        width: "100%",
+        height: "100%",
       }}
     >
+      <div style={{ display: "flex", gap: "1rem", flexDirection: "row" }}>
+        {ThemeNames.map((themeName) => (
+          <button
+            key={themeName}
+            style={{
+              padding: "1rem",
+              borderRadius: "1em",
+              cursor: "pointer",
+            }}
+            onClick={() => setThemeName(themeName)}
+          >
+            {themeName}
+          </button>
+        ))}
+      </div>
       <div
         style={{
           alignSelf: "center",
@@ -39,16 +77,7 @@ const App = () => {
         Connect Wallet
       </button> */}
       <UniswapEasy
-        theme={
-          {
-            // primary: "#1a1a1a",
-            // secondary: "#1a1a1a",
-            // tertiary: "#1a1a1a",
-            // background: "#f7f8fa",
-            // text: "#1a1a1a",
-            // textInverted: "#f7f8fa",
-          }
-        }
+        theme={themeName}
         defaultChainId={1}
         jsonRpcUrlMap={{
           111: JSON_RPC_URL,
