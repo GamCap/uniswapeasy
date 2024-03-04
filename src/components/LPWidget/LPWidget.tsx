@@ -45,11 +45,11 @@ const SubHeader = styled(Box)`
 const Section = styled.div`
   display: flex;
   flex-direction: column;
-  padding: ${({ theme }) => theme.gap.lg};
-  align-items: center;
+  align-items: flex-start;
   align-self: stretch;
   border: 1px solid ${({ theme }) => theme.borders.borders};
   border-radius: 24px;
+  background: ${({ theme }) => theme.surfacesAndElevation.elevation1};
 `;
 
 const BodyWrapper = styled.div<BodyWrapperProps>`
@@ -387,18 +387,11 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
             <ContentColumn gap="lg">
               {/* Pool Key Selection */}
               <Section>
-                <AutoColumn gap="md" justify="start" grow>
-                  {/* <SubHeader>
-                  <ThemedText.SubHeader>Select Pool</ThemedText.SubHeader>
-                </SubHeader> */}
-                  <Box $padding="24px 32px 24px 32px">
-                    <PoolKeySelect
-                      poolKeys={poolKeys}
-                      selectedPoolKey={poolKey}
-                      onSelect={setPoolKey}
-                    />
-                  </Box>
-                </AutoColumn>
+                <PoolKeySelect
+                  poolKeys={poolKeys}
+                  selectedPoolKey={poolKey}
+                  onSelect={setPoolKey}
+                />
               </Section>
               {/* Chart Range Input */}
               <Section>

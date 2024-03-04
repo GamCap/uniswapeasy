@@ -3,35 +3,61 @@ import styled from "styled-components";
 
 type TextProps = Omit<TextPropsOriginal, "css">;
 
-const TextWrapper = styled(Text).withConfig({
-  shouldForwardProp: (prop) => prop !== "color",
-})<{ color: string }>`
-  color: ${({ color, theme }) => (theme as any)[color]};
+interface ThemedTextProps extends TextProps {
+  textColor: string;
+}
+
+const getColorFromTheme = (color: string, theme: any) => {
+  const path = color.split(".");
+  let currentObj = theme;
+  for (const p of path) {
+    if (!currentObj[p]) {
+      console.warn(`Theme color not found: ${color}`);
+      return "text.primary";
+    }
+
+    currentObj = currentObj[p];
+  }
+  return currentObj;
+};
+
+const TextWrapper = styled(Text)<{ textColor: string }>`
+  color: ${({ textColor, theme }) => getColorFromTheme(textColor, theme)};
 `;
 
 export const ThemedText = {
-  MediumHeader(props: TextProps) {
+  ParagraphRegular({ textColor, ...props }: ThemedTextProps) {
+    return (
+      <TextWrapper fontSize={16} fontWeight={500} lineHeight={24} {...props} />
+    );
+  },
+  ParagraphExtraSmall({ textColor, ...props }: ThemedTextProps) {
+    return (
+      <TextWrapper fontSize={12} fontWeight={400} lineHeight={16} {...props} />
+    );
+  },
+  MediumHeader({ textColor, ...props }: ThemedTextProps) {
     return <TextWrapper fontWeight={535} fontSize={20} {...props} />;
   },
-  SmallActiveGreen(props: TextProps) {
-    return <TextWrapper color="textActive" fontSize={12} {...props} />;
+  SmallActiveGreen({ textColor, ...props }: ThemedTextProps) {
+    return <TextWrapper textColor="textActive" fontSize={12} {...props} />;
   },
-  SubHeader(props: TextProps) {
+  SubHeader({ textColor, ...props }: ThemedTextProps) {
     return (
       <TextWrapper
         fontWeight={500}
         fontSize={16}
-        color={"primary"}
+        textColor={"primary"}
         {...props}
       />
     );
   },
-  SmallText(props: TextProps) {
+  SmallText({ textColor, ...props }: ThemedTextProps) {
     return (
       <TextWrapper
         fontSize={12}
         fontWeight={500}
-        color="textTertiary"
+        textColor="textTertiary"
         {...props}
       />
     );
