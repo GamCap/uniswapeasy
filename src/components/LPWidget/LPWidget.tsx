@@ -40,10 +40,15 @@ const SubHeader = styled(Box)`
   padding: 24px 32px 24px 32px;
   border-bottom: 1px solid ${({ theme }) => theme.border};
 `;
-const Section = styled(BoxPrimary)`
+
+//TODO add border radius to theme
+const Section = styled.div`
   display: flex;
   flex-direction: column;
-  border: 1px solid ${({ theme }) => theme.border};
+  padding: ${({ theme }) => theme.gap.lg};
+  align-items: center;
+  align-self: stretch;
+  border: 1px solid ${({ theme }) => theme.borders.borders};
   border-radius: 24px;
 `;
 
