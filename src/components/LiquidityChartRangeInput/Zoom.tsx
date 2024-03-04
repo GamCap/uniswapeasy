@@ -1,4 +1,3 @@
-import { ButtonGray } from "../Button";
 import {
   ScaleLinear,
   select,
@@ -23,10 +22,15 @@ const Wrapper = styled.div<{ count: number }>`
   right: 0;
 `;
 
-const Button = styled(ButtonGray)`
+const Button = styled.button`
+  background-color: ${({ theme }) =>
+    theme.components.button.secondary.background};
+  color: ${({ theme }) => theme.components.button.secondary.foreground};
   &:hover {
-    background-color: ${({ theme }) => theme.surface3};
-    color: ${({ theme }) => theme.neutral1};
+    background-color: ${({ theme }) =>
+      theme.components.button.secondary.hoverAndFocusBackground};
+    color: ${({ theme }) =>
+      theme.components.button.secondary.hoverAndFocusForeground};
   }
 
   width: 32px;

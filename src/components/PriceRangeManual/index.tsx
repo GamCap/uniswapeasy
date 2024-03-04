@@ -17,6 +17,7 @@ export default function RangeSelector({
   currencyB,
   feeAmount,
   ticksAtLimit,
+  disabled = false,
 }: {
   priceLower?: Price<Token, Token>;
   priceUpper?: Price<Token, Token>;
@@ -30,6 +31,7 @@ export default function RangeSelector({
   currencyB?: Currency | null;
   feeAmount?: BigNumberish;
   ticksAtLimit: { [bound in Bound]?: boolean | undefined };
+  disabled?: boolean;
 }) {
   const tokenA = (currencyA ?? undefined)?.wrapped;
   const tokenB = (currencyB ?? undefined)?.wrapped;
@@ -39,7 +41,7 @@ export default function RangeSelector({
   const rightPrice = isSorted ? priceUpper : priceLower?.invert();
 
   return (
-    <Row gap="md">
+    <Row gap="md" padding="0px 24px">
       <StepCounter
         value={
           ticksAtLimit[isSorted ? Bound.LOWER : Bound.UPPER]
@@ -62,6 +64,7 @@ export default function RangeSelector({
         title={`Low price`}
         tokenA={currencyA?.symbol}
         tokenB={currencyB?.symbol}
+        locked={disabled}
       />
       <StepCounter
         value={
@@ -85,6 +88,7 @@ export default function RangeSelector({
         tokenA={currencyA?.symbol}
         tokenB={currencyB?.symbol}
         title={`High price`}
+        locked={disabled}
       />
     </Row>
   );

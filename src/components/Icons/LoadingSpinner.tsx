@@ -6,6 +6,8 @@ import { StyledRotatingSVG, StyledSVG } from "./shared";
  * Takes in custom size and stroke for circle color, default to primary color as fill,
  * need ...rest for layered styles on top
  */
+
+//TODO: Update colors according to theme
 export default function Loader({
   size = "16px",
   stroke,
@@ -24,7 +26,7 @@ export default function Loader({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       size={size}
-      stroke={stroke ?? theme.accent1}
+      stroke={stroke ?? theme.text.primary}
       {...rest}
     >
       <path

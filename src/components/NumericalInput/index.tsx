@@ -10,7 +10,12 @@ const StyledInput = styled.input<{
   align?: string;
   disabled?: boolean;
 }>`
-  color: ${({ error, theme }) => (error ? theme.secondary : theme.primary)};
+  color: ${({ disabled, error, theme }) =>
+    disabled
+      ? theme.components.inputFieldCurrencyField.disabledForeground
+      : error
+      ? theme.components.inputFieldCurrencyField.foreground
+      : theme.components.inputFieldCurrencyField.typeAndActiveForeground};
   pointer-events: ${({ disabled }) => (disabled ? "none" : "auto")};
   width: 0;
   position: relative;

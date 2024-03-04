@@ -24,6 +24,7 @@ function InfoBox({ message, icon }: { message?: ReactNode; icon: ReactNode }) {
       {icon}
       {message && (
         <ThemedText.MediumHeader
+          textColor="text.primary"
           padding={10}
           marginTop="20px"
           textAlign="center"

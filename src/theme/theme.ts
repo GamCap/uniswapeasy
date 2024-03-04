@@ -17,6 +17,7 @@ export interface Gaps {
   sm: string;
   md: string;
   lg: string;
+  lgplus: string;
   xl: string;
 }
 export type Gap = keyof Gaps;

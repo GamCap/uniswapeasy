@@ -1,30 +1,32 @@
-import { BoxSecondary } from "../../theme/components";
+import { BoxSecondary, ThemedText } from "../../theme/components";
 import { Currency } from "@uniswap/sdk-core";
 import { Input as NumericalInput } from "../NumericalInput";
 import { styled } from "styled-components";
 import { useWeb3React } from "@web3-react/core";
 import { supportedChainId } from "utils/supportedChainId";
 import useCurrencyBalance from "hooks/web3/useCurrencyBalances";
-import { useEffect } from "react";
 const StyledNumericalInput = styled(NumericalInput)<{ $loading: boolean }>`
   background-color: transparent;
   text-align: left;
   font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
   width: 100%;
 `;
 
 //a small box that displays currency logo and symbol
 //radius is 100%, 4px pad, 2px gap between logo and symbol
 // row flex
-
+//TODO get colors from theme
 const CurrencyContainer = styled.div`
   border-radius: 1000px;
   padding: 4px;
   gap: 2px;
   display: flex;
   flex-direction: row;
-  background-color: #273345;
+  background-color: ${({ theme }) => theme.components.chip.background};
   align-items: center;
+  justify-content: center;
 `;
 
 const CurrencyLogo = styled.div`
@@ -34,24 +36,11 @@ const CurrencyLogo = styled.div`
   background-color: #ffffff;
 `;
 
-const CurrencyText = styled.p`
-  margin: 0px;
-  font-size: 12px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.textTertiary};
-`;
-
 const InputContainer = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
-`;
-
-const FiatValueContainer = styled.div`
-  font-size: 12px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.textTertiary};
 `;
 
 const CustomContainer = styled.div<{
@@ -60,21 +49,8 @@ const CustomContainer = styled.div<{
 }>`
   display: flex;
   flex-direction: ${({ direction }) => direction};
-  gap: 4px;
+  gap: 8px;
   align-items: ${({ align }) => align};
-`;
-
-//max button is just a text button with a max label 12px font, 500 weight, no pad or margin, color is #3AC1D6
-
-const MaxButton = styled.button`
-  font-size: 12px;
-  font-weight: 500;
-  color: #3ac1d6;
-  background-color: transparent;
-  border: none;
-  outline: none;
-  padding: 0px;
-  margin: 0px;
 `;
 
 interface CurrencyInputProps {
@@ -86,7 +62,7 @@ interface CurrencyInputProps {
   id: string;
   fiatValue?: string;
   showCommonBases?: boolean;
-  locked?: boolean;
+  locked: boolean;
 }
 
 export default function CurrencyInput({
@@ -98,7 +74,7 @@ export default function CurrencyInput({
   id,
   fiatValue,
   showCommonBases,
-  locked,
+  locked = false,
 }: CurrencyInputProps) {
   const { account, chainId } = useWeb3React();
   const selectedCurrencyBalance = useCurrencyBalance(
@@ -123,24 +99,40 @@ export default function CurrencyInput({
           className="token-amount-input"
           value={value}
           onUserInput={onUserInput}
-          disabled={!chainAllowed}
+          disabled={!chainAllowed || locked}
           $loading={false}
         />
-        {fiatValue && <FiatValueContainer>{fiatValue}</FiatValueContainer>}
+        {fiatValue && (
+          <ThemedText.ParagraphExtraSmall textColor="text.tertiary">
+            {fiatValue}
+          </ThemedText.ParagraphExtraSmall>
+        )}
       </InputContainer>
       <CustomContainer direction="column" align="flex-end">
         <CurrencyContainer>
           <CurrencyLogo />
-          <CurrencyText>{currency?.symbol}</CurrencyText>
+          <ThemedText.ParagraphExtraSmall textColor="components.chip.foreground">
+            {currency?.symbol}
+          </ThemedText.ParagraphExtraSmall>
         </CurrencyContainer>
         <CustomContainer direction="row" align="flex-end">
-          <CurrencyText>
+          <ThemedText.ParagraphExtraSmall textColor="components.inputFieldCurrencyField.foreground">
             {selectedCurrencyBalance?.toSignificant(6)}
-          </CurrencyText>
+          </ThemedText.ParagraphExtraSmall>
           {showMaxButton && (
-            <MaxButton type="button" onClick={onMax}>
-              Max
-            </MaxButton>
+            <div
+              onClick={onMax}
+              style={{
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <ThemedText.ParagraphExtraSmall textColor="text.color">
+                Max
+              </ThemedText.ParagraphExtraSmall>
+            </div>
           )}
         </CustomContainer>
       </CustomContainer>

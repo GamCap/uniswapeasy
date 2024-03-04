@@ -7,15 +7,14 @@ const Tabs = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  padding: 24px 32px 24px 32px;
   justify-content: space-between;
-  border-bottom: 1px solid #181b24;
 `;
 
 const TitleText = styled.div`
-  color: ${({ theme }) => theme.primary};
-  font-weight: 700;
-  font-size: 20px;
+  color: ${({ theme }) => theme.text.primary};
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 36px;
   flex: 1;
   margin: auto;
 `;
@@ -36,7 +35,7 @@ export function PositionHeader({
       <RowBetween align="center">
         <TitleText
           style={{
-            textAlign: "center",
+            textAlign: "left",
           }}
         >
           {creating
@@ -45,7 +44,7 @@ export function PositionHeader({
             ? "Add liquidity"
             : "Remove liquidity"}
         </TitleText>
-        {children && <Box style={{ marginRight: ".5rem" }}>{children}</Box>}
+        {children && <Box>{children}</Box>}
       </RowBetween>
     </Tabs>
   );

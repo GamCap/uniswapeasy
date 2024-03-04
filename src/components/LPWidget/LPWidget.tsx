@@ -12,12 +12,12 @@ import usePoolManager from "../../hooks/web3/usePoolManager";
 import usePoolModifyPosition from "../../hooks/web3/usePoolModifiyPosition";
 import { Bound, Field } from "../../state/v4/actions";
 import LiquidityChartRangeInput from "../LiquidityChartRangeInput";
-import Column, { AutoColumn } from "components/Column";
+import Column from "components/Column";
 import { PositionHeader } from "../PositionHeader";
+import Header from "../Header";
 import styled, { useTheme } from "styled-components";
 import Row from "components/Row";
-import { ButtonText } from "components/Button";
-import { Box, BoxPrimary, BoxSecondary, ThemedText } from "theme/components";
+import { BoxSecondary, ThemedText } from "theme/components";
 import PoolKeySelect from "../PoolKeySelect";
 import PriceRangeManual from "../PriceRangeManual";
 import { IPoolManager, PoolKeyStruct } from "abis/types/PoolManager";
@@ -36,20 +36,16 @@ const ContentColumn = styled(Column)`
   max-width: 692px;
 `;
 
-const SubHeader = styled(Box)`
-  padding: 24px 32px 24px 32px;
-  border-bottom: 1px solid ${({ theme }) => theme.border};
-`;
-
 //TODO add border radius to theme
-const Section = styled.div`
+const Section = styled.div<{ $padding?: string }>`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   align-self: stretch;
-  gap: ${({ theme }) => theme.grids.md};
+  gap: 24px;
   border: 1px solid ${({ theme }) => theme.borders.borders};
   border-radius: 24px;
+  padding: ${({ $padding }) => $padding ?? "0"};
   background: ${({ theme }) => theme.surfacesAndElevation.elevation1};
 `;
 
@@ -82,6 +78,7 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
   //TODO: add a check for existing position
   const theme = useTheme();
   const [poolKey, setPoolKey] = useState<PoolKey | undefined>(poolKeys[0]);
+  const [swapToRatio, setSwapToRatio] = useState(false);
 
   const { independentField, typedValue, startPriceTypedValue } =
     useV4MintState();
@@ -376,11 +373,19 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
                   style={{ width: "fit-content", minWidth: "fit-content" }}
                 >
                   <MediumOnly>
-                    <ButtonText onClick={clearAll}>
-                      <ThemedText.SmallActiveGreen>
+                    <div
+                      onClick={clearAll}
+                      style={{
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <ThemedText.SmallActiveGreen textColor="components.textButton.primary.default">
                         Clear all
                       </ThemedText.SmallActiveGreen>
-                    </ButtonText>
+                    </div>
                   </MediumOnly>
                 </Row>
               )}
@@ -395,12 +400,12 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
                 />
               </Section>
               {/* Chart Range Input */}
-              <Section>
-                <AutoColumn gap="md" justify="start" grow>
-                  <SubHeader>
-                    <ThemedText.SubHeader>Price Range</ThemedText.SubHeader>
-                  </SubHeader>
-                  {/* <LiquidityChartRangeInput
+              <Section $padding="0 0 24px 0">
+                <Header
+                  title="Price Range"
+                  info="Placeholder Price Range Info"
+                />
+                {/* <LiquidityChartRangeInput
                 currencyA={currencies.CURRENCY_0}
                 currencyB={currencies.CURRENCY_1}
                 feeAmount={
@@ -427,53 +432,170 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
                 onRightRangeInput={onRightRangeInput}
                 interactive={true}
               /> */}
-                  {/* Price Range Component (Manual) */}
-                  <Box $padding="24px 32px 24px 32px">
-                    <BoxSecondary $radius="8px" $padding="12px">
-                      <Column
-                        gap="md"
-                        style={{
-                          alignItems: "flex-start",
-                        }}
-                      >
-                        <ThemedText.SubHeader>
-                          Current Price
-                        </ThemedText.SubHeader>
-                        <ThemedText.SmallText>
-                          {formattedPrice}
-                        </ThemedText.SmallText>
-                      </Column>
+                {/*Placeholder Current Price */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                    padding: "0 24px",
+                    boxSizing: "border-box",
+                    height: "fit-content",
+                  }}
+                >
+                  <BoxSecondary $radius="8px" $padding="12px">
+                    <Column
+                      gap="md"
+                      style={{
+                        alignItems: "flex-start",
+                        width: "fit-content",
+                      }}
+                    >
+                      <ThemedText.SubHeader textColor="text.tertiary">
+                        Current Price
+                      </ThemedText.SubHeader>
+                      <ThemedText.SmallText textColor="text.primary">
+                        {formattedPrice}
+                      </ThemedText.SmallText>
+                    </Column>
+                  </BoxSecondary>
+                </div>
+                {/* Price Range Component (Manual) */}
+                <PriceRangeManual
+                  priceLower={priceLower}
+                  priceUpper={priceUpper}
+                  getDecrementLower={getDecrementLower}
+                  getIncrementLower={getIncrementLower}
+                  getDecrementUpper={getDecrementUpper}
+                  getIncrementUpper={getIncrementUpper}
+                  onLeftRangeInput={onLeftRangeInput}
+                  onRightRangeInput={onRightRangeInput}
+                  currencyA={currencies.CURRENCY_0}
+                  currencyB={currencies.CURRENCY_1}
+                  feeAmount={
+                    pool?.fee
+                      ? BigNumber.from(pool?.fee.toString() ?? "0")
+                      : undefined
+                  }
+                  ticksAtLimit={ticksAtLimit}
+                  disabled={!poolKey || invalidPool}
+                />
+                {outOfRange && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "100%",
+                      padding: "0 24px",
+                      boxSizing: "border-box",
+                      height: "fit-content",
+                    }}
+                  >
+                    <BoxSecondary $radius="15px" $padding="8px 16px">
+                      <ThemedText.SmallText textColor="text.loss">
+                        Your position will not earn fees or be used in trades
+                        until the market price moves into your range.
+                      </ThemedText.SmallText>
                     </BoxSecondary>
-                  </Box>
-                  <Box $padding="24px 32px 24px 32px">
-                    <PriceRangeManual
-                      priceLower={priceLower}
-                      priceUpper={priceUpper}
-                      getDecrementLower={getDecrementLower}
-                      getIncrementLower={getIncrementLower}
-                      getDecrementUpper={getDecrementUpper}
-                      getIncrementUpper={getIncrementUpper}
-                      onLeftRangeInput={onLeftRangeInput}
-                      onRightRangeInput={onRightRangeInput}
-                      currencyA={currencies.CURRENCY_0}
-                      currencyB={currencies.CURRENCY_1}
-                      feeAmount={
-                        pool?.fee
-                          ? BigNumber.from(pool?.fee.toString() ?? "0")
-                          : undefined
-                      }
-                      ticksAtLimit={ticksAtLimit}
-                    />
-                  </Box>
-                </AutoColumn>
+                  </div>
+                )}
+
+                {invalidRange && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "100%",
+                      padding: "0 24px",
+                      boxSizing: "border-box",
+                      height: "fit-content",
+                    }}
+                  >
+                    <BoxSecondary $radius="15px" $padding="8px 16px">
+                      <ThemedText.SmallText textColor="text.loss">
+                        Invalid range selected. The min price must be lower than
+                        the max price.
+                      </ThemedText.SmallText>
+                    </BoxSecondary>
+                  </div>
+                )}
               </Section>
               {/* Deposit Amounts */}
-              <Section>
-                {/* border bottom and get color from theme */}
-                <SubHeader>
-                  <ThemedText.SubHeader>Deposit Amounts</ThemedText.SubHeader>
-                </SubHeader>
-                <Box $padding="24px 32px 24px 32px">
+              <Section $padding="0 0 24px">
+                <Header title="Deposit Amounts">
+                  <Row gap="sm">
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: "2px",
+                      }}
+                    >
+                      <ThemedText.ParagraphExtraSmall textColor="text.primary">
+                        Swap to Ratio
+                      </ThemedText.ParagraphExtraSmall>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="78"
+                        height="2"
+                        viewBox="0 0 78 2"
+                        fill="none"
+                      >
+                        <path
+                          d="M1 1H77"
+                          stroke="#4B5563"
+                          strokeLinecap="square"
+                          strokeDasharray="2 3"
+                        />
+                      </svg>
+                    </div>
+                    <svg
+                      id="toggleSVG"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="40"
+                      height="24"
+                      viewBox="0 0 40 24"
+                      onClick={() => setSwapToRatio(!swapToRatio)}
+                      style={{
+                        cursor: "pointer",
+                      }}
+                    >
+                      <path
+                        d="M0 12C0 5.37258 5.37258 0 12 0H28C34.6274 0 40 5.37258 40 12C40 18.6274 34.6274 24 28 24H12C5.37258 24 0 18.6274 0 12Z"
+                        fill={
+                          swapToRatio
+                            ? theme.components.toggle.activeDefaultBackground
+                            : theme.components.toggle.inactiveDefaultBackground
+                        }
+                        style={{
+                          transition: "fill 0.3s ease",
+                        }}
+                      />
+                      <circle
+                        id="toggleCircle"
+                        cx={swapToRatio ? "28" : "12"}
+                        cy="12"
+                        r="8"
+                        fill={theme.components.toggle.activeDefaultForeground}
+                        style={{
+                          transition: "cx 0.3s ease",
+                        }}
+                      />
+                    </svg>
+                  </Row>
+                </Header>
+                <Column
+                  gap="lgplus"
+                  style={{
+                    padding: "0 24px",
+                  }}
+                >
                   <Row gap="md">
                     <CurrencyInput
                       value={formattedAmounts[Field.CURRENCY_0]}
@@ -504,10 +626,12 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
                       locked={depositBDisabled}
                     />
                   </Row>
-                </Box>
+                  {/*TODO: Swap to Ratio info text */}
+                </Column>
               </Section>
               {/* Transaction Info */}
-              {/* Buttons */}
+              {/* Pool Feature Settings */}
+              {/*Placeholder Buttons */}
               <Section>
                 <button
                   onClick={onAdd}
@@ -522,9 +646,10 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
                     !position
                   }
                   style={{
-                    color: theme.primary,
-                    border: `1px solid ${theme.border}`,
-                    backgroundColor: theme.background,
+                    color: theme.text.secondary,
+                    border: `1px solid ${theme.borders.borders}`,
+                    backgroundColor: "transparent",
+                    width: "100%",
                     borderRadius: "1000px",
                     padding: "12px",
                     fontSize: "16px",

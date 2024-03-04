@@ -4,12 +4,31 @@ import {
   ThemeProvider as StyledThemeProvider,
   createGlobalStyle,
 } from "styled-components";
-import type { BorderRadius, Colors, Gaps, Theme } from "./theme";
+import type {
+  BorderRadius,
+  Colors,
+  Gaps,
+  Theme,
+  ThemeV2,
+  ColorsV2,
+} from "./theme";
+import { tealDark, tealLight } from "./teal";
+import { orangeDark, orangeLight } from "./orange";
 export type { Color, Colors, Theme, ThemeV2, ColorsV2 } from "./theme";
 
+export type ThemeName = "tealDark" | "tealLight" | "orangeDark" | "orangeLight";
+
 export interface ThemeProps {
-  theme: Theme;
+  theme: ThemeV2 | ThemeName;
 }
+
+// Mapping theme names to their corresponding theme objects
+const themeMap: Record<ThemeName, ColorsV2> = {
+  tealDark,
+  tealLight,
+  orangeDark,
+  orangeLight,
+};
 
 export const lightTheme: Colors = {
   primary: "#FFFFFF", // pure white for primary elements
@@ -51,6 +70,7 @@ const gapValues: Gaps = {
   sm: "8px",
   md: "12px",
   lg: "20px",
+  lgplus: "24px",
   xl: "32px",
 };
 
@@ -61,7 +81,7 @@ const defaultFont = {
 export const defaultTheme = {
   font: defaultFont,
   grids: gapValues,
-  ...lightTheme,
+  ...tealDark,
   borderRadius: defaultBorderRadius,
 };
 
@@ -69,17 +89,20 @@ const ThemeContext = createContext<DefaultTheme>(toDefaultTheme(defaultTheme));
 
 // Create a Global Style component
 const GlobalStyle = createGlobalStyle`
-  body {
+  * {
     font-family: ${(props) => props.theme.font.family};
   }
 `;
 export function Provider({ theme, children }: PropsWithChildren<ThemeProps>) {
   const themeCtx = useContext(ThemeContext);
   const value = useMemo(() => {
-    return toDefaultTheme({
-      ...theme,
-      ...themeCtx,
-    } as Required<Theme>);
+    if (typeof theme === "string") {
+      return toDefaultTheme({
+        ...themeCtx,
+        ...themeMap[theme],
+      } as Required<ThemeV2>);
+    }
+    return toDefaultTheme({ ...themeCtx, ...theme } as Required<ThemeV2>);
   }, [theme, themeCtx]);
   return (
     <ThemeContext.Provider value={value}>
@@ -91,7 +114,7 @@ export function Provider({ theme, children }: PropsWithChildren<ThemeProps>) {
   );
 }
 
-function toDefaultTheme(theme: Required<Theme>): DefaultTheme {
+function toDefaultTheme(theme: Required<ThemeV2>): DefaultTheme {
   // default font is Inter
   return {
     ...theme,
