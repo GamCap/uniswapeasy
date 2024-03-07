@@ -76,7 +76,7 @@ export const ThemedText = {
       <TextWrapper
         fontSize={12}
         fontWeight={500}
-        textColor="textTertiary"
+        textColor={textColor}
         {...props}
       />
     );

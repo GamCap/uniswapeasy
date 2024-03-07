@@ -73,7 +73,18 @@ export type LPWidgetProps = {
   poolKeys: PoolKey[];
 };
 
-export default function LPWidget({ poolKeys }: LPWidgetProps) {
+export default function LPWidgetWrapper({ poolKeys }: LPWidgetProps) {
+  const { chainId } = useWeb3React();
+  if (!chainId || chainId !== 5)
+    return (
+      <ThemedText.MediumHeader textColor="text.primary">
+        Unsupported Chain
+      </ThemedText.MediumHeader>
+    );
+  return <LPWidget poolKeys={poolKeys} />;
+}
+
+function LPWidget({ poolKeys }: LPWidgetProps) {
   const { account, chainId, provider } = useWeb3React();
   //TODO: add a check for existing position
   const theme = useTheme();
@@ -220,7 +231,7 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
 
       try {
         const response = await provider.getSigner().sendTransaction(tx);
-        console.log(response);
+        console.log("transaction response", response);
       } catch (error) {
         console.error("Failed to send transaction", error);
         if (error?.code !== 4001) {
@@ -280,7 +291,7 @@ export default function LPWidget({ poolKeys }: LPWidgetProps) {
 
       try {
         const response = await provider.getSigner().sendTransaction(tx);
-        console.log(response);
+        console.log("modify position response", response);
       } catch (error) {
         console.error("Failed to send transaction", error);
         if (error?.code !== 4001) {

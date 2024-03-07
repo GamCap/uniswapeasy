@@ -105,16 +105,16 @@ export default function PoolKeySelect({
           <path
             d="M11.2001 2.1333L13.8667 4.79997M13.8667 4.79997L11.2001 7.46663M13.8667 4.79997H2.1333"
             stroke={theme.components.icon.icon}
-            stroke-width="0.9"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="0.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
           <path
             d="M2.1333 11.2001L4.79997 8.53345M2.1333 11.2001L4.79997 13.8668M2.1333 11.2001H13.8666"
             stroke={theme.components.icon.icon}
-            stroke-width="0.9"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="0.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </svg>
         <ThemedText.ParagraphExtraSmall textColor="components.button.secondary.foreground">

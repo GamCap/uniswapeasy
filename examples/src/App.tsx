@@ -18,7 +18,6 @@ const App = () => {
     "tealDark" | "tealLight" | "orangeDark" | "orangeLight"
   >("tealDark");
   useEffect(() => {
-    //when theme changes, find the first body element and set its background color
     const body = document.querySelector("body");
     if (body) {
       body.style.backgroundColor =
@@ -78,11 +77,8 @@ const App = () => {
       </button> */}
       <UniswapEasy
         theme={themeName}
-        defaultChainId={1}
-        jsonRpcUrlMap={{
-          111: JSON_RPC_URL,
-          11155111: "https://sepolia.drpc.org",
-        }}
+        defaultChainId={5}
+        jsonRpcUrlMap={{}}
         provider={provider}
         poolKeys={[
           {
