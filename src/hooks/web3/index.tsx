@@ -213,6 +213,7 @@ function useWeb3ReactConnectors({
       rpcMap: urlMap,
       projectId: "c6c9bacd35afa3eb9e6cccf6d8464395",
       // this requires the connecting wallet to support eth mainnet
+      // TODO: add goerli to l1 chains and remove from chains
       chains: [SupportedChainId.MAINNET, SupportedChainId.GOERLI],
       optionalChains: [...L1_CHAIN_IDS, ...L2_CHAIN_IDS],
       optionalMethods: [

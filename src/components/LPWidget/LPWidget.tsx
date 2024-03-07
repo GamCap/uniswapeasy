@@ -370,9 +370,13 @@ function LPWidget({ poolKeys }: LPWidgetProps) {
   return (
     <>
       {!account ? (
-        <div>Connect Wallet</div>
+        <ThemedText.MediumHeader textColor="text.primary">
+          Connect Wallet
+        </ThemedText.MediumHeader>
       ) : invalidPool ? (
-        <div>Invalid Pool</div>
+        <ThemedText.MediumHeader textColor="text.primary">
+          Invalid Pool
+        </ThemedText.MediumHeader>
       ) : (
         <StyledBoddyWrapper $hasExistingPosition={hasExistingPosition}>
           <Column gap="xl">
