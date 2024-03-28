@@ -37,6 +37,17 @@ export const ThemedText = {
       />
     );
   },
+  ParagraphSmall({ textColor, ...props }: ThemedTextProps) {
+    return (
+      <TextWrapper
+        fontSize={14}
+        fontWeight={500}
+        lineHeight={"20px"}
+        textColor={textColor}
+        {...props}
+      />
+    );
+  },
   ParagraphExtraSmall({ textColor, ...props }: ThemedTextProps) {
     return (
       <TextWrapper
@@ -102,4 +113,16 @@ export const BoxPrimary = styled(Box)`
 
 export const BoxSecondary = styled(Box)`
   background: ${({ theme }) => theme.surfacesAndElevation.elevation2};
+`;
+
+export const Section = styled.div<{ $padding?: string }>`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  gap: 24px;
+  border: 1px solid ${({ theme }) => theme.borders.borders};
+  border-radius: 24px;
+  padding: ${({ $padding }) => $padding ?? "0"};
+  background: ${({ theme }) => theme.surfacesAndElevation.elevation1};
 `;

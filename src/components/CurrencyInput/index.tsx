@@ -17,7 +17,7 @@ const StyledNumericalInput = styled(NumericalInput)<{ $loading: boolean }>`
 //a small box that displays currency logo and symbol
 //radius is 100%, 4px pad, 2px gap between logo and symbol
 // row flex
-//TODO get colors from theme
+
 const CurrencyContainer = styled.div`
   border-radius: 1000px;
   padding: 4px;
@@ -29,6 +29,8 @@ const CurrencyContainer = styled.div`
   justify-content: center;
 `;
 
+//TODO:
+//Get logo from a source
 const CurrencyLogo = styled.div`
   width: 16px;
   height: 16px;

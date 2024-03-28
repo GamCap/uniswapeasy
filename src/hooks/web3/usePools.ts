@@ -215,8 +215,6 @@ export function usePool(
       return [PoolState.NOT_EXISTS, null];
 
     try {
-      //TODO
-      //slot0 doesn't return tickSpacing, look into this
       const pool = PoolCache.getPool(
         token0,
         token1,

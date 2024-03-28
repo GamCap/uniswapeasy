@@ -8,7 +8,7 @@ import { Provider as ReduxProvider } from "react-redux";
 import store from "../state";
 import { LPWidgetProps } from "./LPWidget/LPWidget";
 
-export interface WidgetProps extends Web3Props, LPWidgetProps {
+export interface WidgetProps extends Web3Props {
   theme: ThemeV2 | ThemeName;
 }
 

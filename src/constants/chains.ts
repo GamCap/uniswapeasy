@@ -113,7 +113,6 @@ export enum SupportedChainId {
     SupportedChainId.OPTIMISM_GOERLI,
     SupportedChainId.BASE,
     SupportedChainId.CONDUIT_TESTNET,
-    SupportedChainId.ETHEREUM_SEPOLIA
     
   ] as const
   

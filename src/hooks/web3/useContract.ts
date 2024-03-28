@@ -31,7 +31,7 @@ export function useContract<T extends Contract = Contract>(
 
 
   export function useTestnetContract(){
-    return useContract("0x3A9D48AB9751398BbFa63ad67599Bb04e4BdF98b",PoolManagerABI, false);
+    return useContract("0xf7a031A182aFB3061881156df520FE7912A51617",PoolManagerABI, false);
   }
 
   export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean) {

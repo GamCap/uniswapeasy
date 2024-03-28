@@ -1,6 +1,6 @@
 {
   "name": "uniswapeasy",
-  "version": "0.0.125",
+  "version": "0.0.131",
   "description": "Uniswap V4 Liquidity Provider",
   "files": [
     "dist"

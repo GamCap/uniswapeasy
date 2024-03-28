@@ -112,8 +112,6 @@ function getCurrencyBalances(
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error | undefined>(undefined)
 
-  //TODO
-  //cancel promises on unmount
   useEffect(() => {
     if (!provider || !address) return
     setLoading(true)
@@ -125,6 +123,9 @@ function getCurrencyBalances(
         data: ERC20Interface.encodeFunctionData('balanceOf', [address]),
       })
     })
+
+    console.log('calls', calls);
+
 
     Promise.all(calls).then((results) => {
       const balances = results.map((result) => {

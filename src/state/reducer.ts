@@ -3,13 +3,14 @@ import localForage from 'localforage'
 import { PersistConfig, persistReducer } from 'redux-persist'
 
 import mintV4 from './v4/reducer'
+import form from './form/reducer'
 
 const persistedReducers = {
 }
 
 const appReducer = combineReducers({
   mintV4,
- 
+  form
 })
 
 export type AppState = ReturnType<typeof appReducer>

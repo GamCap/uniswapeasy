@@ -77,26 +77,111 @@ const App = () => {
       </button> */}
       <UniswapEasy
         theme={themeName}
-        defaultChainId={5}
+        defaultChainId={1}
         jsonRpcUrlMap={{}}
         provider={provider}
-        poolKeys={[
+        poolInfos={[
           {
-            currency0: new Token(
-              5,
-              "0x981d8acaf6af3a46785e7741d22fbe81b25ebf1e",
-              18,
-              "UNI"
-            ),
-            currency1: new Token(
-              5,
-              "0x9FD21bE27A2B059a288229361E2fA632D8D2d074",
-              6,
-              "USDC"
-            ),
-            fee: 5000,
-            tickSpacing: 60,
-            hooks: "0x0000000000000000000000000000000000000000",
+            poolKey: {
+              currency0: new Token(
+                5,
+                "0x981d8acaf6af3a46785e7741d22fbe81b25ebf1e",
+                18,
+                "UNI"
+              ),
+              currency1: new Token(
+                5,
+                "0x9FD21bE27A2B059a288229361E2fA632D8D2d074",
+                6,
+                "USDC"
+              ),
+              fee: 5000,
+              tickSpacing: 60,
+              hooks: "0x0000000000000000000000000000000000000000",
+            },
+            chainId: 5,
+          },
+          {
+            poolKey: {
+              currency0: new Token(
+                11155111,
+                "0x29f2D40B0605204364af54EC677bD022dA425d03",
+                8,
+                "WBTC"
+              ),
+              currency1: new Token(
+                11155111,
+                "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                6,
+                "USDC"
+              ),
+              fee: 4000,
+              tickSpacing: 60,
+              hooks: "0x0000000000000000000000000000000000000000",
+            },
+            chainId: 11155111,
+          },
+          {
+            poolKey: {
+              currency0: new Token(
+                11155111,
+                "0x29f2D40B0605204364af54EC677bD022dA425d03",
+                8,
+                "WBTC"
+              ),
+              currency1: new Token(
+                11155111,
+                "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                6,
+                "USDC"
+              ),
+              fee: 5000,
+              tickSpacing: 60,
+              hooks: "0x0000000000000000000000000000000000000000",
+            },
+            chainId: 11155111,
+          },
+        ]}
+        hookInfos={[
+          {
+            address: "0x0000000000000000000000000000000000000000",
+            name: "Uniswap V3",
+            abbr: "V3",
+            desc: "Uniswap V3",
+            inputFields: [
+              {
+                name: "Sender",
+                description: "The address of the sender",
+                type: "address",
+                restrictions: {
+                  required: true,
+                },
+              },
+              {
+                name: "TupleTest",
+                description: "A tuple test",
+                fields: [
+                  {
+                    name: "Number",
+                    description: "A number test",
+                    type: "uint24",
+                    restrictions: {
+                      min: "0",
+                      required: true,
+                    },
+                  },
+                  {
+                    name: "String",
+                    description: "A string test",
+                    type: "string",
+                    restrictions: {
+                      pattern: "^[a-zA-Z]*$",
+                      required: true,
+                    },
+                  },
+                ],
+              },
+            ],
           },
         ]}
       />

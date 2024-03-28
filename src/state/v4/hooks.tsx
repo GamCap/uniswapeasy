@@ -178,11 +178,6 @@ export function useV4PoolInfo(
     [tokenA, tokenB]
   );
 
-  // balances
-  //NOTE:
-  //v3 uses peripery and multicall to get balances
-  //which is not implemented yet, so we need some clarification on how to get balances
-  //for now we just return 0
   const balances = useCurrencyBalances(
     account ?? undefined,
     useMemo(

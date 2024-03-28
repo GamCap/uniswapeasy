@@ -9,7 +9,7 @@ import {
 import { useWeb3React } from "@web3-react/core";
 import { BigNumber, Contract } from "ethers";
 import usePoolManager from "../../hooks/web3/usePoolManager";
-import usePoolModifyPosition from "../../hooks/web3/usePoolModifiyPosition";
+import usePoolModifyLiquidity from "../../hooks/web3/usePoolModifiyPosition";
 import { Bound, Field } from "../../state/v4/actions";
 import LiquidityChartRangeInput from "../LiquidityChartRangeInput";
 import Column from "components/Column";
@@ -17,7 +17,7 @@ import { PositionHeader } from "../PositionHeader";
 import Header from "../Header";
 import styled, { useTheme } from "styled-components";
 import Row from "components/Row";
-import { BoxSecondary, ThemedText } from "theme/components";
+import { BoxSecondary, ThemedText, Section } from "theme/components";
 import PoolKeySelect from "../PoolKeySelect";
 import PriceRangeManual from "../PriceRangeManual";
 import { IPoolManager, PoolKeyStruct } from "abis/types/PoolManager";
@@ -26,6 +26,9 @@ import CurrencyInput from "components/CurrencyInput";
 import { Currency, CurrencyAmount } from "@uniswap/sdk-core";
 import { useTokenContract } from "hooks/web3/useContract";
 import { parseUnits } from "ethers/lib/utils";
+import { InputField } from "../DynamicFeatureForm/types";
+import DynamicFeatureForm from "../DynamicFeatureForm";
+import { useFormState } from "state/form/hooks";
 
 interface BodyWrapperProps {
   $maxWidth?: string;
@@ -34,19 +37,6 @@ interface BodyWrapperProps {
 const ContentColumn = styled(Column)`
   width: 100%;
   max-width: 692px;
-`;
-
-//TODO add border radius to theme
-const Section = styled.div<{ $padding?: string }>`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  align-self: stretch;
-  gap: 24px;
-  border: 1px solid ${({ theme }) => theme.borders.borders};
-  border-radius: 24px;
-  padding: ${({ $padding }) => $padding ?? "0"};
-  background: ${({ theme }) => theme.surfacesAndElevation.elevation1};
 `;
 
 const BodyWrapper = styled.div<BodyWrapperProps>`
@@ -69,30 +59,68 @@ const MediumOnly = styled.div`
   }
 `;
 
-export type LPWidgetProps = {
-  poolKeys: PoolKey[];
+type PoolInfo = {
+  chainId: number;
+  poolKey: PoolKey;
 };
 
-export default function LPWidgetWrapper({ poolKeys }: LPWidgetProps) {
+type HookInfo = {
+  address: string;
+  name: string;
+  abbr: string;
+  desc: string;
+  inputFields: InputField[];
+};
+
+export type LPWidgetProps = {
+  poolInfos: PoolInfo[];
+  hookInfos: HookInfo[];
+};
+
+export default function LPWidgetWrapper(props: LPWidgetProps) {
   const { chainId } = useWeb3React();
-  if (!chainId || chainId !== 5)
+  if (!chainId || chainId !== 11155111)
     return (
       <ThemedText.MediumHeader textColor="text.primary">
         Unsupported Chain
       </ThemedText.MediumHeader>
     );
-  return <LPWidget poolKeys={poolKeys} />;
+  return <LPWidget {...props} />;
 }
 
-function LPWidget({ poolKeys }: LPWidgetProps) {
+function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
   const { account, chainId, provider } = useWeb3React();
   //TODO: add a check for existing position
   const theme = useTheme();
-  const [poolKey, setPoolKey] = useState<PoolKey | undefined>(poolKeys[0]);
+
+  const [poolKey, setPoolKey] = useState<PoolKey | undefined>(undefined);
   const [swapToRatio, setSwapToRatio] = useState(false);
+
+  const poolKeys = useMemo(() => {
+    return poolInfos
+      .filter((poolInfo) => poolInfo.chainId === chainId)
+      .map((poolInfo) => poolInfo.poolKey);
+  }, [poolInfos, chainId]);
+
+  useEffect(() => {
+    if (poolKeys.length > 0) {
+      setPoolKey(poolKeys[0]);
+    }
+  }, [poolKeys]);
+
+  const selectedHook = useMemo(() => {
+    return hookInfos.find((hookInfo) => hookInfo.address === poolKey?.hooks);
+  }, [hookInfos, poolKey]);
+
+  const { values } = useFormState();
+
+  useEffect(() => {
+    console.log("values", values);
+  }, [values]);
 
   const { independentField, typedValue, startPriceTypedValue } =
     useV4MintState();
+
   const {
     pool,
     ticks,
@@ -118,7 +146,7 @@ function LPWidget({ poolKeys }: LPWidgetProps) {
     //existingPosition
   );
 
-  const { poolModifyPosition } = usePoolModifyPosition();
+  const { poolModifyLiquidity } = usePoolModifyLiquidity();
 
   const formattedPrice = useMemo(() => {
     return price
@@ -180,7 +208,7 @@ function LPWidget({ poolKeys }: LPWidgetProps) {
       !provider ||
       !account ||
       !poolManager ||
-      !poolModifyPosition
+      !poolModifyLiquidity
     ) {
       return;
     }
@@ -207,11 +235,6 @@ function LPWidget({ poolKeys }: LPWidgetProps) {
       spender: string,
       amount: CurrencyAmount<Currency>
     ) => {
-      //TODO
-      //decide on slippage
-      // const slippage = 1;
-      // const slippageAmount = amount.mul(100 + slippage).div(100);
-
       const data = contract.interface.encodeFunctionData("approve", [
         spender,
         toHex(amount.quotient),
@@ -244,18 +267,18 @@ function LPWidget({ poolKeys }: LPWidgetProps) {
       await Promise.all([
         approveAndSendTransaction(
           c0contract,
-          poolModifyPosition.address,
+          poolModifyLiquidity.address,
           parsedAmounts[Field.CURRENCY_0]
         ),
         approveAndSendTransaction(
           c1contract,
-          poolModifyPosition.address,
+          poolModifyLiquidity.address,
           parsedAmounts[Field.CURRENCY_1]
         ),
       ]);
 
-      const data = poolModifyPosition.interface.encodeFunctionData(
-        "modifyPosition",
+      const data = poolModifyLiquidity.interface.encodeFunctionData(
+        "modifyLiquidity",
         [
           {
             currency0: poolKey.currency0.isToken
@@ -272,7 +295,7 @@ function LPWidget({ poolKeys }: LPWidgetProps) {
             tickLower: BigNumber.from(position.tickLower),
             tickUpper: BigNumber.from(position.tickUpper),
             liquidityDelta: BigNumber.from(position.liquidity.toString()),
-          } as IPoolManager.ModifyPositionParamsStruct,
+          } as IPoolManager.ModifyLiquidityParamsStruct,
           "0x",
         ]
       );
@@ -283,7 +306,7 @@ function LPWidget({ poolKeys }: LPWidgetProps) {
         value: string;
         gasLimit: BigNumber;
       } = {
-        to: poolModifyPosition.address,
+        to: poolModifyLiquidity.address,
         data: data,
         value: toHex(0),
         gasLimit: BigNumber.from(500000),
@@ -332,35 +355,8 @@ function LPWidget({ poolKeys }: LPWidgetProps) {
     pool
   );
 
-  const [minPrice, setMinPrice] = useState<string | undefined>();
-  const [maxPrice, setMaxPrice] = useState<string | undefined>();
-
   //TODO: add existing position check
   const hasExistingPosition = false;
-
-  const handleSetFullRange = useCallback(() => {
-    getSetFullRange();
-    const tempMinPrice = pricesAtLimit[Bound.LOWER];
-    if (tempMinPrice && tempMinPrice.toSignificant(5) !== minPrice) {
-      setMinPrice(tempMinPrice.toSignificant(5));
-    }
-    const tempMaxPrice = pricesAtLimit[Bound.UPPER];
-    if (tempMaxPrice && tempMaxPrice.toSignificant(5) !== maxPrice) {
-      setMaxPrice(tempMaxPrice.toSignificant(5));
-    }
-  }, [getSetFullRange, pricesAtLimit]);
-
-  useEffect(() => {
-    if (minPrice && typeof minPrice === "string" && !isNaN(minPrice as any)) {
-      onLeftRangeInput(minPrice);
-    }
-  }, [minPrice, onLeftRangeInput]);
-
-  useEffect(() => {
-    if (maxPrice && typeof maxPrice === "string" && !isNaN(maxPrice as any)) {
-      onRightRangeInput(maxPrice);
-    }
-  }, [maxPrice, onRightRangeInput]);
 
   useEffect(() => {
     console.log("pool", pool);
@@ -645,7 +641,17 @@ function LPWidget({ poolKeys }: LPWidgetProps) {
                 </Column>
               </Section>
               {/* Transaction Info */}
+
               {/* Pool Feature Settings */}
+              {selectedHook && (
+                <Section $padding="0 0 24px">
+                  <Header
+                    title="Pool feature settings"
+                    info="This form is generated dynamically based on the fields provided."
+                  />
+                  <DynamicFeatureForm fields={selectedHook.inputFields} />
+                </Section>
+              )}
               {/*Placeholder Buttons */}
               <Section>
                 <button

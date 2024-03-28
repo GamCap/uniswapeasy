@@ -28,7 +28,7 @@ export const JSON_RPC_FALLBACK_ENDPOINTS: Record<SupportedChainId, string[]> = {
   ],
   [SupportedChainId.GOERLI]: [
     // "Safe" URLs
-    "https://ethereum-goerli-rpc.publicnode.com",
+    "https://goerli.gateway.tenderly.co",
     // "Fallback" URLs
     "https://rpc.ankr.com/eth_goerli",
   ],
