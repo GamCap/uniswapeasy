@@ -278,7 +278,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
       ]);
 
       const data = poolModifyLiquidity.interface.encodeFunctionData(
-        "modifyLiquidity",
+        "modifyLiquidity((address,address,uint24,int24,address),(int24,int24,int256),bytes)",
         [
           {
             currency0: poolKey.currency0.isToken

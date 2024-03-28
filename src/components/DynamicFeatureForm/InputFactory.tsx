@@ -39,17 +39,19 @@ const StyledInput = styled.input<{
   -webkit-appearance: textfield;
   text-align: right;
 
-  ::-webkit-search-decoration {
+  &::-webkit-search-decoration {
     -webkit-appearance: none;
   }
 
-  [type="number"] {
+  &[type="number"] {
     -moz-appearance: textfield;
+    appearance: textfield;
   }
 
-  ::-webkit-outer-spin-button,
-  ::-webkit-inner-spin-button {
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
     -webkit-appearance: none;
+    margin: 0;
   }
 
   ::placeholder {
@@ -83,7 +85,7 @@ const BigNumberInput = ({
       </ThemedText.ParagraphExtraSmall>
     </Column>
     <StyledInput
-      type="text"
+      type="number"
       inputMode="numeric"
       name={field.name}
       value={value}
