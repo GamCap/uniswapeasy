@@ -2,131 +2,60 @@ import { BigNumberish, BigNumber } from "@ethersproject/bignumber";
 import Column from "components/Column";
 import Row, { RowBetween } from "components/Row";
 import { useFormState } from "state/form/hooks";
-import { useTheme } from "styled-components";
+import styled, { useTheme } from "styled-components";
 import { ThemedText } from "theme/components";
 import { Tuple, InputField, BaseInputField } from "./types";
 import { isTuple } from "./utils";
 
-// //TODO:
-// //TupleInputField extending BaseInputField is a bit weird, but it's the easiest way to make TypeScript happy for now
-// //We should probably refactor this to make more sense in the future
-// interface TupleInputField extends BaseInputField {
-//   nestedFields: InputField[];
-//   tupleName?: string;
-//   tupleDescription?: string;
-// }
+const StyledInput = styled.input<{
+  error?: boolean;
+  fontSize?: string;
+  align?: string;
+  disabled?: boolean;
+}>`
+  color: ${({ disabled, error, theme }) =>
+    disabled
+      ? theme.components.inputFieldCurrencyField.disabledForeground
+      : error
+      ? theme.components.inputFieldCurrencyField.foreground
+      : theme.components.inputFieldCurrencyField.filledForeground};
+  pointer-events: ${({ disabled }) => (disabled ? "none" : "auto")};
+  width: 0;
+  max-width: 25%;
+  position: relative;
+  font-weight: 500;
+  outline: none;
+  border: none;
+  flex: 1 1 auto;
+  background-color: ${({ theme }) =>
+    theme.components.inputFieldCurrencyField.filledBackground};
+  font-size: ${({ fontSize }) => fontSize ?? "16px"};
+  text-align: ${({ align }) => align && align};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 12px;
+  border-radius: 8px;
+  -webkit-appearance: textfield;
+  text-align: right;
 
-// type InputField = BaseInputField | TupleInputField;
+  ::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
 
-// const isTuple = (field: InputField): field is TupleInputField => {
-//   return "nestedFields" in field;
-// };
+  [type="number"] {
+    -moz-appearance: textfield;
+  }
 
-// const BigNumberInput = ({
-//   field,
-//   onChange,
-// }: {
-//   field: BaseInputField;
-//   onChange: (path: string, value: BigNumberish) => void;
-// }) => (
-//   <div>
-//     <label>{field.description}</label>
-//     <input
-//       type="text"
-//       name={field.name}
-//       defaultValue={field.defaultValue}
-//       min={field.restrictions?.min}
-//       max={field.restrictions?.max}
-//       required={field.restrictions?.required}
-//       pattern={field.restrictions?.pattern}
-//       onChange={(e) => onChange(BigNumber.from(e.target.value))}
-//     />
-//   </div>
-// );
+  ::-webkit-outer-spin-button,
+  ::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
 
-// const BooleanInput = ({
-//   field,
-//   onChange,
-// }: {
-//   field: BaseInputField;
-//   onChange: (path: string, value: boolean) => void;
-// }) => (
-//   <div>
-//     <label>{field.description}</label>
-//     <input
-//       type="checkbox"
-//       name={field.name}
-//       defaultChecked={field.defaultValue === "true"}
-//       required={field.restrictions?.required}
-//       onChange={(e) => onChange(e.target.checked)}
-//     />
-//   </div>
-// );
-
-// const TextInput = ({
-//   field,
-//   onChange,
-// }: {
-//   field: BaseInputField;
-//   onChange: (path: string, value: string) => void;
-// }) => (
-//   <div>
-//     <label>{field.description}</label>
-//     <input
-//       type="text"
-//       name={field.name}
-//       defaultValue={field.defaultValue}
-//       pattern={field.restrictions?.pattern}
-//       required={field.restrictions?.required}
-//       onChange={(e) => onChange(e.target.value)}
-//     />
-//   </div>
-// );
-
-// const ByteArrayInput = ({
-//   field,
-//   onChange,
-// }: {
-//   field: BaseInputField;
-//   onChange: (path: string, value: string) => void;
-// }) => (
-//   <div>
-//     <label>{field.description}</label>
-//     <input
-//       type="text"
-//       name={field.name}
-//       defaultValue={field.defaultValue}
-//       required={field.restrictions?.required}
-//       onChange={(e) => onChange(e.target.value)}
-//     />
-//   </div>
-// );
-
-// const TupleInput = ({
-//   tuple,
-//   path = "",
-//   onChange,
-// }: {
-//   tuple: Tuple;
-//   path: string;
-//   onChange: (path: string, value: any) => void;
-// }) => (
-//   <fieldset>
-//     <legend>{tuple.name}</legend>
-//     <p>{tuple.description}</p>
-//     {tuple.fields.map((nestedField, index) => (
-//       <InputFactory
-//         key={index}
-//         field={nestedField}
-//         path={path}
-//         onChange={onChange}
-//       />
-//     ))}
-//   </fieldset>
-// );
-
-//these components should create current path by using path and field name
-// and use it on onChange callback
+  ::placeholder {
+    color: ${({ theme }) => theme.text.tertiary};
+  }
+`;
 
 const BigNumberInput = ({
   field,
@@ -153,15 +82,16 @@ const BigNumberInput = ({
         {field.description}
       </ThemedText.ParagraphExtraSmall>
     </Column>
-    <input
-      type="number"
+    <StyledInput
+      type="text"
+      inputMode="numeric"
       name={field.name}
       value={value}
       min={field.restrictions?.min}
       max={field.restrictions?.max}
       required={field.restrictions?.required}
       pattern={field.restrictions?.pattern}
-      onChange={(e) => onChange(path, BigNumber.from(e.target.value))}
+      onChange={(e) => onChange(path, e.target.value)}
     />
   </RowBetween>
 );
@@ -227,7 +157,7 @@ const TextInput = ({
         {field.description}
       </ThemedText.ParagraphExtraSmall>
     </Column>
-    <input
+    <StyledInput
       type="text"
       name={field.name}
       value={value}
@@ -263,8 +193,7 @@ const ByteArrayInput = ({
         {field.description}
       </ThemedText.ParagraphExtraSmall>
     </Column>
-    <label>{field.description}</label>
-    <input
+    <StyledInput
       type="text"
       name={field.name}
       value={value}

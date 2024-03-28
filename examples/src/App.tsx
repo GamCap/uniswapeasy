@@ -167,6 +167,7 @@ const App = () => {
                     type: "uint24",
                     restrictions: {
                       min: "0",
+                      pattern: "[0-9]*$",
                       required: true,
                     },
                   },
