@@ -2,6 +2,8 @@ import { styled, useTheme } from "styled-components";
 import { PoolKey } from "state/v4/hooks";
 import Row, { RowBetween } from "components/Row";
 import { ThemedText } from "theme/components";
+import { useEffect, useState } from "react";
+import Modal from "../Modal";
 
 const CurrencyLogo = styled.div`
   width: 24px;
@@ -45,6 +47,7 @@ const ChangeButton = styled.button`
   border: ${({ theme }) =>
     `1px solid ${theme.components.button.secondary.border}`};
   background: ${({ theme }) => theme.components.button.secondary.background};
+  cursor: pointer;
 `;
 
 const BadgeWrapper = styled.div`
@@ -65,8 +68,11 @@ export default function PoolKeySelect({
   onSelect?: (poolKey: PoolKey) => void;
 }) {
   const theme = useTheme();
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <RowBetween padding="20px 32px">
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} />
       <Row gap="md">
         <LogoWrapper>
           {/* 
@@ -94,13 +100,22 @@ export default function PoolKeySelect({
         </PoolTitle>
       </Row>
       {/* Change Button */}
-      <ChangeButton>
+      <ChangeButton
+        disabled={false}
+        onClick={() => {
+          console.log("Change button clicked");
+          setIsOpen(true);
+        }}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"
           height="16"
           viewBox="0 0 16 16"
           fill="none"
+          style={{
+            pointerEvents: "none",
+          }}
         >
           <path
             d="M11.2001 2.1333L13.8667 4.79997M13.8667 4.79997L11.2001 7.46663M13.8667 4.79997H2.1333"
