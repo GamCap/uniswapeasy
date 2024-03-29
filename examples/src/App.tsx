@@ -145,9 +145,9 @@ const App = () => {
         hookInfos={[
           {
             address: "0x0000000000000000000000000000000000000000",
-            name: "Uniswap V3",
-            abbr: "V3",
-            desc: "Uniswap V3",
+            name: "Test Hook",
+            abbr: "TestHook",
+            desc: "This is a test hook",
             inputFields: [
               {
                 name: "Sender",

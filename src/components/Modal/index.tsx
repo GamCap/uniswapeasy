@@ -1,9 +1,11 @@
 import { useRef, useEffect } from "react";
 import { styled } from "styled-components";
+import { ThemedText } from "theme/components";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
+  title?: string;
   children?: React.ReactNode;
 }
 
@@ -24,13 +26,30 @@ const Backdrop = styled.div`
 const Content = styled.div`
   background: ${({ theme }) => theme.surfacesAndElevation.elevation1};
   border: 1px solid ${({ theme }) => theme.borders.borders};
-  width: 400px;
-  height: 400px;
+  min-width: 640px;
+  min-height: 300px;
   border-radius: 24px;
   z-index: 1000;
+  overflow: hidden;
 `;
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+const Header = styled.div`
+  padding: 20px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid ${({ theme }) => theme.borders.dividers};
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  padding: 8px;
+  border: none;
+  color: ${({ theme }) => theme.components.icon.icon};
+  cursor: pointer;
+`;
+
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
   const modalContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -61,7 +80,16 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   return (
     <Backdrop>
       <Content ref={modalContentRef}>
-        <button onClick={onClose}>Close</button>
+        <Header
+          style={{
+            justifyContent: title ? "space-between" : "flex-end",
+          }}
+        >
+          <ThemedText.ParagraphRegular textColor="text.primary">
+            {title}
+          </ThemedText.ParagraphRegular>
+          <CloseButton onClick={onClose}>X</CloseButton>
+        </Header>
         {children}
       </Content>
     </Backdrop>

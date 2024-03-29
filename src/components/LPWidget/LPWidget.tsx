@@ -102,6 +102,15 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
       .map((poolInfo) => poolInfo.poolKey);
   }, [poolInfos, chainId]);
 
+  const hookAddressToAbbr = useMemo(() => {
+    return hookInfos.reduce((accumulator, hookInfo) => {
+      return {
+        ...accumulator,
+        [hookInfo.address]: hookInfo.abbr,
+      };
+    }, {});
+  }, [hookInfos]);
+
   useEffect(() => {
     if (poolKeys.length > 0) {
       setPoolKey(poolKeys[0]);
@@ -406,6 +415,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
               <Section>
                 <PoolKeySelect
                   poolKeys={poolKeys}
+                  hookAddressToAbbr={hookAddressToAbbr}
                   selectedPoolKey={poolKey}
                   onSelect={setPoolKey}
                 />
