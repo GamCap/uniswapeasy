@@ -181,10 +181,170 @@ const App = () => {
             },
             chainId: 11155111,
           },
+          {
+            poolKey: {
+              currency0: new Token(
+                11155111,
+                "0x29f2D40B0605204364af54EC677bD022dA425d03",
+                8,
+                "UNI"
+              ),
+              currency1: new Token(
+                11155111,
+                "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                6,
+                "USDC"
+              ),
+              fee: 5000,
+              tickSpacing: 60,
+              hooks: "0x0000000000000000000000000000000000000001",
+            },
+            chainId: 11155111,
+          },
+          {
+            poolKey: {
+              currency0: new Token(
+                11155111,
+                "0x29f2D40B0605204364af54EC677bD022dA425d03",
+                8,
+                "UNI"
+              ),
+              currency1: new Token(
+                11155111,
+                "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                6,
+                "USDC"
+              ),
+              fee: 5000,
+              tickSpacing: 60,
+              hooks: "0x0000000000000000000000000000000000000002",
+            },
+            chainId: 11155111,
+          },
+          {
+            poolKey: {
+              currency0: new Token(
+                11155111,
+                "0x29f2D40B0605204364af54EC677bD022dA425d03",
+                8,
+                "UNI"
+              ),
+              currency1: new Token(
+                11155111,
+                "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                6,
+                "USDC"
+              ),
+              fee: 5000,
+              tickSpacing: 60,
+              hooks: "0x0000000000000000000000000000000000000003",
+            },
+            chainId: 11155111,
+          },
+          {
+            poolKey: {
+              currency0: new Token(
+                11155111,
+                "0x29f2D40B0605204364af54EC677bD022dA425d03",
+                8,
+                "UNI"
+              ),
+              currency1: new Token(
+                11155111,
+                "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                6,
+                "USDC"
+              ),
+              fee: 5000,
+              tickSpacing: 60,
+              hooks: "0x0000000000000000000000000000000000000000",
+            },
+            chainId: 11155111,
+          },
+          {
+            poolKey: {
+              currency0: new Token(
+                11155111,
+                "0x29f2D40B0605204364af54EC677bD022dA425d03",
+                8,
+                "UNI"
+              ),
+              currency1: new Token(
+                11155111,
+                "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                6,
+                "USDT"
+              ),
+              fee: 5000,
+              tickSpacing: 60,
+              hooks: "0x0000000000000000000000000000000000000000",
+            },
+            chainId: 11155111,
+          },
+          {
+            poolKey: {
+              currency0: new Token(
+                11155111,
+                "0x29f2D40B0605204364af54EC677bD022dA425d03",
+                8,
+                "UNI"
+              ),
+              currency1: new Token(
+                11155111,
+                "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                6,
+                "DAI"
+              ),
+              fee: 5000,
+              tickSpacing: 60,
+              hooks: "0x0000000000000000000000000000000000000001",
+            },
+            chainId: 11155111,
+          },
+          {
+            poolKey: {
+              currency0: new Token(
+                11155111,
+                "0x29f2D40B0605204364af54EC677bD022dA425d03",
+                8,
+                "DAI"
+              ),
+              currency1: new Token(
+                11155111,
+                "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                6,
+                "USDT"
+              ),
+              fee: 5000,
+              tickSpacing: 60,
+              hooks: "0x0000000000000000000000000000000000000002",
+            },
+            chainId: 11155111,
+          },
+          {
+            poolKey: {
+              currency0: new Token(
+                11155111,
+                "0x29f2D40B0605204364af54EC677bD022dA425d03",
+                8,
+                "DAI"
+              ),
+              currency1: new Token(
+                11155111,
+                "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                6,
+                "USDT"
+              ),
+              fee: 5000,
+              tickSpacing: 60,
+              hooks: "0x0000000000000000000000000000000000000003",
+            },
+            chainId: 11155111,
+          },
         ]}
         hookInfos={[
           {
-            address: "0x0000000000000000000000000000000000000000",
+            address: "0x0000000000000000000000000000000000000003",
             name: "Test Hook",
             abbr: "TestHook",
             desc: "This is a test hook",
@@ -252,6 +412,37 @@ const App = () => {
             address: "0x2809B0D6DABb3A338341Bfc45Fe61D640A877caA",
             name: "Gamcap Test Hook",
             abbr: "GamCap2",
+            desc: "This is a test hook created by GamCap",
+            inputFields: [
+              {
+                name: "Sender",
+                description: "The address of the sender",
+                type: "address",
+                restrictions: {
+                  required: true,
+                },
+              },
+              {
+                name: "Arbitrary number",
+                description: "An arbitrary number to test",
+                type: "uint256",
+                restrictions: {
+                  required: true,
+                },
+              },
+            ],
+          },
+          {
+            address: "0x0000000000000000000000000000000000000001",
+            name: "Dummy Hook 1",
+            abbr: "",
+            desc: "This is a test hook created by GamCap",
+            inputFields: [],
+          },
+          {
+            address: "0x0000000000000000000000000000000000000002",
+            name: "Dummy Hook 2",
+            abbr: "Dummy",
             desc: "This is a test hook created by GamCap",
             inputFields: [
               {

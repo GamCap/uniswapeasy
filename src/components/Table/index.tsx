@@ -53,10 +53,46 @@ const TableWrapper = styled.div`
   overflow-x: auto;
 `;
 
-const SearchInput = styled.input`
-  padding: 8px;
-  width: 98%;
+//top-bottom 12px left-right 8px padding
+const SearchBoxWrapper = styled.div`
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  border-radius: 8px;
+  border: 1px solid
+    ${({ theme }) => theme.components.inputFieldCurrencyField.border};
+  background-color: ${({ theme }) =>
+    theme.components.inputFieldCurrencyField.background};
   box-sizing: border-box;
+`;
+
+const StyledIcon = styled.svg`
+  color: ${({ theme }) => theme.components.icon.icon};
+`;
+
+const SearchInput = styled.input`
+  flex: 1 1 auto;
+  border: none;
+  background-color: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: ${({ theme }) =>
+    theme.components.inputFieldCurrencyField.typeAndActiveForeground};
+  &::placeholder: ${({ theme }) =>
+    theme.components.inputFieldCurrencyField.foreground};
+  outline: none;
+  box-sizing: border-box;
+  &:focus {
+    outline: none;
+  }
+
 `;
 
 const PaginationWrapper = styled.div`
@@ -68,6 +104,21 @@ const PaginationWrapper = styled.div`
   justify-content: center;
   width: 100%;
   box-sizing: border-box;
+`;
+
+const PageButton = styled.button`
+  background-color: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  color: ${({ theme }) => theme.components.icon.icon};
+  :disabled {
+    color: ${({ theme }) => theme.components.icon.icon};
+    background-color: transparent;
+    opacity: 0;
+  }
 `;
 
 interface Column {
@@ -138,12 +189,40 @@ const TableComponent: React.FC<TableProps> = ({
 
   return (
     <TableWrapper>
-      <SearchInput
-        type="text"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          padding: "24px",
+          gap: "16px",
+        }}
+      >
+        <SearchBoxWrapper>
+          <StyledIcon
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+          >
+            <path
+              d="M17.5 17.5L13.875 13.875M15.8333 9.16667C15.8333 12.8486 12.8486 15.8333 9.16667 15.8333C5.48477 15.8333 2.5 12.8486 2.5 9.16667C2.5 5.48477 5.48477 2.5 9.16667 2.5C12.8486 2.5 15.8333 5.48477 15.8333 9.16667Z"
+              stroke="currentColor"
+              stroke-width="1.66"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </StyledIcon>
+
+          <SearchInput
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </SearchBoxWrapper>
+      </div>
       <StyledTable>
         <thead>
           <StyledTr>
@@ -166,9 +245,13 @@ const TableComponent: React.FC<TableProps> = ({
             >
               {columns.map((column) => (
                 <StyledTd key={column.key}>
-                  {renderers[column.key]
-                    ? renderers[column.key](item[column.key])
-                    : item[column.key]}
+                  {renderers[column.key] ? (
+                    renderers[column.key](item[column.key])
+                  ) : (
+                    <ThemedText.ParagraphExtraSmall textColor="text.primary">
+                      {item[column.key]}
+                    </ThemedText.ParagraphExtraSmall>
+                  )}
                 </StyledTd>
               ))}
             </StyledTr>
@@ -176,7 +259,7 @@ const TableComponent: React.FC<TableProps> = ({
         </tbody>
       </StyledTable>
       <PaginationWrapper>
-        <button
+        <PageButton
           onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
           disabled={currentPage === 1}
         >
@@ -194,11 +277,11 @@ const TableComponent: React.FC<TableProps> = ({
               fill={theme.components.icon.icon}
             />
           </svg>
-        </button>
+        </PageButton>
         <ThemedText.ParagraphExtraSmall textColor="text.primary">
           Page {currentPage} of {totalPages}
         </ThemedText.ParagraphExtraSmall>
-        <button
+        <PageButton
           onClick={() =>
             setCurrentPage((prev) => Math.min(totalPages, prev + 1))
           }
@@ -219,7 +302,7 @@ const TableComponent: React.FC<TableProps> = ({
               fill={theme.components.icon.icon}
             />
           </svg>
-        </button>
+        </PageButton>
       </PaginationWrapper>
     </TableWrapper>
   );
