@@ -141,6 +141,46 @@ const App = () => {
             },
             chainId: 11155111,
           },
+          {
+            poolKey: {
+              currency0: new Token(
+                11155111,
+                "0x29f2D40B0605204364af54EC677bD022dA425d03",
+                8,
+                "WBTC"
+              ),
+              currency1: new Token(
+                11155111,
+                "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                6,
+                "USDC"
+              ),
+              fee: 6000,
+              tickSpacing: 60,
+              hooks: "0x3c03aE381A591F0A9Fc845FEbf22e9f50142a19D",
+            },
+            chainId: 11155111,
+          },
+          {
+            poolKey: {
+              currency0: new Token(
+                11155111,
+                "0x29f2D40B0605204364af54EC677bD022dA425d03",
+                8,
+                "WBTC"
+              ),
+              currency1: new Token(
+                11155111,
+                "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                6,
+                "USDC"
+              ),
+              fee: 5000,
+              tickSpacing: 60,
+              hooks: "0x2809B0D6DABb3A338341Bfc45Fe61D640A877caA",
+            },
+            chainId: 11155111,
+          },
         ]}
         hookInfos={[
           {
@@ -181,6 +221,54 @@ const App = () => {
                     },
                   },
                 ],
+              },
+            ],
+          },
+          {
+            address: "0x3c03aE381A591F0A9Fc845FEbf22e9f50142a19D",
+            name: "Gamcap Test Hook",
+            abbr: "GamCap",
+            desc: "This is a test hook created by GamCap",
+            inputFields: [
+              {
+                name: "Sender",
+                description: "The address of the sender",
+                type: "address",
+                restrictions: {
+                  required: true,
+                },
+              },
+              {
+                name: "Arbitrary number",
+                description: "An arbitrary number to test",
+                type: "uint256",
+                restrictions: {
+                  required: true,
+                },
+              },
+            ],
+          },
+          {
+            address: "0x2809B0D6DABb3A338341Bfc45Fe61D640A877caA",
+            name: "Gamcap Test Hook",
+            abbr: "GamCap2",
+            desc: "This is a test hook created by GamCap",
+            inputFields: [
+              {
+                name: "Sender",
+                description: "The address of the sender",
+                type: "address",
+                restrictions: {
+                  required: true,
+                },
+              },
+              {
+                name: "Arbitrary number",
+                description: "An arbitrary number to test",
+                type: "uint256",
+                restrictions: {
+                  required: true,
+                },
               },
             ],
           },
