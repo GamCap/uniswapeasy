@@ -173,7 +173,7 @@ export default function PoolKeySelect({
   }));
 
   const poolFilterMethod = (item: any, searchTerm: string) => {
-    const poolText = `${item?.Pool?.currency0?.symbol} / ${item?.Pool?.currency1?.symbol}`;
+    const poolText = `${item?.Pool?.currency0?.symbol} / ${item?.Pool?.currency1?.symbol} ${item?.Pool?.currency0?.address} ${item?.Pool?.currency1?.address} ${item?.Pool?.address}`;
     return poolText.toLowerCase().includes(searchTerm.toLowerCase());
   };
 
@@ -199,6 +199,17 @@ export default function PoolKeySelect({
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         title="Find a pool"
+        //breakpoint is min media query width
+        breakpoints={[
+          {
+            breakpoint: "768px",
+            width: "600px",
+          },
+          {
+            breakpoint: "1024px",
+            width: "1000px",
+          },
+        ]}
       >
         <Table
           columns={columns}
@@ -217,6 +228,7 @@ export default function PoolKeySelect({
             }
             setIsOpen(false);
           }}
+          searchPlaceholder="Search by token, pool address, or feature"
         />
       </Modal>
       <Row gap="md">

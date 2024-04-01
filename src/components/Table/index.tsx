@@ -19,10 +19,13 @@ const StyledTr = styled.tr`
   td {
     padding-top: 20px;
     padding-bottom: 20px;
+    padding-right: 20px;
+    width: min-content;
   }
 
   td:first-child {
     padding-left: 32px;
+    width: 100%;
   }
 
   td:last-child {
@@ -31,10 +34,13 @@ const StyledTr = styled.tr`
 
   th {
     padding-bottom: 20px;
+    padding-right: 20px;
+    width: min-content;
   }
 
   th:first-child {
     padding-left: 32px;
+    width: 100%;
   }
 
   th:last-child {
@@ -71,11 +77,12 @@ const SearchBoxWrapper = styled.div`
 `;
 
 const StyledIcon = styled.svg`
+  flex: 1 0 auto;
   color: ${({ theme }) => theme.components.icon.icon};
 `;
 
 const SearchInput = styled.input`
-  flex: 1 1 auto;
+  width: 100%;
   border: none;
   background-color: transparent;
   -webkit-appearance: none;
@@ -96,7 +103,7 @@ const SearchInput = styled.input`
 `;
 
 const PaginationWrapper = styled.div`
-  padding: 8px;
+  padding: 28px;
   display: flex;
   flex-direction: row;
   gap: 8px;
@@ -132,6 +139,7 @@ interface TableProps {
   pageSize: number;
   renderers: { [key: string]: (data: any) => JSX.Element };
   onSelect?: (item: any) => void;
+  searchPlaceholder?: string;
 }
 
 const TableComponent: React.FC<TableProps> = ({
@@ -140,6 +148,7 @@ const TableComponent: React.FC<TableProps> = ({
   pageSize,
   renderers,
   onSelect,
+  searchPlaceholder,
 }) => {
   const theme = useTheme();
   const [currentPage, setCurrentPage] = useState(1);
@@ -217,7 +226,7 @@ const TableComponent: React.FC<TableProps> = ({
 
           <SearchInput
             type="text"
-            placeholder="Search..."
+            placeholder={searchPlaceholder || "Search"}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />

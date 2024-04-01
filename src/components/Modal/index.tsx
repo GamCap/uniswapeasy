@@ -7,6 +7,7 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   children?: React.ReactNode;
+  breakpoints?: { breakpoint: string; width: string }[];
 }
 
 const Backdrop = styled.div`
@@ -18,19 +19,34 @@ const Backdrop = styled.div`
   background-color: rgba(0, 1, 3, 0.7);
   backdrop-filter: blur(8px);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-end;
   align-items: center;
+  @media (min-width: 768px) {
+    justify-content: center;
+  }
   z-index: 999;
 `;
 
-const Content = styled.div`
+const Content = styled.div<{
+  breakpoints?: { breakpoint: string; width: string }[];
+}>`
   background: ${({ theme }) => theme.surfacesAndElevation.elevation1};
   border: 1px solid ${({ theme }) => theme.borders.borders};
-  min-width: 640px;
+  width: 100%;
   min-height: 300px;
   border-radius: 24px;
   z-index: 1000;
   overflow: hidden;
+  ${({ breakpoints }) =>
+    breakpoints &&
+    breakpoints.map(
+      (bp) => `
+@media (min-width: ${bp.breakpoint}) {
+  width: ${bp.width};
+}
+`
+    )}
 `;
 
 const Header = styled.div`
@@ -49,7 +65,13 @@ const CloseButton = styled.button`
   cursor: pointer;
 `;
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
+const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  children,
+  title,
+  breakpoints,
+}) => {
   const modalContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -71,15 +93,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
     };
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    console.log("Modal is open: ", isOpen);
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
   return (
     <Backdrop>
-      <Content ref={modalContentRef}>
+      <Content ref={modalContentRef} breakpoints={breakpoints}>
         <Header
           style={{
             justifyContent: title ? "space-between" : "flex-end",
