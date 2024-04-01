@@ -25,10 +25,11 @@ import { toHex } from "utils/toHex";
 import CurrencyInput from "components/CurrencyInput";
 import { Currency, CurrencyAmount } from "@uniswap/sdk-core";
 import { useTokenContract } from "hooks/web3/useContract";
-import { parseUnits } from "ethers/lib/utils";
+import { defaultAbiCoder, parseUnits } from "ethers/lib/utils";
 import { InputField } from "../DynamicFeatureForm/types";
 import DynamicFeatureForm from "../DynamicFeatureForm";
 import { useFormState } from "state/form/hooks";
+import { isTuple } from "components/DynamicFeatureForm/utils";
 
 interface BodyWrapperProps {
   $maxWidth?: string;
@@ -101,6 +102,15 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
       .filter((poolInfo) => poolInfo.chainId === chainId)
       .map((poolInfo) => poolInfo.poolKey);
   }, [poolInfos, chainId]);
+
+  const hookAddressToAbbr = useMemo(() => {
+    return hookInfos.reduce((accumulator, hookInfo) => {
+      return {
+        ...accumulator,
+        [hookInfo.address]: hookInfo.abbr,
+      };
+    }, {});
+  }, [hookInfos]);
 
   useEffect(() => {
     if (poolKeys.length > 0) {
@@ -277,6 +287,62 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
         ),
       ]);
 
+      const mapValuesToEncodedFormat = (
+        stateValues: Record<string, any>,
+        fields: InputField[]
+      ): any[] => {
+        const encodedValues: any[] = [];
+
+        fields.forEach((field) => {
+          if (isTuple(field)) {
+            // This field is a tuple, recursively map its nested fields
+            const nestedStateValues = stateValues[field.name];
+            const nestedEncodedValues = mapValuesToEncodedFormat(
+              nestedStateValues,
+              field.fields
+            );
+            encodedValues.push(nestedEncodedValues);
+          } else {
+            // This field is a simple input field
+            encodedValues.push(stateValues[field.name]);
+          }
+        });
+
+        return encodedValues;
+      };
+
+      //
+      const mapInputFieldTypesToAbiTypes = (fields: InputField[]) => {
+        const abiTypes: any[] = [];
+
+        fields.forEach((field) => {
+          if (isTuple(field)) {
+            // This field is a tuple, recursively map its nested fields
+            const nestedAbiTypes = mapInputFieldTypesToAbiTypes(field.fields);
+            abiTypes.push(nestedAbiTypes);
+          } else {
+            // This field is a simple input field
+            abiTypes.push(field.type);
+          }
+        });
+
+        return abiTypes;
+      };
+
+      //get data from values for each hook field. go to nested values for nested fields
+      const types = selectedHook
+        ? mapInputFieldTypesToAbiTypes(selectedHook.inputFields)
+        : [];
+      const vals = selectedHook
+        ? mapValuesToEncodedFormat(values, selectedHook.inputFields)
+        : [];
+      const hookData = selectedHook
+        ? defaultAbiCoder.encode(types, vals)
+        : "0x";
+
+      console.log("types", types);
+      console.log("vals", vals);
+      console.log("hookData", hookData);
       const data = poolModifyLiquidity.interface.encodeFunctionData(
         "modifyLiquidity((address,address,uint24,int24,address),(int24,int24,int256),bytes)",
         [
@@ -296,7 +362,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
             tickUpper: BigNumber.from(position.tickUpper),
             liquidityDelta: BigNumber.from(position.liquidity.toString()),
           } as IPoolManager.ModifyLiquidityParamsStruct,
-          "0x",
+          hookData,
         ]
       );
 
@@ -406,6 +472,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
               <Section>
                 <PoolKeySelect
                   poolKeys={poolKeys}
+                  hookAddressToAbbr={hookAddressToAbbr}
                   selectedPoolKey={poolKey}
                   onSelect={setPoolKey}
                 />
