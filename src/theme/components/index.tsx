@@ -26,6 +26,17 @@ const TextWrapper = styled(Text)<{ textColor: string }>`
 `;
 
 export const ThemedText = {
+  ParagraphLeading({ textColor, ...props }: ThemedTextProps) {
+    return (
+      <TextWrapper
+        fontSize={18}
+        fontWeight={500}
+        lineHeight={"28px"}
+        textColor={textColor}
+        {...props}
+      />
+    );
+  },
   ParagraphRegular({ textColor, ...props }: ThemedTextProps) {
     return (
       <TextWrapper
@@ -115,7 +126,7 @@ export const BoxSecondary = styled(Box)`
   background: ${({ theme }) => theme.surfacesAndElevation.elevation2};
 `;
 
-export const Section = styled.div<{ $padding?: string }>`
+export const Section = styled.div<{ $padding?: string; $disabled?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -125,4 +136,5 @@ export const Section = styled.div<{ $padding?: string }>`
   border-radius: 24px;
   padding: ${({ $padding }) => $padding ?? "0"};
   background: ${({ theme }) => theme.surfacesAndElevation.elevation1};
+  opacity: ${({ $disabled: disabled }) => (disabled ? 0.5 : 1)};
 `;

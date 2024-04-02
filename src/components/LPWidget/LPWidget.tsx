@@ -7,7 +7,7 @@ import {
   useV4PoolInfo,
 } from "../../state/v4/hooks";
 import { useWeb3React } from "@web3-react/core";
-import { BigNumber, Contract } from "ethers";
+import { BigNumber } from "ethers";
 import usePoolManager from "../../hooks/web3/usePoolManager";
 import usePoolModifyLiquidity from "../../hooks/web3/usePoolModifiyPosition";
 import { Bound, Field } from "../../state/v4/actions";
@@ -23,13 +23,19 @@ import PriceRangeManual from "../PriceRangeManual";
 import { IPoolManager, PoolKeyStruct } from "abis/types/PoolManager";
 import { toHex } from "utils/toHex";
 import CurrencyInput from "components/CurrencyInput";
-import { Currency, CurrencyAmount } from "@uniswap/sdk-core";
 import { useTokenContract } from "hooks/web3/useContract";
-import { defaultAbiCoder, parseUnits } from "ethers/lib/utils";
+import { defaultAbiCoder } from "ethers/lib/utils";
 import { InputField } from "../DynamicFeatureForm/types";
 import DynamicFeatureForm from "../DynamicFeatureForm";
 import { useFormState } from "state/form/hooks";
-import { isTuple } from "components/DynamicFeatureForm/utils";
+import Modal from "components/Modal";
+import TransactionModalContent from "components/TransactionModalContent";
+import {
+  mapInputFieldTypesToAbiTypes,
+  mapValuesToEncodedFormat,
+  sendModifyLiquidityTransaction,
+  approveAndSendTransaction,
+} from "./utils";
 
 interface BodyWrapperProps {
   $maxWidth?: string;
@@ -37,12 +43,13 @@ interface BodyWrapperProps {
 
 const ContentColumn = styled(Column)`
   width: 100%;
-  max-width: 692px;
 `;
 
 const BodyWrapper = styled.div<BodyWrapperProps>`
   position: relative;
-  max-width: ${({ $maxWidth }) => $maxWidth ?? "420px"};
+  @media (min-width: 768px) {
+    max-width: 692px;
+  }
   width: 100%;
 `;
 
@@ -51,12 +58,38 @@ const StyledBoddyWrapper = styled(BodyWrapper)<{
 }>`
   padding: ${({ $hasExistingPosition }) =>
     $hasExistingPosition ? "10px" : "0"};
-  max-width: 640px;
 `;
 
 const MediumOnly = styled.div`
   @media (max-width: 960px) {
     display: none;
+  }
+`;
+
+const TransactionDialogueHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  padding: 8px;
+  border: none;
+  color: ${({ theme }) => theme.components.icon.icon};
+  cursor: pointer;
+`;
+
+const SwapToRatioButton = styled.button`
+  background: none;
+  cursor: pointer;
+  &:disabled {
+    background-color: transparent;
+    cursor: not-allowed;
+    color: transparent;
+    border-color: transparent;
+    border: none;
   }
 `;
 
@@ -89,44 +122,29 @@ export default function LPWidgetWrapper(props: LPWidgetProps) {
   return <LPWidget {...props} />;
 }
 
+type TransactionStatus =
+  | "idle"
+  | "approve"
+  | "inProgress"
+  | "success"
+  | "failed";
+
 function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
   const { account, chainId, provider } = useWeb3React();
   //TODO: add a check for existing position
   const theme = useTheme();
 
-  const [poolKey, setPoolKey] = useState<PoolKey | undefined>(undefined);
   const [swapToRatio, setSwapToRatio] = useState(false);
+  const [transactionModalOpen, setTransactionModalOpen] = useState(false);
+  const [transactionStatus, setTransactionStatus] =
+    useState<TransactionStatus>("idle");
+  const [transactionError, setTransactionError] = useState<string | null>(null);
+  const [txnAddress, setTxnAddress] = useState<string>("");
 
-  const poolKeys = useMemo(() => {
-    return poolInfos
-      .filter((poolInfo) => poolInfo.chainId === chainId)
-      .map((poolInfo) => poolInfo.poolKey);
-  }, [poolInfos, chainId]);
-
-  const hookAddressToAbbr = useMemo(() => {
-    return hookInfos.reduce((accumulator, hookInfo) => {
-      return {
-        ...accumulator,
-        [hookInfo.address]: hookInfo.abbr,
-      };
-    }, {});
-  }, [hookInfos]);
-
-  useEffect(() => {
-    if (poolKeys.length > 0) {
-      setPoolKey(poolKeys[0]);
-    }
-  }, [poolKeys]);
-
-  const selectedHook = useMemo(() => {
-    return hookInfos.find((hookInfo) => hookInfo.address === poolKey?.hooks);
-  }, [hookInfos, poolKey]);
+  const { poolKey, setPoolKey, poolKeys, hookAddressToAbbr, selectedHook } =
+    usePoolAndHookManagement(poolInfos, hookInfos, chainId);
 
   const { values } = useFormState();
-
-  useEffect(() => {
-    console.log("values", values);
-  }, [values]);
 
   const { independentField, typedValue, startPriceTypedValue } =
     useV4MintState();
@@ -136,6 +154,10 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
     ticks,
     dependentField,
     price,
+    formattedPrice,
+    formattedAmounts,
+    maxAmounts,
+    atMaxAmounts,
     pricesAtTicks,
     pricesAtLimit,
     parsedAmounts,
@@ -158,12 +180,6 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
 
   const { poolModifyLiquidity } = usePoolModifyLiquidity();
 
-  const formattedPrice = useMemo(() => {
-    return price
-      ? (invertPrice ? price.invert() : price).toSignificant(6)
-      : undefined;
-  }, [price, invertPrice]);
-
   const {
     onFieldAInput,
     onFieldBInput,
@@ -173,32 +189,6 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
   } = useV4PoolActionHandlers(noLiquidity);
 
   const isValid = !errorMessage && !invalidRange;
-
-  const formattedAmounts = {
-    [independentField]: typedValue,
-    [dependentField]: parsedAmounts[dependentField]?.toSignificant(6) ?? "",
-  };
-
-  //TODO: add handler for native currency (balance - min gas fee)
-  const maxAmounts: { [field in Field]?: CurrencyAmount<Currency> } = [
-    Field.CURRENCY_0,
-    Field.CURRENCY_1,
-  ].reduce((accumulator, field) => {
-    return {
-      ...accumulator,
-      [field]: currencyBalances[field],
-    };
-  }, {});
-
-  const atMaxAmounts: { [field in Field]?: CurrencyAmount<Currency> } = [
-    Field.CURRENCY_0,
-    Field.CURRENCY_1,
-  ].reduce((accumulator, field) => {
-    return {
-      ...accumulator,
-      [field]: maxAmounts[field]?.equalTo(parsedAmounts[field] ?? "0"),
-    };
-  }, {});
 
   const { poolManager } = usePoolManager();
 
@@ -210,185 +200,151 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
     currencies?.CURRENCY_1?.isToken ? currencies.CURRENCY_1.address : undefined
   );
 
+  function getNecessaryVariables() {
+    if (
+      !provider ||
+      !poolModifyLiquidity ||
+      !c0contract ||
+      !c1contract ||
+      !position ||
+      !parsedAmounts?.[Field.CURRENCY_0] ||
+      !parsedAmounts?.[Field.CURRENCY_1] ||
+      !poolKey ||
+      !poolKey.currency0 ||
+      !poolKey.currency1
+    ) {
+      return null;
+    }
+
+    const poolKeyStruct: PoolKeyStruct = {
+      currency0: poolKey.currency0.isToken ? poolKey.currency0.address : "0x",
+      currency1: poolKey.currency1.isToken ? poolKey.currency1.address : "0x",
+      fee: poolKey.fee,
+      tickSpacing: poolKey.tickSpacing,
+      hooks: poolKey.hooks,
+    };
+
+    const modifyLiquidityParams: IPoolManager.ModifyLiquidityParamsStruct = {
+      tickLower: BigNumber.from(position.tickLower),
+      tickUpper: BigNumber.from(position.tickUpper),
+      liquidityDelta: BigNumber.from(position.liquidity.toString()),
+    };
+
+    return {
+      provider,
+      poolModifyLiquidity,
+      c0contract,
+      c1contract,
+      poolKeyStruct,
+      modifyLiquidityParams,
+      parsedAmount0: parsedAmounts[Field.CURRENCY_0],
+      parsedAmount1: parsedAmounts[Field.CURRENCY_1],
+    };
+  }
+
+  const getHookData = () => {
+    if (!selectedHook) return "0x";
+    const types = mapInputFieldTypesToAbiTypes(selectedHook.inputFields);
+    const vals = mapValuesToEncodedFormat(values, selectedHook.inputFields);
+    return defaultAbiCoder.encode(types, vals);
+  };
+
   //TODO
   //Look into native currency handling
   async function onAdd() {
-    if (
-      !chainId ||
-      !provider ||
-      !account ||
-      !poolManager ||
-      !poolModifyLiquidity
-    ) {
-      return;
-    }
-    if (
-      !poolKey ||
-      !currencies.CURRENCY_0 ||
-      !currencies.CURRENCY_1 ||
-      !c0contract ||
-      !c1contract
-    ) {
-      return;
-    }
-    if (
-      !position ||
-      !account ||
-      !parsedAmounts[Field.CURRENCY_0] ||
-      !parsedAmounts[Field.CURRENCY_1]
-    ) {
+    const necessaryVariables = getNecessaryVariables();
+
+    if (!necessaryVariables) {
+      console.error(
+        "Cannot proceed: one or more necessary variables are missing."
+      );
       return;
     }
 
-    const approveAndSendTransaction = async (
-      contract: Contract,
-      spender: string,
-      amount: CurrencyAmount<Currency>
-    ) => {
-      const data = contract.interface.encodeFunctionData("approve", [
-        spender,
-        toHex(amount.quotient),
-      ]);
-
-      const tx: {
-        to: string;
-        data: string;
-        value: string;
-        gasLimit: BigNumber;
-      } = {
-        to: contract.address,
-        data: data,
-        value: toHex(0),
-        gasLimit: BigNumber.from(500000),
-      };
-
-      try {
-        const response = await provider.getSigner().sendTransaction(tx);
-        console.log("transaction response", response);
-      } catch (error) {
-        console.error("Failed to send transaction", error);
-        if (error?.code !== 4001) {
-          console.error(error);
-        }
-      }
-    };
+    const {
+      provider,
+      poolModifyLiquidity,
+      c0contract,
+      c1contract,
+      poolKeyStruct,
+      modifyLiquidityParams,
+      parsedAmount0,
+      parsedAmount1,
+    } = necessaryVariables;
 
     try {
-      await Promise.all([
-        approveAndSendTransaction(
-          c0contract,
-          poolModifyLiquidity.address,
-          parsedAmounts[Field.CURRENCY_0]
-        ),
-        approveAndSendTransaction(
-          c1contract,
-          poolModifyLiquidity.address,
-          parsedAmounts[Field.CURRENCY_1]
-        ),
+      setTransactionStatus("approve");
+      setTransactionError(null);
+      setTxnAddress("");
+      setTransactionModalOpen(true);
+
+      const contractData0 = c0contract.interface.encodeFunctionData("approve", [
+        poolModifyLiquidity.address,
+        toHex(parsedAmount0.quotient.toString()),
+      ]);
+      const contractData1 = c1contract.interface.encodeFunctionData("approve", [
+        poolModifyLiquidity.address,
+        toHex(parsedAmount1.quotient.toString()),
       ]);
 
-      const mapValuesToEncodedFormat = (
-        stateValues: Record<string, any>,
-        fields: InputField[]
-      ): any[] => {
-        const encodedValues: any[] = [];
-
-        fields.forEach((field) => {
-          if (isTuple(field)) {
-            // This field is a tuple, recursively map its nested fields
-            const nestedStateValues = stateValues[field.name];
-            const nestedEncodedValues = mapValuesToEncodedFormat(
-              nestedStateValues,
-              field.fields
-            );
-            encodedValues.push(nestedEncodedValues);
-          } else {
-            // This field is a simple input field
-            encodedValues.push(stateValues[field.name]);
-          }
-        });
-
-        return encodedValues;
-      };
-
-      //
-      const mapInputFieldTypesToAbiTypes = (fields: InputField[]) => {
-        const abiTypes: any[] = [];
-
-        fields.forEach((field) => {
-          if (isTuple(field)) {
-            // This field is a tuple, recursively map its nested fields
-            const nestedAbiTypes = mapInputFieldTypesToAbiTypes(field.fields);
-            abiTypes.push(nestedAbiTypes);
-          } else {
-            // This field is a simple input field
-            abiTypes.push(field.type);
-          }
-        });
-
-        return abiTypes;
-      };
-
-      //get data from values for each hook field. go to nested values for nested fields
-      const types = selectedHook
-        ? mapInputFieldTypesToAbiTypes(selectedHook.inputFields)
-        : [];
-      const vals = selectedHook
-        ? mapValuesToEncodedFormat(values, selectedHook.inputFields)
-        : [];
-      const hookData = selectedHook
-        ? defaultAbiCoder.encode(types, vals)
-        : "0x";
-
-      console.log("types", types);
-      console.log("vals", vals);
-      console.log("hookData", hookData);
-      const data = poolModifyLiquidity.interface.encodeFunctionData(
-        "modifyLiquidity((address,address,uint24,int24,address),(int24,int24,int256),bytes)",
-        [
-          {
-            currency0: poolKey.currency0.isToken
-              ? poolKey.currency0.address
-              : "0x",
-            currency1: poolKey.currency1.isToken
-              ? poolKey.currency1.address
-              : "0x",
-            fee: poolKey.fee,
-            tickSpacing: poolKey.tickSpacing,
-            hooks: poolKey.hooks,
-          } as PoolKeyStruct,
-          {
-            tickLower: BigNumber.from(position.tickLower),
-            tickUpper: BigNumber.from(position.tickUpper),
-            liquidityDelta: BigNumber.from(position.liquidity.toString()),
-          } as IPoolManager.ModifyLiquidityParamsStruct,
-          hookData,
-        ]
+      const approval1 = approveAndSendTransaction(
+        provider,
+        c0contract.address,
+        contractData0
+      );
+      const approval2 = approveAndSendTransaction(
+        provider,
+        c1contract.address,
+        contractData1
       );
 
-      const tx: {
-        to: string;
-        data: string;
-        value: string;
-        gasLimit: BigNumber;
-      } = {
-        to: poolModifyLiquidity.address,
-        data: data,
-        value: toHex(0),
-        gasLimit: BigNumber.from(500000),
-      };
+      const approvals = await Promise.all([approval1, approval2]);
+      if (approvals.includes(undefined))
+        throw new Error("Approval failed on wallet side");
 
-      try {
-        const response = await provider.getSigner().sendTransaction(tx);
-        console.log("modify position response", response);
-      } catch (error) {
-        console.error("Failed to send transaction", error);
-        if (error?.code !== 4001) {
-          console.error(error);
-        }
-      }
+      setTransactionStatus("inProgress");
+      setTransactionModalOpen(true);
+      const waitForApprovals = await Promise.all(
+        approvals.map((a) => a?.wait())
+      );
+      console.log("Approvals", waitForApprovals);
+      if (waitForApprovals.includes(undefined))
+        throw new Error("Approval failed on blockchain side");
+
+      setTransactionStatus("approve");
+      const hookData = getHookData();
+      const modifyTxResult = await sendModifyLiquidityTransaction(
+        poolModifyLiquidity,
+        poolKeyStruct,
+        modifyLiquidityParams,
+        hookData,
+        provider
+      );
+
+      if (!modifyTxResult.success || !modifyTxResult.transaction)
+        throw new Error(
+          modifyTxResult.errorMessage ||
+            "Modify liquidity transaction failed on wallet side"
+        );
+      setTransactionStatus("inProgress");
+      const waitModifyTx = await modifyTxResult.transaction.wait();
+
+      console.log("Modify liquidity transaction", waitModifyTx);
+      if (!waitModifyTx)
+        throw new Error(
+          "Modify liquidity transaction failed on blockchain side"
+        );
+
+      setTransactionStatus("success");
+      setTransactionModalOpen(true);
+      setTxnAddress(waitModifyTx.transactionHash ?? "");
     } catch (error) {
-      console.error("Failed to approve and send transactions", error);
+      console.error("Transaction process failed", error);
+      setTransactionStatus("failed");
+      setTransactionModalOpen(true);
+      setTransactionError(
+        error instanceof Error ? error.message : JSON.stringify(error)
+      );
     }
   }
 
@@ -424,29 +380,247 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
   //TODO: add existing position check
   const hasExistingPosition = false;
 
-  useEffect(() => {
-    console.log("pool", pool);
-    console.log("position", position);
-  }, [pool, position]);
-
+  const TransactionStateModalContent = useMemo(() => {
+    switch (transactionStatus) {
+      case "idle":
+        return null;
+      case "approve":
+        return (
+          <TransactionModalContent
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="41"
+                height="40"
+                viewBox="0 0 41 40"
+                fill="none"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M20.5016 4.10107C10.8089 4.10107 4.60156 12.0407 4.60156 20.0011C4.60156 27.9615 10.8089 35.9011 20.5016 35.9011C25.174 35.9011 29.0242 34.0617 31.7661 31.2718C33.2405 29.7716 34.3959 27.9949 35.1845 26.0787C35.2896 25.8233 35.5818 25.7015 35.8372 25.8066C36.0925 25.9117 36.2144 26.2039 36.1093 26.4592C35.2729 28.4914 34.0469 30.3777 32.4793 31.9727C29.5569 34.9463 25.4528 36.9011 20.5016 36.9011C10.1862 36.9011 3.60156 28.4407 3.60156 20.0011C3.60156 11.5615 10.1862 3.10107 20.5016 3.10107C20.7777 3.10107 21.0016 3.32493 21.0016 3.60107C21.0016 3.87722 20.7777 4.10107 20.5016 4.10107Z"
+                  fill={theme.components.graph.main}
+                >
+                  <animateTransform
+                    attributeName="transform"
+                    attributeType="XML"
+                    type="rotate"
+                    from="0 20.5 20"
+                    to="360 20.5 20"
+                    dur="1s"
+                    repeatCount="indefinite"
+                  />
+                </path>
+              </svg>
+            }
+            title={"Confirm in your wallet"}
+            info={`Add ${
+              parsedAmounts?.[Field.CURRENCY_0]?.toSignificant(6) ?? ""
+            } ${currencies.CURRENCY_0?.symbol} and ${
+              parsedAmounts?.[Field.CURRENCY_1]?.toSignificant(6) ?? ""
+            } ${currencies.CURRENCY_1?.symbol}`}
+            children={undefined}
+            buttonText={"Close"}
+            buttonAction={() => {
+              setTransactionError(null);
+              setTxnAddress("");
+              setTransactionModalOpen(false);
+            }}
+          />
+        );
+      case "inProgress":
+        return (
+          <TransactionModalContent
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="41"
+                height="40"
+                viewBox="0 0 41 40"
+                fill="none"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M20.5016 4.10107C10.8089 4.10107 4.60156 12.0407 4.60156 20.0011C4.60156 27.9615 10.8089 35.9011 20.5016 35.9011C25.174 35.9011 29.0242 34.0617 31.7661 31.2718C33.2405 29.7716 34.3959 27.9949 35.1845 26.0787C35.2896 25.8233 35.5818 25.7015 35.8372 25.8066C36.0925 25.9117 36.2144 26.2039 36.1093 26.4592C35.2729 28.4914 34.0469 30.3777 32.4793 31.9727C29.5569 34.9463 25.4528 36.9011 20.5016 36.9011C10.1862 36.9011 3.60156 28.4407 3.60156 20.0011C3.60156 11.5615 10.1862 3.10107 20.5016 3.10107C20.7777 3.10107 21.0016 3.32493 21.0016 3.60107C21.0016 3.87722 20.7777 4.10107 20.5016 4.10107Z"
+                  fill={theme.components.graph.main}
+                >
+                  <animateTransform
+                    attributeName="transform"
+                    attributeType="XML"
+                    type="rotate"
+                    from="0 20.5 20"
+                    to="360 20.5 20"
+                    dur="1s"
+                    repeatCount="indefinite"
+                  />
+                </path>
+              </svg>
+            }
+            title={"Transaction pending"}
+            info={"Please wait while the transaction is being processed"}
+            children={
+              <ThemedText.ParagraphExtraSmall textColor="text.primary">
+                {txnAddress}
+              </ThemedText.ParagraphExtraSmall>
+            }
+            buttonText={"Close"}
+            buttonAction={() => {
+              setTransactionError(null);
+              setTxnAddress("");
+              setTransactionModalOpen(false);
+            }}
+          />
+        );
+      case "success":
+        return (
+          <TransactionModalContent
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="40"
+                height="40"
+                viewBox="0 0 41 40"
+                fill="none"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M20.4992 3.10522C11.1688 3.10522 3.60498 10.669 3.60498 19.9994C3.60498 29.3298 11.1688 36.8937 20.4992 36.8937C29.8295 36.8937 37.3934 29.3298 37.3934 19.9994C37.3934 10.669 29.8295 3.10522 20.4992 3.10522ZM4.60498 19.9994C4.60498 11.2213 11.7211 4.10522 20.4992 4.10522C29.2773 4.10522 36.3934 11.2213 36.3934 19.9994C36.3934 28.7775 29.2773 35.8937 20.4992 35.8937C11.7211 35.8937 4.60498 28.7775 4.60498 19.9994ZM26.9095 14.2874C27.0684 14.0615 27.0141 13.7496 26.7883 13.5907C26.5625 13.4318 26.2506 13.486 26.0917 13.7119L17.9925 25.2212L14.1907 21.3489C13.9972 21.1519 13.6806 21.149 13.4836 21.3425C13.2865 21.5359 13.2836 21.8525 13.4771 22.0495L17.6993 26.3499C17.8033 26.4558 17.9489 26.51 18.0968 26.4979C18.2447 26.4859 18.3796 26.4087 18.465 26.2874L26.9095 14.2874Z"
+                  fill={theme.text.gain}
+                />
+              </svg>
+            }
+            title={"Success"}
+            info={`Add ${
+              parsedAmounts?.[Field.CURRENCY_0]?.toSignificant(6) ?? ""
+            } ${currencies.CURRENCY_0?.symbol} and ${
+              parsedAmounts?.[Field.CURRENCY_1]?.toSignificant(6) ?? ""
+            } ${currencies.CURRENCY_1?.symbol}`}
+            //TODO: view in explorer
+            children={undefined}
+            //TODO: see my portfolio
+            buttonText={"Close"}
+            buttonAction={() => {
+              setTransactionStatus("idle");
+              setTransactionError(null);
+              setTxnAddress("");
+              setTransactionModalOpen(false);
+            }}
+          />
+        );
+      case "failed":
+        return (
+          <TransactionModalContent
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="41"
+                height="40"
+                viewBox="0 0 41 40"
+                fill="none"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M21.4451 0.608857C21.0185 -0.106925 19.9819 -0.106923 19.5552 0.608858L0.744674 32.1702C0.30767 32.9035 0.836006 33.8334 1.68958 33.8334H39.3108C40.1644 33.8334 40.6927 32.9035 40.2557 32.1702L21.4451 0.608857ZM20.4143 1.12082C20.453 1.05575 20.5473 1.05575 20.5861 1.12082L39.3967 32.6822C39.4364 32.7489 39.3884 32.8334 39.3108 32.8334H1.68958C1.61198 32.8334 1.56395 32.7489 1.60368 32.6822L20.4143 1.12082ZM18.7052 11.9631C18.6661 10.9447 19.481 10.0978 20.5002 10.0978C21.5193 10.0978 22.3343 10.9447 22.2951 11.9631L21.8847 22.6322C21.8561 23.3761 21.2447 23.9645 20.5002 23.9645C19.7556 23.9645 19.1442 23.3761 19.1156 22.6322L18.7052 11.9631ZM22.4999 27.9361C22.4999 29.0407 21.6044 29.9361 20.4999 29.9361C19.3953 29.9361 18.4999 29.0407 18.4999 27.9361C18.4999 26.8315 19.3953 25.9361 20.4999 25.9361C21.6044 25.9361 22.4999 26.8315 22.4999 27.9361Z"
+                  fill="#FD4040"
+                />
+              </svg>
+            }
+            title={"Something went wrong"}
+            info={"Look at the error details below"}
+            children={
+              <ThemedText.ParagraphExtraSmall textColor="text.primary">
+                {transactionError}
+              </ThemedText.ParagraphExtraSmall>
+            }
+            buttonText={"Close"}
+            buttonAction={() => {
+              setTransactionStatus("idle");
+              setTransactionError(null);
+              setTxnAddress("");
+              setTransactionModalOpen(false);
+            }}
+          />
+        );
+    }
+  }, [transactionStatus, transactionError, theme, txnAddress, currencies]);
   return (
     <>
       {!account ? (
         <ThemedText.MediumHeader textColor="text.primary">
           Connect Wallet
         </ThemedText.MediumHeader>
-      ) : invalidPool ? (
-        <ThemedText.MediumHeader textColor="text.primary">
-          Invalid Pool
-        </ThemedText.MediumHeader>
       ) : (
         <StyledBoddyWrapper $hasExistingPosition={hasExistingPosition}>
-          <Column gap="xl">
+          {/* Transaction dialogue */}
+          <Modal
+            isOpen={transactionModalOpen}
+            onClose={() => {
+              setTransactionModalOpen(false);
+            }}
+            breakpoints={[
+              {
+                breakpoint: "768px",
+                width: "445px",
+              },
+            ]}
+            customHeader={
+              <TransactionDialogueHeader>
+                <div
+                  style={{
+                    backgroundColor: "#6B8AFF33",
+                    borderRadius: "8px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 25 24"
+                    fill="none"
+                  >
+                    <path
+                      d="M11.9817 4.29043L7.58715 11.516C7.41315 11.8019 7.50806 12.1725 7.79743 12.3421L12.192 14.9163C12.3818 15.0279 12.6182 15.0279 12.808 14.9163L17.2026 12.3421C17.4919 12.1725 17.5869 11.8019 17.4129 11.516L13.0192 4.29043C12.7838 3.90319 12.2171 3.90319 11.9817 4.29043Z"
+                      fill="#6B8AFF"
+                    />
+                    <path
+                      d="M16.2897 15.0102C16.2897 14.999 16.2878 14.9888 16.2869 14.9786C16.285 14.9684 16.2831 14.9582 16.2813 14.948C16.2785 14.9359 16.2748 14.9248 16.2711 14.9127C16.2683 14.9035 16.2655 14.8951 16.2608 14.8868C16.2552 14.8738 16.2478 14.8608 16.2404 14.8487C16.2366 14.8422 16.2329 14.8348 16.2283 14.8283C16.2153 14.8098 16.2013 14.7912 16.1846 14.7754C16.1678 14.7597 16.1502 14.7448 16.1316 14.7318C16.125 14.7272 16.1185 14.7244 16.1111 14.7198C16.099 14.7123 16.086 14.7049 16.073 14.6993C16.0646 14.6956 16.0553 14.6928 16.046 14.6891C16.0348 14.6854 16.0228 14.6817 16.0107 14.6789C16.0004 14.6761 15.9902 14.6743 15.98 14.6734C15.9697 14.6715 15.9595 14.6706 15.9484 14.6706C15.9363 14.6706 15.9251 14.6697 15.913 14.6706C15.9046 14.6706 15.8963 14.6724 15.887 14.6734C15.874 14.6752 15.8609 14.6761 15.8479 14.6789C15.8442 14.6789 15.8405 14.6817 15.8368 14.6826C15.7968 14.6928 15.7586 14.7086 15.7233 14.7318L12.8311 16.4363C12.6265 16.5569 12.3735 16.5569 12.1689 16.4363L9.27673 14.7318C9.24139 14.7086 9.20326 14.6928 9.16327 14.6826C9.15955 14.6817 9.15583 14.6799 9.15211 14.6789C9.13909 14.6761 9.12607 14.6752 9.11305 14.6734C9.10468 14.6724 9.09631 14.6715 9.08701 14.6706C9.07492 14.6706 9.06376 14.6706 9.05167 14.6706C9.04144 14.6706 9.03029 14.6724 9.02006 14.6734C9.00983 14.6752 8.9996 14.6771 8.98937 14.6789C8.97728 14.6817 8.96612 14.6854 8.95403 14.6891C8.94473 14.6919 8.93636 14.6956 8.92706 14.6993C8.91404 14.7049 8.90102 14.7123 8.88893 14.7198C8.88242 14.7235 8.87498 14.7272 8.86847 14.7318C8.84987 14.7448 8.83127 14.7587 8.81546 14.7754C8.79965 14.7921 8.78477 14.8098 8.77175 14.8283C8.7671 14.8348 8.76431 14.8413 8.75966 14.8487C8.75222 14.8617 8.74478 14.8738 8.7392 14.8868C8.73548 14.8951 8.73269 14.9044 8.72897 14.9127C8.72525 14.9248 8.72153 14.9359 8.71874 14.948C8.71595 14.9582 8.71409 14.9684 8.71316 14.9786C8.7113 14.9888 8.71037 15 8.71037 15.0102C8.71037 15.0213 8.70944 15.0334 8.71037 15.0445C8.71037 15.0538 8.71223 15.0621 8.71316 15.0714C8.71502 15.0844 8.71595 15.0974 8.71874 15.1095C8.71967 15.115 8.72153 15.1197 8.72339 15.1243C8.73455 15.167 8.75315 15.2069 8.78012 15.244L11.9681 19.7265C12.2275 20.0911 12.7706 20.0911 13.0301 19.7265L16.218 15.244C16.245 15.2069 16.2636 15.167 16.2748 15.1243C16.2757 15.1197 16.2785 15.1141 16.2794 15.1095C16.2822 15.0965 16.2831 15.0844 16.285 15.0714C16.2859 15.0621 16.2869 15.0538 16.2878 15.0445C16.2878 15.0334 16.2878 15.0213 16.2878 15.0102H16.2897Z"
+                      fill="#6B8AFF"
+                    />
+                  </svg>
+                </div>
+                <CloseButton
+                  onClick={() => {
+                    setTransactionModalOpen(false);
+                    if (
+                      transactionStatus === "success" ||
+                      transactionStatus === "failed"
+                    ) {
+                      setTransactionStatus("idle");
+                      setTransactionError(null);
+                      setTxnAddress("");
+                    }
+                  }}
+                >
+                  X
+                </CloseButton>
+              </TransactionDialogueHeader>
+            }
+          >
+            {TransactionStateModalContent}
+          </Modal>
+
+          <Column $gap="xl">
             {/* Header */}
             <PositionHeader adding={true} creating={false}>
               {!hasExistingPosition && (
                 <Row
-                  justify="flex-end"
+                  $justify="flex-end"
                   style={{ width: "fit-content", minWidth: "fit-content" }}
                 >
                   <MediumOnly>
@@ -467,7 +641,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                 </Row>
               )}
             </PositionHeader>
-            <ContentColumn gap="lg">
+            <ContentColumn $gap="lg">
               {/* Pool Key Selection */}
               <Section>
                 <PoolKeySelect
@@ -478,7 +652,10 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                 />
               </Section>
               {/* Chart Range Input */}
-              <Section $padding="0 0 24px 0">
+              <Section
+                $padding="0 0 24px 0"
+                $disabled={!poolKey || invalidPool}
+              >
                 <Header
                   title="Price Range"
                   info="Placeholder Price Range Info"
@@ -525,7 +702,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                 >
                   <BoxSecondary $radius="8px" $padding="12px">
                     <Column
-                      gap="md"
+                      $gap="md"
                       style={{
                         alignItems: "flex-start",
                         width: "fit-content",
@@ -603,9 +780,9 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                 )}
               </Section>
               {/* Deposit Amounts */}
-              <Section $padding="0 0 24px">
+              <Section $padding="0 0 24px" $disabled={!poolKey || invalidPool}>
                 <Header title="Deposit Amounts">
-                  <Row gap="sm">
+                  <Row $gap="sm">
                     <div
                       style={{
                         display: "flex",
@@ -633,48 +810,52 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                         />
                       </svg>
                     </div>
-                    <svg
-                      id="toggleSVG"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="40"
-                      height="24"
-                      viewBox="0 0 40 24"
+                    <SwapToRatioButton
                       onClick={() => setSwapToRatio(!swapToRatio)}
-                      style={{
-                        cursor: "pointer",
-                      }}
+                      disabled={!poolKey || invalidPool}
                     >
-                      <path
-                        d="M0 12C0 5.37258 5.37258 0 12 0H28C34.6274 0 40 5.37258 40 12C40 18.6274 34.6274 24 28 24H12C5.37258 24 0 18.6274 0 12Z"
-                        fill={
-                          swapToRatio
-                            ? theme.components.toggle.activeDefaultBackground
-                            : theme.components.toggle.inactiveDefaultBackground
-                        }
-                        style={{
-                          transition: "fill 0.3s ease",
-                        }}
-                      />
-                      <circle
-                        id="toggleCircle"
-                        cx={swapToRatio ? "28" : "12"}
-                        cy="12"
-                        r="8"
-                        fill={theme.components.toggle.activeDefaultForeground}
-                        style={{
-                          transition: "cx 0.3s ease",
-                        }}
-                      />
-                    </svg>
+                      <svg
+                        id="toggleSVG"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="40"
+                        height="24"
+                        viewBox="0 0 40 24"
+                      >
+                        <path
+                          d="M0 12C0 5.37258 5.37258 0 12 0H28C34.6274 0 40 5.37258 40 12C40 18.6274 34.6274 24 28 24H12C5.37258 24 0 18.6274 0 12Z"
+                          fill={
+                            swapToRatio
+                              ? theme.components.toggle.activeDefaultBackground
+                              : theme.components.toggle
+                                  .inactiveDefaultBackground
+                          }
+                          style={{
+                            transition: "fill 0.3s ease",
+                          }}
+                        />
+                        <circle
+                          id="toggleCircle"
+                          cx={swapToRatio ? "28" : "12"}
+                          cy="12"
+                          r="8"
+                          fill={theme.components.toggle.activeDefaultForeground}
+                          style={{
+                            transition: "cx 0.3s ease",
+                          }}
+                        />
+                      </svg>
+                    </SwapToRatioButton>
                   </Row>
                 </Header>
                 <Column
-                  gap="lgplus"
+                  $gap="lgplus"
                   style={{
                     padding: "0 24px",
+                    width: "100%",
+                    boxSizing: "border-box",
                   }}
                 >
-                  <Row gap="md">
+                  <Row $gap="md">
                     <CurrencyInput
                       value={formattedAmounts[Field.CURRENCY_0]}
                       onUserInput={onFieldAInput}
@@ -684,10 +865,11 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                         );
                       }}
                       showMaxButton={!atMaxAmounts[Field.CURRENCY_0]}
-                      currency={currencies[Field.CURRENCY_0] ?? null}
+                      currency={currencies[Field.CURRENCY_0] ?? "C0"}
                       id="add-liquidity-input-token0"
                       showCommonBases
                       locked={depositADisabled}
+                      disabled={!poolKey || invalidPool}
                     />
                     <CurrencyInput
                       value={formattedAmounts[Field.CURRENCY_1]}
@@ -698,10 +880,11 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                         );
                       }}
                       showMaxButton={!atMaxAmounts[Field.CURRENCY_1]}
-                      currency={currencies[Field.CURRENCY_1] ?? null}
+                      currency={currencies[Field.CURRENCY_1] ?? "C1"}
                       id="add-liquidity-input-token1"
                       showCommonBases
                       locked={depositBDisabled}
+                      disabled={!poolKey || invalidPool}
                     />
                   </Row>
                   {/*TODO: Swap to Ratio info text */}
@@ -711,17 +894,23 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
 
               {/* Pool Feature Settings */}
               {selectedHook && (
-                <Section $padding="0 0 24px">
+                <Section
+                  $padding="0 0 24px"
+                  $disabled={!poolKey || invalidPool}
+                >
                   <Header
                     title="Pool feature settings"
                     info="This form is generated dynamically based on the fields provided."
                   />
-                  <DynamicFeatureForm fields={selectedHook.inputFields} />
+                  <DynamicFeatureForm
+                    fields={selectedHook.inputFields}
+                    disabled={!poolKey || invalidPool}
+                  />
                 </Section>
               )}
               {/*Placeholder Buttons */}
-              <Section>
-                <button
+              <Section $disabled={!poolKey || invalidPool}>
+                <SwapToRatioButton
                   onClick={onAdd}
                   disabled={
                     !isValid ||
@@ -731,22 +920,21 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                     !account ||
                     !provider ||
                     !chainId ||
-                    !position
+                    !position ||
+                    transactionStatus === "inProgress" ||
+                    transactionStatus === "approve"
                   }
                   style={{
-                    color: theme.text.secondary,
-                    border: `1px solid ${theme.borders.borders}`,
                     backgroundColor: "transparent",
                     width: "100%",
                     borderRadius: "1000px",
                     padding: "12px",
-                    fontSize: "16px",
-                    fontWeight: 500,
-                    cursor: "pointer",
                   }}
                 >
-                  Add Liquidity
-                </button>
+                  <ThemedText.ParagraphRegular textColor="text.primary">
+                    Add Liquidity
+                  </ThemedText.ParagraphRegular>
+                </SwapToRatioButton>
               </Section>
             </ContentColumn>
           </Column>
@@ -754,4 +942,41 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
       )}
     </>
   );
+}
+
+interface PoolAndHookManagement {
+  poolKey: PoolKey | undefined;
+  setPoolKey: React.Dispatch<React.SetStateAction<PoolKey | undefined>>;
+  poolKeys: PoolKey[];
+  hookAddressToAbbr: { [address: string]: string };
+  selectedHook: HookInfo | undefined;
+}
+
+function usePoolAndHookManagement(
+  poolInfos: PoolInfo[],
+  hookInfos: HookInfo[],
+  chainId: number | undefined
+): PoolAndHookManagement {
+  const [poolKey, setPoolKey] = useState<PoolKey | undefined>(undefined);
+
+  const poolKeys: PoolKey[] = useMemo(() => {
+    return poolInfos
+      .filter((poolInfo) => poolInfo.chainId === chainId)
+      .map((poolInfo) => poolInfo.poolKey);
+  }, [poolInfos, chainId]);
+
+  const hookAddressToAbbr: { [address: string]: string } = useMemo(() => {
+    return hookInfos.reduce((accumulator, hookInfo) => {
+      return {
+        ...accumulator,
+        [hookInfo.address]: hookInfo.abbr,
+      };
+    }, {});
+  }, [hookInfos]);
+
+  const selectedHook: HookInfo | undefined = useMemo(() => {
+    return hookInfos.find((hookInfo) => hookInfo.address === poolKey?.hooks);
+  }, [hookInfos, poolKey]);
+
+  return { poolKey, setPoolKey, poolKeys, hookAddressToAbbr, selectedHook };
 }

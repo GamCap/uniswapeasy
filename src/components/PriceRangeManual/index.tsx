@@ -41,7 +41,7 @@ export default function RangeSelector({
   const rightPrice = isSorted ? priceUpper : priceLower?.invert();
 
   return (
-    <Row gap="md" padding="0px 24px">
+    <Row $gap="md" $padding="0px 24px">
       <StepCounter
         value={
           ticksAtLimit[isSorted ? Bound.LOWER : Bound.UPPER]
@@ -62,8 +62,8 @@ export default function RangeSelector({
         feeAmount={feeAmount}
         label={leftPrice ? `${currencyB?.symbol}` : "-"}
         title={`Low price`}
-        tokenA={currencyA?.symbol}
-        tokenB={currencyB?.symbol}
+        tokenA={currencyA?.symbol ?? "Currency0"}
+        tokenB={currencyB?.symbol ?? "Currency1"}
         locked={disabled}
       />
       <StepCounter
@@ -85,8 +85,8 @@ export default function RangeSelector({
         }
         feeAmount={feeAmount}
         label={rightPrice ? `${currencyB?.symbol}` : "-"}
-        tokenA={currencyA?.symbol}
-        tokenB={currencyB?.symbol}
+        tokenA={currencyA?.symbol ?? "Currency0"}
+        tokenB={currencyB?.symbol ?? "Currency1"}
         title={`High price`}
         locked={disabled}
       />

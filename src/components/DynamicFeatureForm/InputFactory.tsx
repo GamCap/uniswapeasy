@@ -8,12 +8,11 @@ import { Tuple, InputField, BaseInputField } from "./types";
 import { isTuple } from "./utils";
 
 const StyledInput = styled.input<{
-  error?: boolean;
-  fontSize?: string;
-  align?: string;
-  disabled?: boolean;
+  $error?: boolean;
+  $fontSize?: string;
+  $align?: string;
 }>`
-  color: ${({ disabled, error, theme }) =>
+  color: ${({ disabled, $error: error, theme }) =>
     disabled
       ? theme.components.inputFieldCurrencyField.disabledForeground
       : error
@@ -29,8 +28,8 @@ const StyledInput = styled.input<{
   flex: 1 1 auto;
   background-color: ${({ theme }) =>
     theme.components.inputFieldCurrencyField.filledBackground};
-  font-size: ${({ fontSize }) => fontSize ?? "16px"};
-  text-align: ${({ align }) => align && align};
+  font-size: ${({ $fontSize: fontSize }) => fontSize ?? "16px"};
+  text-align: ${({ $align: align }) => align && align};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -64,15 +63,17 @@ const BigNumberInput = ({
   value,
   path,
   onChange,
+  disabled = false,
 }: {
   field: BaseInputField;
   value: any;
   path: string;
   onChange: (path: string, value: any) => void;
+  disabled?: boolean;
 }) => (
   <RowBetween>
     <Column
-      gap="md"
+      $gap="md"
       style={{
         alignItems: "flex-start",
       }}
@@ -94,6 +95,7 @@ const BigNumberInput = ({
       required={field.restrictions?.required}
       pattern={field.restrictions?.pattern}
       onChange={(e) => onChange(path, e.target.value)}
+      disabled={disabled}
     />
   </RowBetween>
 );
@@ -103,15 +105,17 @@ const BooleanInput = ({
   value,
   path,
   onChange,
+  disabled = false,
 }: {
   field: BaseInputField;
   value: any;
   path: string;
   onChange: (path: string, value: any) => void;
+  disabled?: boolean;
 }) => (
   <RowBetween>
     <Column
-      gap="md"
+      $gap="md"
       style={{
         alignItems: "flex-start",
       }}
@@ -130,6 +134,7 @@ const BooleanInput = ({
       checked={value}
       required={field.restrictions?.required}
       onChange={(e) => onChange(path, e.target.checked)}
+      disabled={disabled}
     />
   </RowBetween>
 );
@@ -139,15 +144,17 @@ const TextInput = ({
   value,
   path,
   onChange,
+  disabled = false,
 }: {
   field: BaseInputField;
   value: any;
   path: string;
   onChange: (path: string, value: any) => void;
+  disabled?: boolean;
 }) => (
   <RowBetween>
     <Column
-      gap="md"
+      $gap="md"
       style={{
         alignItems: "flex-start",
       }}
@@ -166,6 +173,7 @@ const TextInput = ({
       pattern={field.restrictions?.pattern}
       required={field.restrictions?.required}
       onChange={(e) => onChange(path, e.target.value)}
+      disabled={disabled}
     />
   </RowBetween>
 );
@@ -175,15 +183,17 @@ const ByteArrayInput = ({
   value,
   path,
   onChange,
+  disabled = false,
 }: {
   field: BaseInputField;
   value: any;
   path: string;
   onChange: (path: string, value: any) => void;
+  disabled?: boolean;
 }) => (
   <RowBetween>
     <Column
-      gap="md"
+      $gap="md"
       style={{
         alignItems: "flex-start",
       }}
@@ -201,6 +211,7 @@ const ByteArrayInput = ({
       value={value}
       required={field.restrictions?.required}
       onChange={(e) => onChange(path, e.target.value)}
+      disabled={disabled}
     />
   </RowBetween>
 );
@@ -209,16 +220,18 @@ const TupleInput = ({
   tuple,
   path,
   onChange,
+  disabled = false,
 }: {
   tuple: Tuple;
   path: string;
   onChange: (path: string, value: any) => void;
+  disabled?: boolean;
 }) => {
   const theme = useTheme();
   return (
-    <Column gap="md">
+    <Column $gap="md">
       <Row
-        gap="md"
+        $gap="md"
         style={{
           alignItems: "flex-start",
         }}
@@ -252,13 +265,14 @@ const TupleInput = ({
           </div>
         )}
       </Row>
-      <Column gap="xl" style={{ paddingLeft: "12px" }}>
+      <Column $gap="xl" style={{ paddingLeft: "12px" }}>
         {tuple.fields.map((nestedField, index) => (
           <InputFactory
             key={index}
             field={nestedField}
             path={path}
             onChange={onChange}
+            disabled={disabled}
           />
         ))}
       </Column>
@@ -270,15 +284,24 @@ const InputFactory = ({
   field,
   path = "",
   onChange,
+  disabled = false,
 }: {
   field: InputField;
   path: string;
   onChange: (path: string, value: any) => void;
+  disabled?: boolean;
 }) => {
   const currentPath = path ? `${path}.${field.name}` : field.name;
 
   if (isTuple(field)) {
-    return <TupleInput tuple={field} path={currentPath} onChange={onChange} />;
+    return (
+      <TupleInput
+        tuple={field}
+        path={currentPath}
+        onChange={onChange}
+        disabled={disabled}
+      />
+    );
   }
 
   const fieldType = field.type.toLowerCase();
@@ -292,6 +315,7 @@ const InputFactory = ({
         value={value}
         path={currentPath}
         onChange={onChange}
+        disabled={disabled}
       />
     );
   }
@@ -303,6 +327,7 @@ const InputFactory = ({
         value={value}
         path={currentPath}
         onChange={onChange}
+        disabled={disabled}
       />
     );
   }
@@ -314,6 +339,7 @@ const InputFactory = ({
         value={value}
         path={currentPath}
         onChange={onChange}
+        disabled={disabled}
       />
     );
   }
@@ -325,6 +351,7 @@ const InputFactory = ({
         value={value}
         path={currentPath}
         onChange={onChange}
+        disabled={disabled}
       />
     );
   }

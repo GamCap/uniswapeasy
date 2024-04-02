@@ -14,15 +14,13 @@ const RotationStyle = css`
 `;
 
 export const StyledSVG = styled.svg<{
-  size: string;
-  stroke?: string;
-  fill?: string;
+  $size: string;
 }>`
-  height: ${({ size }) => size};
-  width: ${({ size }) => size};
+  height: ${({ $size: size }) => size};
+  width: ${({ $size: size }) => size};
   path {
     stroke: ${({ stroke }) => stroke};
-    background: ${({ theme }) => theme.neutral2};
+    background: ${({ theme }) => theme.text.primary};
     fill: ${({ fill }) => fill};
   }
 `;
