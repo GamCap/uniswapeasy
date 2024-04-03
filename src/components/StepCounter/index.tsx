@@ -12,13 +12,13 @@ const InputRow = styled.div`
   align-items: center;
 `;
 
-const InputColumn = styled.div<{ justify: string }>`
+const InputColumn = styled.div<{ $justify: string }>`
   display: flex;
   flex-direction: column;
-  justify-content: ${({ justify }) => justify};
+  justify-content: ${({ $justify: justify }) => justify};
 `;
 
-const StyledInput = styled(NumericalInput)<{ usePercent?: boolean }>`
+const StyledInput = styled(NumericalInput)<{ $usePercent?: boolean }>`
   background-color: transparent;
   text-align: left;
   font-weight: 500;
@@ -108,7 +108,7 @@ const StepCounter = ({
       onBlur={handleOnBlur}
     >
       <InputRow>
-        <InputColumn justify="flex-start">
+        <InputColumn $justify="flex-start">
           <ThemedText.ParagraphExtraSmall
             textColor="text.tertiary"
             textAlign="left"
@@ -130,7 +130,7 @@ const StepCounter = ({
           >{`${tokenB} per ${tokenA}`}</ThemedText.ParagraphExtraSmall>
         </InputColumn>
 
-        <AutoColumn gap="sm">
+        <AutoColumn $gap="sm">
           {!locked && (
             <SmallButton
               data-testid="increment-price-range"

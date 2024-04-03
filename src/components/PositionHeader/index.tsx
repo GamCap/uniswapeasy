@@ -32,7 +32,7 @@ export function PositionHeader({
 
   return (
     <Tabs>
-      <RowBetween align="center">
+      <RowBetween $align="center">
         <TitleText
           style={{
             textAlign: "left",

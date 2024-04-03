@@ -218,9 +218,9 @@ const TableComponent: React.FC<TableProps> = ({
             <path
               d="M17.5 17.5L13.875 13.875M15.8333 9.16667C15.8333 12.8486 12.8486 15.8333 9.16667 15.8333C5.48477 15.8333 2.5 12.8486 2.5 9.16667C2.5 5.48477 5.48477 2.5 9.16667 2.5C12.8486 2.5 15.8333 5.48477 15.8333 9.16667Z"
               stroke="currentColor"
-              stroke-width="1.66"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.66"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </StyledIcon>
 
@@ -280,8 +280,8 @@ const TableComponent: React.FC<TableProps> = ({
             fill="none"
           >
             <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
+              fillRule="evenodd"
+              clipRule="evenodd"
               d="M5.35355 0.646447C5.54882 0.841709 5.54882 1.15829 5.35355 1.35355L2.20711 4.5H11C11.2761 4.5 11.5 4.72386 11.5 5C11.5 5.27614 11.2761 5.5 11 5.5H2.20711L5.35355 8.64645C5.54882 8.84171 5.54882 9.15829 5.35355 9.35355C5.15829 9.54882 4.84171 9.54882 4.64645 9.35355L0.646447 5.35355C0.451184 5.15829 0.451184 4.84171 0.646447 4.64645L4.64645 0.646447C4.84171 0.451184 5.15829 0.451184 5.35355 0.646447Z"
               fill={theme.components.icon.icon}
             />
@@ -305,8 +305,8 @@ const TableComponent: React.FC<TableProps> = ({
             style={{ transform: "rotate(180deg)" }}
           >
             <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
+              fillRule="evenodd"
+              clipRule="evenodd"
               d="M5.35355 0.646447C5.54882 0.841709 5.54882 1.15829 5.35355 1.35355L2.20711 4.5H11C11.2761 4.5 11.5 4.72386 11.5 5C11.5 5.27614 11.2761 5.5 11 5.5H2.20711L5.35355 8.64645C5.54882 8.84171 5.54882 9.15829 5.35355 9.35355C5.15829 9.54882 4.84171 9.54882 4.64645 9.35355L0.646447 5.35355C0.451184 5.15829 0.451184 4.84171 0.646447 4.64645L4.64645 0.646447C4.84171 0.451184 5.15829 0.451184 5.35355 0.646447Z"
               fill={theme.components.icon.icon}
             />

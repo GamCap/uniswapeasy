@@ -116,6 +116,10 @@ export function useV4PoolInfo(
   poolState: PoolState;
   ticks: { [bound in Bound]?: number | undefined };
   price?: Price<Token, Token>;
+  formattedPrice?: string;
+  formattedAmounts: { [x: string]: string };
+  maxAmounts: { [field in Field]?: CurrencyAmount<Currency> };
+  atMaxAmounts: { [field in Field]?: boolean | undefined };
   pricesAtTicks: {
     [bound in Bound]?: Price<Token, Token> | undefined;
   };
@@ -625,6 +629,38 @@ export function useV4PoolInfo(
 
   const invalidPool = poolState === PoolState.INVALID;
 
+  const formattedPrice = useMemo(() => {
+    return price
+      ? (invertPrice ? price.invert() : price).toSignificant(6)
+      : undefined;
+  }, [price, invertPrice]);
+
+  const formattedAmounts = {
+    [independentField]: typedValue,
+    [dependentField]: parsedAmounts[dependentField]?.toSignificant(6) ?? "",
+  };
+
+  //TODO: add handler for native currency (balance - min gas fee)
+  const maxAmounts: { [field in Field]?: CurrencyAmount<Currency> } = [
+    Field.CURRENCY_0,
+    Field.CURRENCY_1,
+  ].reduce((accumulator, field) => {
+    return {
+      ...accumulator,
+      [field]: currencyBalances[field],
+    };
+  }, {});
+
+  const atMaxAmounts: { [field in Field]?: boolean } = [
+    Field.CURRENCY_0,
+    Field.CURRENCY_1,
+  ].reduce((accumulator, field) => {
+    return {
+      ...accumulator,
+      [field]: maxAmounts[field]?.equalTo(parsedAmounts[field] ?? "0"),
+    };
+  }, {});
+
   return {
     dependentField,
     currencies,
@@ -634,6 +670,10 @@ export function useV4PoolInfo(
     parsedAmounts,
     ticks,
     price,
+    formattedPrice,
+    formattedAmounts,
+    maxAmounts,
+    atMaxAmounts,
     pricesAtTicks,
     pricesAtLimit,
     position,

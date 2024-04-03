@@ -8,6 +8,7 @@ interface ModalProps {
   title?: string;
   children?: React.ReactNode;
   breakpoints?: { breakpoint: string; width: string }[];
+  customHeader?: React.ReactNode;
 }
 
 const Backdrop = styled.div`
@@ -29,7 +30,7 @@ const Backdrop = styled.div`
 `;
 
 const Content = styled.div<{
-  breakpoints?: { breakpoint: string; width: string }[];
+  $breakpoints?: { breakpoint: string; width: string }[];
 }>`
   background: ${({ theme }) => theme.surfacesAndElevation.elevation1};
   border: 1px solid ${({ theme }) => theme.borders.borders};
@@ -38,7 +39,7 @@ const Content = styled.div<{
   border-radius: 24px;
   z-index: 1000;
   overflow: hidden;
-  ${({ breakpoints }) =>
+  ${({ $breakpoints: breakpoints }) =>
     breakpoints &&
     breakpoints.map(
       (bp) => `
@@ -71,6 +72,7 @@ const Modal: React.FC<ModalProps> = ({
   children,
   title,
   breakpoints,
+  customHeader,
 }) => {
   const modalContentRef = useRef<HTMLDivElement>(null);
 
@@ -97,17 +99,21 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <Backdrop>
-      <Content ref={modalContentRef} breakpoints={breakpoints}>
-        <Header
-          style={{
-            justifyContent: title ? "space-between" : "flex-end",
-          }}
-        >
-          <ThemedText.ParagraphRegular textColor="text.primary">
-            {title}
-          </ThemedText.ParagraphRegular>
-          <CloseButton onClick={onClose}>X</CloseButton>
-        </Header>
+      <Content ref={modalContentRef} $breakpoints={breakpoints}>
+        {customHeader ? (
+          customHeader
+        ) : (
+          <Header
+            style={{
+              justifyContent: title ? "space-between" : "flex-end",
+            }}
+          >
+            <ThemedText.ParagraphRegular textColor="text.primary">
+              {title}
+            </ThemedText.ParagraphRegular>
+            <CloseButton onClick={onClose}>X</CloseButton>
+          </Header>
+        )}
         {children}
       </Content>
     </Backdrop>

@@ -5,12 +5,11 @@ import { escapeRegExp } from "../../utils/escapeRegExp";
 import { useFormatterLocales } from "../../utils/formatNumbers";
 
 const StyledInput = styled.input<{
-  error?: boolean;
-  fontSize?: string;
-  align?: string;
-  disabled?: boolean;
+  $error?: boolean;
+  $fontSize?: string;
+  $align?: string;
 }>`
-  color: ${({ disabled, error, theme }) =>
+  color: ${({ disabled, $error: error, theme }) =>
     disabled
       ? theme.components.inputFieldCurrencyField.disabledForeground
       : error
@@ -24,8 +23,8 @@ const StyledInput = styled.input<{
   border: none;
   flex: 1 1 auto;
   background-color: transparent;
-  font-size: ${({ fontSize }) => fontSize ?? "18px"};
-  text-align: ${({ align }) => align && align};
+  font-size: ${({ $fontSize: fontSize }) => fontSize ?? "18px"};
+  text-align: ${({ $align: align }) => align && align};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -89,7 +88,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       const [searchValue, replaceValue] = localeUsesComma(formatterLocale)
         ? [/\./g, ","]
         : [/,/g, "."];
-      return value.toString().replace(searchValue, replaceValue);
+      return value?.toString()?.replace(searchValue, replaceValue);
     };
 
     const valueFormattedWithLocale = formatValueWithLocale(value);

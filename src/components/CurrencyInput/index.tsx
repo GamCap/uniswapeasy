@@ -46,25 +46,41 @@ const InputContainer = styled.div`
 `;
 
 const CustomContainer = styled.div<{
-  direction: "row" | "column";
-  align: "flex-start" | "flex-end" | "center";
+  $direction: "row" | "column";
+  $align: "flex-start" | "flex-end" | "center";
 }>`
   display: flex;
-  flex-direction: ${({ direction }) => direction};
+  flex-direction: ${({ $direction }) => $direction};
   gap: 8px;
-  align-items: ${({ align }) => align};
+  align-items: ${({ $align }) => $align};
 `;
 
+const MaxButton = styled.button`
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  &:disabled {
+    cursor: not-allowed;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    border-color: transparent;
+  }
+`;
+
+type PlaceholderSymbol = "C0" | "C1";
 interface CurrencyInputProps {
   value: string;
   onUserInput: (value: string) => void;
   onMax?: () => void;
   showMaxButton?: boolean;
-  currency?: Currency | null;
+  currency?: Currency | PlaceholderSymbol;
   id: string;
   fiatValue?: string;
   showCommonBases?: boolean;
   locked: boolean;
+  disabled?: boolean;
 }
 
 export default function CurrencyInput({
@@ -77,11 +93,14 @@ export default function CurrencyInput({
   fiatValue,
   showCommonBases,
   locked = false,
+  disabled = false,
 }: CurrencyInputProps) {
   const { account, chainId } = useWeb3React();
+  const parsedCurrency: Currency | undefined =
+    currency === "C0" || currency === "C1" ? undefined : currency;
   const selectedCurrencyBalance = useCurrencyBalance(
     account ?? undefined,
-    currency ?? undefined
+    parsedCurrency
   );
 
   const chainAllowed = supportedChainId(chainId) !== undefined;
@@ -101,7 +120,7 @@ export default function CurrencyInput({
           className="token-amount-input"
           value={value}
           onUserInput={onUserInput}
-          disabled={!chainAllowed || locked}
+          disabled={!chainAllowed || locked || disabled}
           $loading={false}
         />
         {fiatValue && (
@@ -110,31 +129,33 @@ export default function CurrencyInput({
           </ThemedText.ParagraphExtraSmall>
         )}
       </InputContainer>
-      <CustomContainer direction="column" align="flex-end">
+      <CustomContainer $direction="column" $align="flex-end">
         <CurrencyContainer>
           <CurrencyLogo />
           <ThemedText.ParagraphExtraSmall textColor="components.chip.foreground">
-            {currency?.symbol}
+            {parsedCurrency
+              ? parsedCurrency.symbol
+              : (currency as PlaceholderSymbol)}
           </ThemedText.ParagraphExtraSmall>
         </CurrencyContainer>
-        <CustomContainer direction="row" align="flex-end">
+        <CustomContainer $direction="row" $align="flex-end">
           <ThemedText.ParagraphExtraSmall textColor="components.inputFieldCurrencyField.foreground">
             {selectedCurrencyBalance?.toSignificant(6)}
           </ThemedText.ParagraphExtraSmall>
           {showMaxButton && (
-            <div
+            <MaxButton
               onClick={onMax}
               style={{
-                cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
+              disabled={disabled}
             >
               <ThemedText.ParagraphExtraSmall textColor="text.color">
                 Max
               </ThemedText.ParagraphExtraSmall>
-            </div>
+            </MaxButton>
           )}
         </CustomContainer>
       </CustomContainer>

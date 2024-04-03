@@ -33,7 +33,7 @@ export default function Header({
   const theme = useTheme();
   return (
     <HeaderWrapper>
-      <Row gap="sm">
+      <Row $gap="sm">
         <ThemedText.ParagraphRegular textColor="text.primary">
           {title}
         </ThemedText.ParagraphRegular>
