@@ -15,6 +15,8 @@ const Content = styled.div`
 `;
 
 const Symbol = styled.div`
+  border-radius: 1000px;
+  background: ${({ theme }) => theme.surfacesAndElevation.elevation2};
   display: flex;
   padding: 16px;
   justify-content: center;
@@ -42,6 +44,7 @@ const Button = styled.button`
 `;
 
 const Body = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;

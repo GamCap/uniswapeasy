@@ -56,6 +56,9 @@ const CustomContainer = styled.div<{
 `;
 
 const MaxButton = styled.button`
+  appearance: none;
+  border: none;
+  background: transparent;
   cursor: pointer;
   &:disabled {
     cursor: not-allowed;

@@ -16,7 +16,7 @@ import Column from "components/Column";
 import { PositionHeader } from "../PositionHeader";
 import Header from "../Header";
 import styled, { useTheme } from "styled-components";
-import Row from "components/Row";
+import Row, { RowBetween } from "components/Row";
 import { BoxSecondary, ThemedText, Section } from "theme/components";
 import PoolKeySelect from "../PoolKeySelect";
 import PriceRangeManual from "../PriceRangeManual";
@@ -81,8 +81,10 @@ const CloseButton = styled.button`
   cursor: pointer;
 `;
 
-const SwapToRatioButton = styled.button`
+const StyledButton = styled.button`
   background: none;
+  appearance: none;
+  border: none;
   cursor: pointer;
   &:disabled {
     background-color: transparent;
@@ -90,6 +92,31 @@ const SwapToRatioButton = styled.button`
     color: transparent;
     border-color: transparent;
     border: none;
+  }
+`;
+
+// a container that contains 6 rows of text max, the rest is overflowed and can be seen by scrolling
+const OverflowContainer = styled.div`
+  max-height: 132px;
+  overflow-y: auto;
+  padding: 12px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  white-space: normal;
+  word-break: break-word;
+  background-color: ${({ theme }) => theme.surfacesAndElevation.pageBackground};
+  &::-webkit-scrollbar {
+    width: 8px;
+    padding-right: 12px;
+    background: transparent;
+  }
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.surfacesAndElevation.elevation3};
+    border-radius: 50px;
+    background-clip: padding-box;
   }
 `;
 
@@ -139,6 +166,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
   const [transactionStatus, setTransactionStatus] =
     useState<TransactionStatus>("idle");
   const [transactionError, setTransactionError] = useState<string | null>(null);
+  const [errorMessageOpen, setErrorMessageOpen] = useState(false);
   const [txnAddress, setTxnAddress] = useState<string>("");
 
   const { poolKey, setPoolKey, poolKeys, hookAddressToAbbr, selectedHook } =
@@ -531,9 +559,77 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
             title={"Something went wrong"}
             info={"Look at the error details below"}
             children={
-              <ThemedText.ParagraphExtraSmall textColor="text.primary">
-                {transactionError}
-              </ThemedText.ParagraphExtraSmall>
+              <>
+                <RowBetween
+                  style={{
+                    width: "100%",
+                  }}
+                >
+                  <ThemedText.ParagraphRegular textColor="components.textButton.tertiary.default">
+                    Error details
+                  </ThemedText.ParagraphRegular>
+                  <Row
+                    style={{
+                      width: "fit-content",
+                      gap: "16px",
+                    }}
+                  >
+                    {/* Copy error message to clipboard */}
+                    <StyledButton
+                      onClick={() => {
+                        navigator?.clipboard?.writeText(transactionError ?? "");
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="15"
+                        height="15"
+                        viewBox="0 0 13 14"
+                        fill="none"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          clip-rule="evenodd"
+                          d="M0.0830081 9.16683C0.0830082 9.85719 0.642652 10.4168 1.33301 10.4168H2.99967V9.5835H1.33301C1.10289 9.5835 0.916342 9.39695 0.916341 9.16683L0.916341 1.8335C0.916341 1.60338 1.10289 1.41683 1.33301 1.41683L8.66634 1.41683C8.89646 1.41683 9.08301 1.60338 9.08301 1.8335V3.5H4.3335C3.59712 3.5 3.00016 4.09695 3.00016 4.83333V12.1667C3.00016 12.903 3.59712 13.5 4.3335 13.5H11.6668C12.4032 13.5 13.0002 12.903 13.0002 12.1667V4.83334C13.0002 4.09696 12.4032 3.5 11.6668 3.5H9.91634V1.8335C9.91634 1.14314 9.3567 0.583496 8.66634 0.583496L1.33301 0.583496C0.642652 0.583496 0.0830078 1.14314 0.0830078 1.8335L0.0830081 9.16683ZM4.00016 4.83333C4.00016 4.64924 4.1494 4.5 4.3335 4.5H11.6668C11.8509 4.5 12.0002 4.64924 12.0002 4.83334V12.1667C12.0002 12.3508 11.8509 12.5 11.6668 12.5H4.3335C4.1494 12.5 4.00016 12.3508 4.00016 12.1667V4.83333Z"
+                          fill={theme.components.icon.icon}
+                        />
+                      </svg>
+                    </StyledButton>
+                    <StyledButton
+                      onClick={() => {
+                        setErrorMessageOpen(!errorMessageOpen);
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="15"
+                        height="15"
+                        viewBox="0 0 15 16"
+                        fill="none"
+                        style={{
+                          transform: errorMessageOpen
+                            ? "rotate(180deg)"
+                            : "none",
+                        }}
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          clip-rule="evenodd"
+                          d="M3.13523 6.65803C3.3241 6.45657 3.64052 6.44637 3.84197 6.63523L7.5 10.0646L11.158 6.63523C11.3595 6.44637 11.6759 6.45657 11.8648 6.65803C12.0536 6.85949 12.0434 7.17591 11.842 7.36477L7.84197 11.1148C7.64964 11.2951 7.35036 11.2951 7.15803 11.1148L3.15803 7.36477C2.95657 7.17591 2.94637 6.85949 3.13523 6.65803Z"
+                          fill={theme.components.icon.icon}
+                        />
+                      </svg>
+                    </StyledButton>
+                  </Row>
+                </RowBetween>
+                {errorMessageOpen && (
+                  <OverflowContainer>
+                    <ThemedText.ParagraphExtraSmall textColor="text.primary">
+                      {transactionError}
+                    </ThemedText.ParagraphExtraSmall>
+                  </OverflowContainer>
+                )}
+              </>
             }
             buttonText={"Close"}
             buttonAction={() => {
@@ -545,7 +641,14 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
           />
         );
     }
-  }, [transactionStatus, transactionError, theme, txnAddress, currencies]);
+  }, [
+    transactionStatus,
+    transactionError,
+    theme,
+    txnAddress,
+    currencies,
+    errorMessageOpen,
+  ]);
   return (
     <>
       {!account ? (
@@ -810,7 +913,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                         />
                       </svg>
                     </div>
-                    <SwapToRatioButton
+                    <StyledButton
                       onClick={() => setSwapToRatio(!swapToRatio)}
                       disabled={!poolKey || invalidPool}
                     >
@@ -844,7 +947,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                           }}
                         />
                       </svg>
-                    </SwapToRatioButton>
+                    </StyledButton>
                   </Row>
                 </Header>
                 <Column
@@ -910,7 +1013,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
               )}
               {/*Placeholder Buttons */}
               <Section $disabled={!poolKey || invalidPool}>
-                <SwapToRatioButton
+                <StyledButton
                   onClick={onAdd}
                   disabled={
                     !isValid ||
@@ -934,7 +1037,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                   <ThemedText.ParagraphRegular textColor="text.primary">
                     Add Liquidity
                   </ThemedText.ParagraphRegular>
-                </SwapToRatioButton>
+                </StyledButton>
               </Section>
             </ContentColumn>
           </Column>

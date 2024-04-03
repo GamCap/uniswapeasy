@@ -248,7 +248,11 @@ function PoolKeySelect({
       </Modal>
       {!selectedPoolKey && (
         <Row $gap="md">
-          <SelectButton>
+          <SelectButton
+            onClick={() => {
+              setIsOpen(true);
+            }}
+          >
             <ThemedText.ParagraphRegular
               textColor="components.button.primary.foreground"
               fontWeight={600}
@@ -294,7 +298,6 @@ function PoolKeySelect({
         <ChangeButton
           disabled={false}
           onClick={() => {
-            console.log("Change button clicked");
             setIsOpen(true);
           }}
         >
