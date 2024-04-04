@@ -8,7 +8,6 @@ import {
 import { useMemo } from "react";
 import styled from "styled-components";
 
-// Assuming your styled component remains unchanged
 const StyledGroup = styled.g`
   .tick {
     line {
@@ -102,7 +101,7 @@ export const AxisRight = ({
 }) =>
   useMemo(
     () => (
-      <StyledGroup transform={`translate(${Math.floor(innerWidth * 0.2)},0)`}>
+      <StyledGroup transform={`translate(${Math.ceil(innerWidth * 0.2)},0)`}>
         <Axis
           axisGenerator={axisRight(yScale)}
           brushDomain={brushDomain}

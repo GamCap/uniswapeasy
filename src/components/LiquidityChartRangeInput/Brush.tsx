@@ -7,7 +7,7 @@ import {
 import { BrushBehavior, brushY, D3BrushEvent, ScaleLinear, select } from "d3";
 import usePrevious from "../../hooks/usePrevious";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 
 const Handle = styled.path<{ color: string }>`
   cursor: ns-resize;
@@ -219,6 +219,7 @@ export const Brush = ({
     yScale(localBrushExtent[1]) >= 0 &&
     yScale(localBrushExtent[1]) <= innerHeight;
 
+  const theme = useTheme();
   return useMemo(
     () => (
       <>
@@ -230,8 +231,8 @@ export const Brush = ({
             x2="50%"
             y2="100%"
           >
-            <stop stopColor={southHandleColor} />
-            <stop stopColor={northHandleColor} offset={1} />
+            <stop stopColor={northHandleColor} />
+            <stop stopColor={southHandleColor} offset={1} />
           </linearGradient>
 
           {/* clips at exactly the svg area */}
@@ -263,6 +264,7 @@ export const Brush = ({
                   <DashedHandle
                     color={northHandleColor}
                     d={dashedBrushHandlePath(innerWidth)}
+                    transform="translate(0,2)"
                   />
                 </g>
                 <g>
@@ -272,6 +274,28 @@ export const Brush = ({
                   />
                   <HandleAccent d={brushHandleAccentPath()} />
                 </g>
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="12"
+                  y2="0"
+                  stroke={theme.text.primary}
+                  strokeWidth="1"
+                  transform={`translate(${
+                    Math.floor(innerWidth * 0.8) + 7
+                  }, -3.5)`}
+                />
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="12"
+                  y2="0"
+                  stroke={theme.text.primary}
+                  strokeWidth="1"
+                  transform={`translate(${
+                    Math.floor(innerWidth * 0.8) + 7
+                  }, -7)`}
+                />
               </g>
             ) : null}
 
@@ -286,6 +310,7 @@ export const Brush = ({
                   <DashedHandle
                     color={southHandleColor}
                     d={dashedBrushHandlePath(innerWidth)}
+                    transform="translate(0,2)"
                   />
                 </g>
                 <g>
@@ -295,14 +320,46 @@ export const Brush = ({
                   />
                   <HandleAccent d={brushHandleAccentPath()} />
                 </g>
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="12"
+                  y2="0"
+                  stroke={theme.text.primary}
+                  strokeWidth="1"
+                  transform={`translate(${
+                    Math.floor(innerWidth * 0.8) + 7
+                  }, -3.5)`}
+                />
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="12"
+                  y2="0"
+                  stroke={theme.text.primary}
+                  strokeWidth="1"
+                  transform={`translate(${
+                    Math.floor(innerWidth * 0.8) + 7
+                  }, -7)`}
+                />
               </g>
             ) : null}
 
-            {showNArrow && <OffScreenHandle color={northHandleColor} />}
+            {showNArrow && (
+              <g
+                transform={`translate(${Math.floor(innerWidth * 0.8) - 10}, 0)`}
+              >
+                <OffScreenHandle color={northHandleColor} />
+              </g>
+            )}
 
             {showSArrow && (
-              <g transform={`translate( 0, ${innerHeight}) scale(1,-1)`}>
-                <OffScreenHandle color={northHandleColor} />
+              <g
+                transform={`translate( ${
+                  Math.floor(innerWidth * 0.8) - 10
+                }, ${innerHeight}) scale(1,-1)`}
+              >
+                <OffScreenHandle color={southHandleColor} />
               </g>
             )}
           </>

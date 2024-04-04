@@ -1,19 +1,26 @@
-import { max, scaleLinear, ZoomTransform } from "d3";
+import { max, min, scaleLinear, scaleTime, ZoomTransform } from "d3";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bound } from "../../state/v4/actions";
 import { Area } from "./Area";
 import { AxisRight } from "./AxisRight";
 import { Brush } from "./Brush";
 import { Line } from "./Line";
-import { ChartEntry, LiquidityChartRangeInputProps } from "./types";
+import {
+  ChartEntry,
+  LiquidityChartRangeInputProps,
+  Chart2Entry,
+} from "./types";
 import Zoom, { ZoomOverlay } from "./Zoom";
+import { AxisBottom } from "./AxisBottom";
+import { TimePriceLine } from "./LinePath";
 
 const xAccessor = (d: ChartEntry) => d.activeLiquidity;
 const yAccessor = (d: ChartEntry) => d.price0;
+const timeAccessor = (d: Chart2Entry) => d.time;
 
 export function Chart({
   id = "liquidityChartRangeInput",
-  data: { series, current },
+  data: { series, series2, current },
   ticksAtLimit,
   styles,
   dimensions: { width, height },
@@ -36,7 +43,7 @@ export function Chart({
     [width, height, margins]
   );
 
-  const { xScale, yScale } = useMemo(() => {
+  const { xScale, yScale, xTimeScale } = useMemo(() => {
     const scales = {
       yScale: scaleLinear()
         .domain([
@@ -47,6 +54,12 @@ export function Chart({
       xScale: scaleLinear()
         .domain([0, max(series, xAccessor)] as number[])
         .range([Math.ceil(innerWidth * 0.2), 0]),
+      xTimeScale: scaleTime()
+        .domain([
+          min(series2, timeAccessor),
+          max(series2, timeAccessor),
+        ] as number[])
+        .range([0, Math.floor(innerWidth * 0.8) - 20]),
     };
 
     if (zoom) {
@@ -61,6 +74,7 @@ export function Chart({
     zoomLevels.initialMax,
     innerWidth,
     series,
+    series2,
     innerHeight,
     zoom,
   ]);
@@ -87,15 +101,16 @@ export function Chart({
         resetBrush={() => {
           onBrushDomainChange(
             [
-              current * zoomLevels.initialMin,
               current * zoomLevels.initialMax,
+              current * zoomLevels.initialMin,
             ] as [number, number],
             "reset"
           );
         }}
-        showResetButton={Boolean(
-          ticksAtLimit[Bound.LOWER] || ticksAtLimit[Bound.UPPER]
-        )}
+        // showResetButton={Boolean(
+        //   ticksAtLimit[Bound.LOWER] || ticksAtLimit[Bound.UPPER]
+        // )}
+        showResetButton={true}
         zoomLevels={zoomLevels}
       />
       <div>
@@ -107,7 +122,7 @@ export function Chart({
         >
           <defs>
             <clipPath id={`${id}-chart-clip`}>
-              <rect x="0" y="0" width={innerWidth} height={height} />
+              <rect x="0" y="0" width={innerWidth} height={innerHeight} />
             </clipPath>
 
             {brushDomain && (
@@ -160,7 +175,35 @@ export function Chart({
                 currentPrice={current}
               />
             </g>
-            <Line value={current} yScale={yScale} innerWidth={innerWidth} />
+            <AxisBottom
+              xScale={xTimeScale}
+              height={innerHeight}
+              tickFormat={"%H:%M"}
+            />
+            <g clipPath={`url(#${id}-chart-clip)`}>
+              <TimePriceLine
+                series={series2}
+                xScale={xTimeScale}
+                yScale={yScale}
+                stroke={styles.area.selection}
+              />
+              <Line value={current} yScale={yScale} innerWidth={innerWidth} />
+              <circle
+                cx={xTimeScale(series2[series2.length - 1].time)}
+                cy={yScale(series2[series2.length - 1].price0)}
+                r="5"
+                fill={styles.area.selection}
+              />
+            </g>
+            <line
+              x1="0"
+              y1={innerHeight}
+              x2={width}
+              y2={innerHeight}
+              stroke={styles.divider}
+              strokeWidth="1"
+            />
+
             <ZoomOverlay width={width} height={height} ref={zoomRef} />
 
             <Brush

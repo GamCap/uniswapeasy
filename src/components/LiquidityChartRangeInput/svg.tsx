@@ -29,11 +29,11 @@ export const brushHandlePath = (width: number) =>
     // `M 1 0`, // move down slightly from top
 
     // head
-    "v -12", // vertical line down
+    "v -10", // vertical line down
     "q 0 -2 2 -2", // rounded corner to the right
-    "h 22", // horizontal line right
+    "h 20", // horizontal line right
     "q 2 0 2 2", // rounded corner upwards
-    "v 12", // vertical line up
+    "v 10", // vertical line up
     `z`, // close path
   ].join(" ");
 
@@ -61,7 +61,7 @@ export const OffScreenHandle = ({
   margin?: number;
 }) => (
   <polygon
-    points={`0 0, ${size} ${size}, 0 ${size}`}
+    points={`0 0, ${size} 0, 0 ${size}`}
     transform={` translate(${size + margin}, ${margin}) rotate(45) `}
     fill={color}
     stroke={color}

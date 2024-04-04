@@ -210,19 +210,50 @@ export default function LiquidityChartRangeInput({
       ) : (
         <ChartWrapper>
           <Chart
-            data={{ series: formattedData.reverse(), current: price }}
-            dimensions={{ width: 668, height: 300 }}
-            margins={{ top: 0, right: 90, bottom: 0, left: 0 }}
+            data={{
+              series: formattedData.reverse(),
+              //TODO: remove this hardcoded data
+              series2: [
+                { time: 1712167200000, price0: 64205 },
+                { time: 1712170800000, price0: 57559 },
+                { time: 1712174400000, price0: 58068 },
+                { time: 1712178000000, price0: 68755 },
+                { time: 1712181600000, price0: 63017 },
+                { time: 1712185200000, price0: 56234 },
+                { time: 1712188800000, price0: 67503 },
+                { time: 1712192400000, price0: 58928 },
+                { time: 1712196000000, price0: 62132 },
+                { time: 1712199600000, price0: 60253 },
+                { time: 1712203200000, price0: 69720 },
+                { time: 1712206800000, price0: 66864 },
+                { time: 1712210400000, price0: 54941 },
+                { time: 1712214000000, price0: 53713 },
+                { time: 1712217600000, price0: 63363 },
+                { time: 1712221200000, price0: 64121 },
+                { time: 1712224800000, price0: 52520 },
+                { time: 1712228400000, price0: 67149 },
+                { time: 1712232000000, price0: 60203 },
+                { time: 1712235600000, price0: 52585 },
+                { time: 1712239200000, price0: 66845 },
+                { time: 1712242800000, price0: 58667 },
+                { time: 1712246400000, price0: 65665 },
+                { time: 1712250000000, price0: price },
+              ],
+              current: price,
+            }}
+            dimensions={{ width: 668, height: 170 }}
+            margins={{ top: 0, right: 90, bottom: 40, left: 0 }}
             styles={{
               area: {
-                selection: "#64D5E4",
+                selection: theme.components.graph.main,
               },
               brush: {
                 handle: {
-                  east: "#FF8A00",
+                  east: "#FAB01D",
                   west: "#627EEA",
                 },
               },
+              divider: theme.borders.dividers,
             }}
             interactive={interactive}
             brushLabels={brushLabelValue}
