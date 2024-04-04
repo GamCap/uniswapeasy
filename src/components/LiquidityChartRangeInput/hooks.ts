@@ -27,7 +27,6 @@ export function useDensityChartData({
 }) {
   
   const { isLoading, error, data } = usePoolActiveLiquidity(currencyA, currencyB, feeAmount, tickSpacing, hooks)
-  // const data = mockTicks.ticks.map((tick) => ({tick: Number(tick.tickIdx), liquidityActive: JSBI.BigInt(tick.liquidityGross), liquidityNet: JSBI.BigInt(tick.liquidityNet), price0: tick.price0} as TickProcessed))
   const formatData = useCallback(() => {
     if (!data?.length) {
       return undefined

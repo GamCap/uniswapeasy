@@ -18,7 +18,7 @@ const Wrapper = styled.div<{ count: number }>`
   grid-gap: 6px;
 
   position: absolute;
-  top: -32px;
+  top: 0;
   right: 0;
 `;
 
@@ -49,7 +49,7 @@ export const ZoomOverlay = styled.rect`
 
 export default function Zoom({
   svg,
-  xScale,
+  yScale,
   setZoom,
   width,
   height,
@@ -58,7 +58,7 @@ export default function Zoom({
   zoomLevels,
 }: {
   svg: SVGElement | null;
-  xScale: ScaleLinear<number, number>;
+  yScale: ScaleLinear<number, number>;
   setZoom: (transform: ZoomTransform) => void;
   width: number;
   height: number;
@@ -121,17 +121,12 @@ export default function Zoom({
     width,
     setZoom,
     svg,
-    xScale,
+    yScale,
     zoomBehavior,
     zoomLevels,
     zoomLevels.max,
     zoomLevels.min,
   ]);
-
-  useEffect(() => {
-    // reset zoom to initial on zoomLevel change
-    zoomInitial();
-  }, [zoomInitial, zoomLevels]);
 
   return (
     <Wrapper count={showResetButton ? 3 : 2}>

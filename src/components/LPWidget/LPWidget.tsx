@@ -649,6 +649,10 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
     currencies,
     errorMessageOpen,
   ]);
+
+  useEffect(() => {
+    console.log("pool", pool);
+  }, [pool]);
   return (
     <>
       {!account ? (
@@ -763,63 +767,38 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                   title="Price Range"
                   info="Placeholder Price Range Info"
                 />
-                {/* <LiquidityChartRangeInput
-                currencyA={currencies.CURRENCY_0}
-                currencyB={currencies.CURRENCY_1}
-                feeAmount={
-                  pool?.fee
-                    ? BigNumber.from(pool?.fee.toString() ?? "0")
-                    : undefined
-                }
-                tickSpacing={
-                  pool?.tickSpacing
-                    ? BigNumber.from(pool?.tickSpacing.toString() ?? "0")
-                    : undefined
-                }
-                price={
-                  price
-                    ? parseFloat(
-                        (invertPrice ? price.invert() : price).toSignificant(6)
-                      )
-                    : undefined
-                }
-                priceLower={priceLower}
-                priceUpper={priceUpper}
-                ticksAtLimit={ticksAtLimit}
-                onLeftRangeInput={onLeftRangeInput}
-                onRightRangeInput={onRightRangeInput}
-                interactive={true}
-              /> */}
-                {/*Placeholder Current Price */}
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "100%",
-                    padding: "0 24px",
-                    boxSizing: "border-box",
-                    height: "fit-content",
-                  }}
-                >
-                  <BoxSecondary $radius="8px" $padding="12px">
-                    <Column
-                      $gap="md"
-                      style={{
-                        alignItems: "flex-start",
-                        width: "fit-content",
-                      }}
-                    >
-                      <ThemedText.SubHeader textColor="text.tertiary">
-                        Current Price
-                      </ThemedText.SubHeader>
-                      <ThemedText.SmallText textColor="text.primary">
-                        {formattedPrice}
-                      </ThemedText.SmallText>
-                    </Column>
-                  </BoxSecondary>
-                </div>
+                <LiquidityChartRangeInput
+                  currencyA={currencies.CURRENCY_0}
+                  currencyB={currencies.CURRENCY_1}
+                  feeAmount={
+                    pool?.fee
+                      ? BigNumber.from(pool?.fee.toString() ?? "0")
+                      : undefined
+                  }
+                  tickSpacing={
+                    pool?.tickSpacing
+                      ? BigNumber.from(pool?.tickSpacing.toString() ?? "0")
+                      : undefined
+                  }
+                  hooks={pool?.hooks}
+                  price={
+                    price
+                      ? parseFloat(
+                          (invertPrice ? price.invert() : price).toSignificant(
+                            6
+                          )
+                        )
+                      : undefined
+                  }
+                  formattedPrice={formattedPrice}
+                  priceLower={priceLower}
+                  priceUpper={priceUpper}
+                  ticksAtLimit={ticksAtLimit}
+                  onLeftRangeInput={onLeftRangeInput}
+                  onRightRangeInput={onRightRangeInput}
+                  interactive={true}
+                />
+
                 {/* Price Range Component (Manual) */}
                 <PriceRangeManual
                   priceLower={priceLower}

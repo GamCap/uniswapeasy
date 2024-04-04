@@ -256,13 +256,22 @@ export function useV4PoolInfo(
 
   // used for ratio calculation when pool not initialized
   const mockPool = useMemo(() => {
-    if (tokenA && tokenB && fee && price && !invalidPrice && tickSpacing) {
+    if (
+      tokenA &&
+      tokenB &&
+      fee &&
+      price &&
+      hooks &&
+      !invalidPrice &&
+      tickSpacing
+    ) {
       const currentTick = priceToClosestTick(price);
       const currentSqrt = TickMath.getSqrtRatioAtTick(currentTick);
       return new Pool(
         tokenA,
         tokenB,
         fee,
+        hooks,
         currentSqrt,
         JSBI.BigInt(0),
         tickSpacing,
