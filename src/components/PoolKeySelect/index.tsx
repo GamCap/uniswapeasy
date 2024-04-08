@@ -5,10 +5,12 @@ import { ThemedText } from "theme/components";
 import { memo, useEffect, useState } from "react";
 import Modal from "../Modal";
 import Table from "../Table";
+import { useCurrencyLogo } from "hooks/useCurrencyLogo";
+import { Currency } from "@uniswap/sdk-core";
 
 const NO_HOOK_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-const CurrencyLogo = styled.div`
+const CurrencyLogo = styled.img`
   width: 24px;
   height: 24px;
   border-radius: 100%;
@@ -84,15 +86,19 @@ const CurrencyPair = styled.span`
 `;
 
 const PoolComponent: React.FC<{
-  pool: { currency0: { symbol: string }; currency1: { symbol: string } };
-}> = ({ pool }) => (
+  pool: { currency0: Currency; currency1: Currency };
+  currencyIconMap: Record<string, string>;
+}> = ({ pool, currencyIconMap }) => (
   <CurrencyPair>
     <LogoWrapper>
-      <CurrencyLogo />
+      <CurrencyLogo
+        src={useCurrencyLogo(pool?.currency0 ?? "C0", currencyIconMap)}
+      />
       <CurrencyLogo
         style={{
           transform: "translateX(-6px)",
         }}
+        src={useCurrencyLogo(pool?.currency1 ?? "C1", currencyIconMap)}
       />
     </LogoWrapper>
     <ThemedText.ParagraphExtraSmall textColor="text.primary">
@@ -163,11 +169,13 @@ function PoolKeySelect({
   poolKeys,
   hookAddressToAbbr,
   selectedPoolKey,
+  currencyIconMap,
   onSelect,
 }: {
   poolKeys?: PoolKey[];
   selectedPoolKey?: PoolKey;
-  hookAddressToAbbr?: { [key: string]: string };
+  hookAddressToAbbr?: Record<string, string>;
+  currencyIconMap?: Record<string, string>;
   onSelect?: (poolKey: PoolKey) => void;
 }) {
   const theme = useTheme();
@@ -231,7 +239,12 @@ function PoolKeySelect({
           data={unifiedData || []}
           pageSize={6}
           renderers={{
-            Pool: (poolData) => <PoolComponent pool={poolData} />,
+            Pool: (poolData) => (
+              <PoolComponent
+                pool={poolData}
+                currencyIconMap={currencyIconMap || {}}
+              />
+            ),
             Feature: (featureData) => (
               <FeatureComponent feature={featureData} />
             ),
@@ -271,8 +284,19 @@ function PoolKeySelect({
             {/* 
         TODO: Replace with actual currency logos
          */}
-            <CurrencyLogo />
             <CurrencyLogo
+              src={useCurrencyLogo(
+                selectedPoolKey?.currency0 ?? "C0",
+                currencyIconMap ?? {}
+              )}
+              alt={selectedPoolKey?.currency0?.symbol ?? "C0"}
+            />
+            <CurrencyLogo
+              src={useCurrencyLogo(
+                selectedPoolKey?.currency1 ?? "C1",
+                currencyIconMap ?? {}
+              )}
+              alt={selectedPoolKey?.currency1?.symbol ?? "C1"}
               style={{
                 transform: "translateX(-6px)",
               }}

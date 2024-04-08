@@ -69,7 +69,7 @@ const MaxButton = styled.button`
   }
 `;
 
-type PlaceholderSymbol = "C0" | "C1";
+export type PlaceholderSymbol = "C0" | "C1";
 interface CurrencyInputProps {
   value: string;
   onUserInput: (value: string) => void;
