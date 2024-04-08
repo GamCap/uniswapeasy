@@ -77,7 +77,7 @@ interface CurrencyInputProps {
   onUserInput: (value: string) => void;
   onMax?: () => void;
   showMaxButton?: boolean;
-  currency?: Currency | PlaceholderSymbol;
+  currency: Currency | PlaceholderSymbol;
   currencyIconMap?: Record<string, string>;
   id: string;
   fiatValue?: string;
@@ -136,10 +136,7 @@ export default function CurrencyInput({
       <CustomContainer $direction="column" $align="flex-end">
         <CurrencyContainer>
           <CurrencyLogo
-            src={useCurrencyLogo(
-              parsedCurrency ? parsedCurrency : (currency as PlaceholderSymbol),
-              currencyIconMap ?? {}
-            )}
+            src={useCurrencyLogo(currency, currencyIconMap ?? {})}
           />
           <ThemedText.ParagraphExtraSmall textColor="components.chip.foreground">
             {parsedCurrency

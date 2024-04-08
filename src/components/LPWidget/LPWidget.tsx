@@ -950,6 +950,7 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
                       }}
                       showMaxButton={!atMaxAmounts[Field.CURRENCY_0]}
                       currency={currencies[Field.CURRENCY_0] ?? "C0"}
+                      currencyIconMap={currencyIconMap}
                       id="add-liquidity-input-token0"
                       showCommonBases
                       locked={depositADisabled}
@@ -965,6 +966,7 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
                       }}
                       showMaxButton={!atMaxAmounts[Field.CURRENCY_1]}
                       currency={currencies[Field.CURRENCY_1] ?? "C1"}
+                      currencyIconMap={currencyIconMap}
                       id="add-liquidity-input-token1"
                       showCommonBases
                       locked={depositBDisabled}
