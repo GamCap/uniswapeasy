@@ -5,6 +5,7 @@ import { styled } from "styled-components";
 import { useWeb3React } from "@web3-react/core";
 import { supportedChainId } from "utils/supportedChainId";
 import useCurrencyBalance from "hooks/web3/useCurrencyBalances";
+import { useCurrencyLogo } from "hooks/useCurrencyLogo";
 const StyledNumericalInput = styled(NumericalInput)<{ $loading: boolean }>`
   background-color: transparent;
   text-align: left;
@@ -31,11 +32,12 @@ const CurrencyContainer = styled.div`
 
 //TODO:
 //Get logo from a source
-const CurrencyLogo = styled.div`
+const CurrencyLogo = styled.img`
   width: 16px;
   height: 16px;
   border-radius: 100%;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.text.primary};
+  border: 1px solid ${({ theme }) => theme.borders.dividerBlank};
 `;
 
 const InputContainer = styled.div`
@@ -76,6 +78,7 @@ interface CurrencyInputProps {
   onMax?: () => void;
   showMaxButton?: boolean;
   currency?: Currency | PlaceholderSymbol;
+  currencyIconMap?: Record<string, string>;
   id: string;
   fiatValue?: string;
   showCommonBases?: boolean;
@@ -89,6 +92,7 @@ export default function CurrencyInput({
   onMax,
   showMaxButton,
   currency,
+  currencyIconMap,
   id,
   fiatValue,
   showCommonBases,
@@ -131,7 +135,12 @@ export default function CurrencyInput({
       </InputContainer>
       <CustomContainer $direction="column" $align="flex-end">
         <CurrencyContainer>
-          <CurrencyLogo />
+          <CurrencyLogo
+            src={useCurrencyLogo(
+              parsedCurrency ? parsedCurrency : (currency as PlaceholderSymbol),
+              currencyIconMap ?? {}
+            )}
+          />
           <ThemedText.ParagraphExtraSmall textColor="components.chip.foreground">
             {parsedCurrency
               ? parsedCurrency.symbol
