@@ -1,14 +1,27 @@
-import { brushHandleAccentPath, brushHandlePath, OffScreenHandle } from "./svg";
-import { BrushBehavior, brushX, D3BrushEvent, ScaleLinear, select } from "d3";
+import {
+  brushHandleAccentPath,
+  brushHandlePath,
+  dashedBrushHandlePath,
+  OffScreenHandle,
+} from "./svg";
+import { BrushBehavior, brushY, D3BrushEvent, ScaleLinear, select } from "d3";
 import usePrevious from "../../hooks/usePrevious";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 
 const Handle = styled.path<{ color: string }>`
-  cursor: ew-resize;
+  cursor: ns-resize;
   pointer-events: none;
 
   stroke-width: 3;
+  stroke: ${({ color }) => color};
+  fill: ${({ color }) => color};
+`;
+
+const DashedHandle = styled.path<{ color: string }>`
+  pointer-events: none;
+  stroke-dasharray: 2;
+  stroke-width: 1;
   stroke: ${({ color }) => color};
   fill: ${({ color }) => color};
 `;
@@ -60,26 +73,26 @@ const compare = (
 
 export const Brush = ({
   id,
-  xScale,
+  yScale,
   interactive,
   brushLabelValue,
   brushExtent,
   setBrushExtent,
   innerWidth,
   innerHeight,
-  westHandleColor,
-  eastHandleColor,
+  southHandleColor,
+  northHandleColor,
 }: {
   id: string;
-  xScale: ScaleLinear<number, number>;
+  yScale: ScaleLinear<number, number>;
   interactive: boolean;
-  brushLabelValue: (d: "w" | "e", x: number) => string;
+  brushLabelValue: (d: "s" | "n", x: number) => string;
   brushExtent: [number, number];
   setBrushExtent: (extent: [number, number], mode: string | undefined) => void;
   innerWidth: number;
   innerHeight: number;
-  westHandleColor: string;
-  eastHandleColor: string;
+  southHandleColor: string;
+  northHandleColor: string;
 }) => {
   const brushRef = useRef<SVGGElement | null>(null);
   const brushBehavior = useRef<BrushBehavior<SVGGElement> | null>(null);
@@ -102,19 +115,19 @@ export const Brush = ({
         return;
       }
 
-      const scaled = (selection as [number, number]).map(xScale.invert) as [
+      const scaled = (selection as [number, number]).map(yScale.invert) as [
         number,
         number
       ];
 
       // avoid infinite render loop by checking for change
-      if (type === "end" && !compare(brushExtent, scaled, xScale)) {
+      if (type === "end" && !compare(brushExtent, scaled, yScale)) {
         setBrushExtent(scaled, mode);
       }
 
       setLocalBrushExtent(scaled);
     },
-    [xScale, brushExtent, setBrushExtent]
+    [yScale, brushExtent, setBrushExtent]
   );
 
   // keep local and external brush extent in sync
@@ -127,10 +140,10 @@ export const Brush = ({
   useEffect(() => {
     if (!brushRef.current) return;
 
-    brushBehavior.current = brushX<SVGGElement>()
+    brushBehavior.current = brushY<SVGGElement>()
       .extent([
-        [Math.max(0 + BRUSH_EXTENT_MARGIN_PX, xScale(0)), 0],
-        [innerWidth - BRUSH_EXTENT_MARGIN_PX, innerHeight],
+        [0, 0],
+        [innerWidth, innerHeight],
       ])
       .handleSize(30)
       .filter(() => interactive)
@@ -140,18 +153,19 @@ export const Brush = ({
 
     if (
       previousBrushExtent &&
-      compare(brushExtent, previousBrushExtent, xScale)
+      compare(brushExtent, previousBrushExtent, yScale)
     ) {
       select(brushRef.current)
         .transition()
-        .call(brushBehavior.current.move as any, brushExtent.map(xScale));
+        .call(brushBehavior.current.move as any, brushExtent.map(yScale));
     }
 
     // brush linear gradient
     select(brushRef.current)
       .selectAll(".selection")
+      .attr("width", innerWidth)
       .attr("stroke", "none")
-      .attr("fill-opacity", "0.1")
+      .attr("fill-opacity", "0.05")
       .attr("fill", `url(#${id}-gradient-selection)`);
   }, [
     brushExtent,
@@ -161,7 +175,7 @@ export const Brush = ({
     innerWidth,
     interactive,
     previousBrushExtent,
-    xScale,
+    yScale,
   ]);
 
   // respond to xScale changes only
@@ -170,9 +184,9 @@ export const Brush = ({
 
     brushBehavior.current.move(
       select(brushRef.current) as any,
-      brushExtent.map(xScale) as any
+      brushExtent.map(yScale) as any
     );
-  }, [brushExtent, xScale]);
+  }, [brushExtent, yScale]);
 
   // show labels when local brush changes
   useEffect(() => {
@@ -182,42 +196,43 @@ export const Brush = ({
   }, [localBrushExtent]);
 
   // variables to help render the SVGs
-  const flipWestHandle =
-    localBrushExtent && xScale(localBrushExtent[0]) > FLIP_HANDLE_THRESHOLD_PX;
-  const flipEastHandle =
+  const flipNHandle =
+    localBrushExtent && yScale(localBrushExtent[0]) > FLIP_HANDLE_THRESHOLD_PX;
+  const flipSHandle =
     localBrushExtent &&
-    xScale(localBrushExtent[1]) > innerWidth - FLIP_HANDLE_THRESHOLD_PX;
+    yScale(localBrushExtent[1]) > innerHeight - FLIP_HANDLE_THRESHOLD_PX;
 
-  const showWestArrow =
+  const showNArrow =
     localBrushExtent &&
-    (xScale(localBrushExtent[0]) < 0 || xScale(localBrushExtent[1]) < 0);
-  const showEastArrow =
+    (yScale(localBrushExtent[0]) < 0 || yScale(localBrushExtent[1]) < 0);
+  const showSArrow =
     localBrushExtent &&
-    (xScale(localBrushExtent[0]) > innerWidth ||
-      xScale(localBrushExtent[1]) > innerWidth);
+    (yScale(localBrushExtent[0]) > innerHeight ||
+      yScale(localBrushExtent[1]) > innerHeight);
 
-  const westHandleInView =
+  const nHandleInView =
     localBrushExtent &&
-    xScale(localBrushExtent[0]) >= 0 &&
-    xScale(localBrushExtent[0]) <= innerWidth;
-  const eastHandleInView =
+    yScale(localBrushExtent[0]) >= 0 &&
+    yScale(localBrushExtent[0]) <= innerHeight;
+  const sHandleInView =
     localBrushExtent &&
-    xScale(localBrushExtent[1]) >= 0 &&
-    xScale(localBrushExtent[1]) <= innerWidth;
+    yScale(localBrushExtent[1]) >= 0 &&
+    yScale(localBrushExtent[1]) <= innerHeight;
 
+  const theme = useTheme();
   return useMemo(
     () => (
       <>
         <defs>
           <linearGradient
             id={`${id}-gradient-selection`}
-            x1="0%"
-            y1="100%"
-            x2="100%"
+            x1="50%"
+            y1="0%"
+            x2="50%"
             y2="100%"
           >
-            <stop stopColor={westHandleColor} />
-            <stop stopColor={eastHandleColor} offset="1" />
+            <stop stopColor={northHandleColor} />
+            <stop stopColor={southHandleColor} offset={1} />
           </linearGradient>
 
           {/* clips at exactly the svg area */}
@@ -238,85 +253,113 @@ export const Brush = ({
         {localBrushExtent && (
           <>
             {/* west handle */}
-            {westHandleInView ? (
+            {nHandleInView ? (
               <g
-                transform={`translate(${Math.max(
+                transform={`translate(0,${Math.max(
                   0,
-                  xScale(localBrushExtent[0])
-                )}, 0), scale(${flipWestHandle ? "-1" : "1"}, 1)`}
+                  yScale(localBrushExtent[0])
+                )}), scale(1,${flipNHandle ? "1" : "-1"})`}
               >
                 <g>
+                  <DashedHandle
+                    color={northHandleColor}
+                    d={dashedBrushHandlePath(innerWidth)}
+                    transform="translate(0,2)"
+                  />
+                </g>
+                <g>
                   <Handle
-                    color={westHandleColor}
-                    d={brushHandlePath(innerHeight)}
+                    color={northHandleColor}
+                    d={brushHandlePath(innerWidth)}
                   />
                   <HandleAccent d={brushHandleAccentPath()} />
                 </g>
-
-                <LabelGroup
-                  transform={`translate(50,0), scale(${
-                    flipWestHandle ? "1" : "-1"
-                  }, 1)`}
-                  visible={showLabels || hovering}
-                >
-                  <TooltipBackground
-                    y="0"
-                    x="-30"
-                    height="30"
-                    width="60"
-                    rx="8"
-                  />
-                  <Tooltip
-                    transform="scale(-1, 1)"
-                    y="15"
-                    dominantBaseline="middle"
-                  >
-                    {brushLabelValue("w", localBrushExtent[0])}
-                  </Tooltip>
-                </LabelGroup>
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="12"
+                  y2="0"
+                  stroke={theme.text.primary}
+                  strokeWidth="1"
+                  transform={`translate(${
+                    Math.floor(innerWidth * 0.8) + 7
+                  }, -3.5)`}
+                />
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="12"
+                  y2="0"
+                  stroke={theme.text.primary}
+                  strokeWidth="1"
+                  transform={`translate(${
+                    Math.floor(innerWidth * 0.8) + 7
+                  }, -7)`}
+                />
               </g>
             ) : null}
 
             {/* east handle */}
-            {eastHandleInView ? (
+            {sHandleInView ? (
               <g
-                transform={`translate(${xScale(
+                transform={`translate(0,${yScale(
                   localBrushExtent[1]
-                )}, 0), scale(${flipEastHandle ? "-1" : "1"}, 1)`}
+                )}), scale(1,${flipSHandle ? "1" : "-1"})`}
               >
                 <g>
+                  <DashedHandle
+                    color={southHandleColor}
+                    d={dashedBrushHandlePath(innerWidth)}
+                    transform="translate(0,2)"
+                  />
+                </g>
+                <g>
                   <Handle
-                    color={eastHandleColor}
-                    d={brushHandlePath(innerHeight)}
+                    color={southHandleColor}
+                    d={brushHandlePath(innerWidth)}
                   />
                   <HandleAccent d={brushHandleAccentPath()} />
                 </g>
-
-                <LabelGroup
-                  transform={`translate(50,0), scale(${
-                    flipEastHandle ? "-1" : "1"
-                  }, 1)`}
-                  visible={showLabels || hovering}
-                >
-                  <TooltipBackground
-                    y="0"
-                    x="-30"
-                    height="30"
-                    width="60"
-                    rx="8"
-                  />
-                  <Tooltip y="15" dominantBaseline="middle">
-                    {brushLabelValue("e", localBrushExtent[1])}
-                  </Tooltip>
-                </LabelGroup>
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="12"
+                  y2="0"
+                  stroke={theme.text.primary}
+                  strokeWidth="1"
+                  transform={`translate(${
+                    Math.floor(innerWidth * 0.8) + 7
+                  }, -3.5)`}
+                />
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="12"
+                  y2="0"
+                  stroke={theme.text.primary}
+                  strokeWidth="1"
+                  transform={`translate(${
+                    Math.floor(innerWidth * 0.8) + 7
+                  }, -7)`}
+                />
               </g>
             ) : null}
 
-            {showWestArrow && <OffScreenHandle color={westHandleColor} />}
+            {showNArrow && (
+              <g
+                transform={`translate(${Math.floor(innerWidth * 0.8) - 10}, 0)`}
+              >
+                <OffScreenHandle color={northHandleColor} />
+              </g>
+            )}
 
-            {showEastArrow && (
-              <g transform={`translate(${innerWidth}, 0) scale(-1, 1)`}>
-                <OffScreenHandle color={eastHandleColor} />
+            {showSArrow && (
+              <g
+                transform={`translate( ${
+                  Math.floor(innerWidth * 0.8) - 10
+                }, ${innerHeight}) scale(1,-1)`}
+              >
+                <OffScreenHandle color={southHandleColor} />
               </g>
             )}
           </>
@@ -325,21 +368,21 @@ export const Brush = ({
     ),
     [
       brushLabelValue,
-      eastHandleColor,
-      eastHandleInView,
-      flipEastHandle,
-      flipWestHandle,
+      northHandleColor,
+      sHandleInView,
+      flipSHandle,
+      flipNHandle,
       hovering,
       id,
       innerHeight,
       innerWidth,
       localBrushExtent,
-      showEastArrow,
+      showSArrow,
       showLabels,
-      showWestArrow,
-      westHandleColor,
-      westHandleInView,
-      xScale,
+      showNArrow,
+      southHandleColor,
+      nHandleInView,
+      yScale,
     ]
   );
 };

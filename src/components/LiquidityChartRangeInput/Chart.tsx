@@ -1,21 +1,26 @@
-import { max, scaleLinear, ZoomTransform } from "d3";
+import { max, min, scaleLinear, scaleTime, ZoomTransform } from "d3";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bound } from "../../state/v4/actions";
-
 import { Area } from "./Area";
-import { AxisBottom } from "./AxisBottom";
+import { AxisRight } from "./AxisRight";
 import { Brush } from "./Brush";
 import { Line } from "./Line";
-import { ChartEntry, LiquidityChartRangeInputProps } from "./types";
+import {
+  ChartEntry,
+  LiquidityChartRangeInputProps,
+  Chart2Entry,
+} from "./types";
 import Zoom, { ZoomOverlay } from "./Zoom";
-import { BoxSecondary } from "theme/components";
+import { AxisBottom } from "./AxisBottom";
+import { TimePriceLine } from "./LinePath";
 
-const xAccessor = (d: ChartEntry) => d.price0;
-const yAccessor = (d: ChartEntry) => d.activeLiquidity;
+const xAccessor = (d: ChartEntry) => d.activeLiquidity;
+const yAccessor = (d: ChartEntry) => d.price0;
+const timeAccessor = (d: Chart2Entry) => d.time;
 
 export function Chart({
   id = "liquidityChartRangeInput",
-  data: { series, current },
+  data: { series, series2, current },
   ticksAtLimit,
   styles,
   dimensions: { width, height },
@@ -30,30 +35,36 @@ export function Chart({
 
   const [zoom, setZoom] = useState<ZoomTransform | null>(null);
 
-  const [innerHeight, innerWidth] = useMemo(
-    () => [
-      height - margins.top - margins.bottom,
-      width - margins.left - margins.right,
-    ],
+  const { innerHeight, innerWidth } = useMemo(
+    () => ({
+      innerHeight: height - margins.top - margins.bottom,
+      innerWidth: width - margins.left - margins.right,
+    }),
     [width, height, margins]
   );
 
-  const { xScale, yScale } = useMemo(() => {
+  const { xScale, yScale, xTimeScale } = useMemo(() => {
     const scales = {
-      xScale: scaleLinear()
-        .domain([
-          current * zoomLevels.initialMin,
-          current * zoomLevels.initialMax,
-        ] as number[])
-        .range([0, innerWidth]),
       yScale: scaleLinear()
-        .domain([0, max(series, yAccessor)] as number[])
-        .range([innerHeight, 0]),
+        .domain([
+          current * zoomLevels.initialMax,
+          current * zoomLevels.initialMin,
+        ] as number[])
+        .range([0, innerHeight]),
+      xScale: scaleLinear()
+        .domain([0, max(series, xAccessor)] as number[])
+        .range([Math.ceil(innerWidth * 0.2), 0]),
+      xTimeScale: scaleTime()
+        .domain([
+          min(series2, timeAccessor),
+          max(series2, timeAccessor),
+        ] as number[])
+        .range([0, Math.floor(innerWidth * 0.8) - 20]),
     };
 
     if (zoom) {
-      const newXscale = zoom.rescaleX(scales.xScale);
-      scales.xScale.domain(newXscale.domain());
+      const newYScale = zoom.rescaleY(scales.yScale);
+      scales.yScale.domain(newYScale.domain());
     }
 
     return scales;
@@ -63,18 +74,19 @@ export function Chart({
     zoomLevels.initialMax,
     innerWidth,
     series,
+    series2,
     innerHeight,
     zoom,
   ]);
 
-  useEffect(() => {
-    // reset zoom as necessary
-    setZoom(null);
-  }, [zoomLevels]);
+  // useEffect(() => {
+  //   // reset zoom as necessary
+  //   setZoom(null);
+  // }, [zoomLevels]);
 
   useEffect(() => {
     if (!brushDomain) {
-      onBrushDomainChange(xScale.domain() as [number, number], undefined);
+      onBrushDomainChange(yScale.domain() as [number, number], undefined);
     }
   }, [brushDomain, onBrushDomainChange, xScale]);
 
@@ -82,28 +94,26 @@ export function Chart({
     <>
       <Zoom
         svg={zoomRef.current}
-        xScale={xScale}
+        yScale={yScale}
         setZoom={setZoom}
-        width={innerWidth}
-        height={
-          // allow zooming inside the x-axis
-          height
-        }
+        width={width}
+        height={innerHeight}
         resetBrush={() => {
           onBrushDomainChange(
             [
-              current * zoomLevels.initialMin,
               current * zoomLevels.initialMax,
+              current * zoomLevels.initialMin,
             ] as [number, number],
             "reset"
           );
         }}
-        showResetButton={Boolean(
-          ticksAtLimit[Bound.LOWER] || ticksAtLimit[Bound.UPPER]
-        )}
+        // showResetButton={Boolean(
+        //   ticksAtLimit[Bound.LOWER] || ticksAtLimit[Bound.UPPER]
+        // )}
+        showResetButton={true}
         zoomLevels={zoomLevels}
       />
-      <BoxSecondary>
+      <div>
         <svg
           width="100%"
           height="100%"
@@ -112,7 +122,7 @@ export function Chart({
         >
           <defs>
             <clipPath id={`${id}-chart-clip`}>
-              <rect x="0" y="0" width={innerWidth} height={height} />
+              <rect x="0" y="0" width={innerWidth} height={innerHeight} />
             </clipPath>
 
             {brushDomain && (
@@ -120,17 +130,20 @@ export function Chart({
               <mask id={`${id}-chart-area-mask`}>
                 <rect
                   fill="white"
-                  x={xScale(brushDomain[0])}
-                  y="0"
-                  width={xScale(brushDomain[1]) - xScale(brushDomain[0])}
-                  height={innerHeight}
+                  x={0}
+                  y={yScale(brushDomain[0])}
+                  width={innerWidth}
+                  height={yScale(brushDomain[1]) - yScale(brushDomain[0])}
                 />
               </mask>
             )}
           </defs>
 
           <g transform={`translate(${margins.left},${margins.top})`}>
-            <g clipPath={`url(#${id}-chart-clip)`}>
+            <g
+              clipPath={`url(#${id}-chart-clip)`}
+              transform={`translate(${Math.floor(innerWidth * 0.8)} , 0 )`}
+            >
               <Area
                 series={series}
                 xScale={xScale}
@@ -155,28 +168,59 @@ export function Chart({
                 </g>
               )}
 
-              <Line value={current} xScale={xScale} innerHeight={innerHeight} />
-
-              <AxisBottom xScale={xScale} innerHeight={innerHeight} />
+              <AxisRight
+                yScale={yScale}
+                innerWidth={innerWidth}
+                brushDomain={brushDomain}
+                currentPrice={current}
+              />
             </g>
+            <AxisBottom
+              xScale={xTimeScale}
+              height={innerHeight}
+              tickFormat={"%H:%M"}
+            />
+            <g clipPath={`url(#${id}-chart-clip)`}>
+              <TimePriceLine
+                series={series2}
+                xScale={xTimeScale}
+                yScale={yScale}
+                stroke={styles.area.selection}
+              />
+              <Line value={current} yScale={yScale} innerWidth={innerWidth} />
+              <circle
+                cx={xTimeScale(series2[series2.length - 1].time)}
+                cy={yScale(series2[series2.length - 1].price0)}
+                r="5"
+                fill={styles.area.selection}
+              />
+            </g>
+            <line
+              x1="0"
+              y1={innerHeight}
+              x2={width}
+              y2={innerHeight}
+              stroke={styles.divider}
+              strokeWidth="1"
+            />
 
-            <ZoomOverlay width={innerWidth} height={height} ref={zoomRef} />
+            <ZoomOverlay width={width} height={height} ref={zoomRef} />
 
             <Brush
               id={id}
-              xScale={xScale}
+              yScale={yScale}
               interactive={interactive}
               brushLabelValue={brushLabels}
-              brushExtent={brushDomain ?? (xScale.domain() as [number, number])}
+              brushExtent={brushDomain ?? (yScale.domain() as [number, number])}
               innerWidth={innerWidth}
               innerHeight={innerHeight}
               setBrushExtent={onBrushDomainChange}
-              westHandleColor={styles.brush.handle.west}
-              eastHandleColor={styles.brush.handle.east}
+              southHandleColor={styles.brush.handle.west}
+              northHandleColor={styles.brush.handle.east}
             />
           </g>
         </svg>
-      </BoxSecondary>
+      </div>
     </>
   );
 }

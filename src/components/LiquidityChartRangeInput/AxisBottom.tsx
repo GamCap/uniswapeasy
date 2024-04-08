@@ -1,49 +1,70 @@
+import React, { useMemo } from "react";
 import {
-  Axis as d3Axis,
   axisBottom,
+  Axis as d3Axis,
   NumberValue,
-  ScaleLinear,
+  ScaleTime,
   select,
+  timeFormat,
 } from "d3";
-import { useMemo } from "react";
 import styled from "styled-components";
 
 const StyledGroup = styled.g`
-  line {
-    display: none;
-  }
-
-  text {
-    color: ${({ theme }) => theme.secondary};
-    transform: translateY(5px);
+  .tick {
+    line {
+      display: none;
+    }
+    text {
+      fill: ${({ theme }) => theme.text.tertiary};
+      font-size: 12px;
+    }
   }
 `;
 
-const Axis = ({ axisGenerator }: { axisGenerator: d3Axis<NumberValue> }) => {
+const Axis = ({
+  axisGenerator,
+  scale,
+  tickFormat,
+}: {
+  axisGenerator: d3Axis<NumberValue>;
+  scale: ScaleTime<number, number>;
+  tickFormat: string;
+}) => {
   const axisRef = (axis: SVGGElement) => {
-    axis &&
-      select(axis)
-        .call(axisGenerator)
-        .call((g) => g.select(".domain").remove());
+    if (!axis) return;
+
+    select(axis)
+      .call(axisGenerator)
+      .call((g) => {
+        g.select(".domain").remove();
+        //d is timestamp, parse it to time and format it
+        g.selectAll(".tick text").text((d, i) =>
+          i === 0 ? "" : timeFormat(tickFormat)(new Date(d as number))
+        );
+      });
   };
 
-  return <g ref={axisRef} />;
+  return <StyledGroup ref={axisRef} />;
 };
 
 export const AxisBottom = ({
   xScale,
-  innerHeight,
-  offset = 0,
+  height,
+  tickFormat,
 }: {
-  xScale: ScaleLinear<number, number>;
-  innerHeight: number;
-  offset?: number;
+  xScale: ScaleTime<number, number>;
+  height: number;
+  tickFormat: string;
 }) =>
   useMemo(
     () => (
-      <StyledGroup transform={`translate(0, ${innerHeight + offset})`}>
-        <Axis axisGenerator={axisBottom(xScale).ticks(6)} />
+      <StyledGroup transform={`translate(0,${height})`}>
+        <Axis
+          axisGenerator={axisBottom(xScale)}
+          scale={xScale}
+          tickFormat={tickFormat}
+        />
       </StyledGroup>
     ),
-    [innerHeight, offset, xScale]
+    [xScale, height, tickFormat]
   );

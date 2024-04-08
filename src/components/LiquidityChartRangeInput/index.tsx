@@ -1,7 +1,7 @@
 import { Currency, Price, Token } from "@uniswap/sdk-core";
-import { AutoColumn, ColumnCenter } from "../Column";
+import Column, { AutoColumn, ColumnCenter } from "../Column";
 import Loader from "../Icons/LoadingSpinner";
-import { ReactNode, useCallback, useMemo } from "react";
+import { ReactNode, useCallback, useEffect, useMemo } from "react";
 import { Bound } from "../../state/v4/actions";
 import styled, { useTheme } from "styled-components";
 import formatDelta from "../../utils/formatDelta";
@@ -9,11 +9,12 @@ import formatDelta from "../../utils/formatDelta";
 import { Chart } from "./Chart";
 import { useDensityChartData } from "./hooks";
 import { BigNumberish } from "ethers";
-import { ThemedText } from "../../theme/components";
+import { BoxSecondary, ThemedText } from "../../theme/components";
 
 const ChartWrapper = styled.div`
   position: relative;
   width: 100%;
+  height: 100%;
   justify-content: center;
   align-content: center;
 `;
@@ -41,8 +42,10 @@ export default function LiquidityChartRangeInput({
   currencyB,
   feeAmount,
   tickSpacing,
+  hooks,
   ticksAtLimit,
   price,
+  formattedPrice,
   priceLower,
   priceUpper,
   onLeftRangeInput,
@@ -53,8 +56,10 @@ export default function LiquidityChartRangeInput({
   currencyB?: Currency;
   feeAmount?: BigNumberish;
   tickSpacing?: BigNumberish;
+  hooks?: string;
   ticksAtLimit: { [bound in Bound]?: boolean | undefined };
   price?: number;
+  formattedPrice?: string;
   priceLower?: Price<Token, Token>;
   priceUpper?: Price<Token, Token>;
   onLeftRangeInput: (typedValue: string) => void;
@@ -77,13 +82,15 @@ export default function LiquidityChartRangeInput({
     currencyB,
     feeAmount,
     tickSpacing,
+    hooks,
   });
 
   const onBrushDomainChangeEnded = useCallback(
     (domain: [number, number], mode: string | undefined) => {
-      let leftRangeValue = Number(domain[0]);
-      const rightRangeValue = Number(domain[1]);
-
+      let leftRangeValue = Number(domain[1]);
+      const rightRangeValue = Number(domain[0]);
+      console.log("leftRangeValue", leftRangeValue);
+      console.log("rightRangeValue", rightRangeValue);
       if (leftRangeValue <= 0) {
         leftRangeValue = 1 / 10 ** 6;
       }
@@ -121,19 +128,19 @@ export default function LiquidityChartRangeInput({
 
     return leftPrice && rightPrice
       ? [
-          parseFloat(leftPrice?.toSignificant(6)),
           parseFloat(rightPrice?.toSignificant(6)),
+          parseFloat(leftPrice?.toSignificant(6)),
         ]
       : undefined;
   }, [isSorted, priceLower, priceUpper]);
 
   const brushLabelValue = useCallback(
-    (d: "w" | "e", x: number) => {
+    (d: "s" | "n", x: number) => {
       if (!price) return "";
 
-      if (d === "w" && ticksAtLimit[isSorted ? Bound.LOWER : Bound.UPPER])
+      if (d === "s" && ticksAtLimit[isSorted ? Bound.LOWER : Bound.UPPER])
         return "0";
-      if (d === "e" && ticksAtLimit[isSorted ? Bound.UPPER : Bound.LOWER])
+      if (d === "n" && ticksAtLimit[isSorted ? Bound.UPPER : Bound.LOWER])
         return "∞";
 
       const percent =
@@ -148,17 +155,46 @@ export default function LiquidityChartRangeInput({
     [formatDelta, isSorted, price, ticksAtLimit]
   );
 
-  const isUninitialized =
-    !currencyA || !currencyB || (formattedData === undefined && !isLoading);
+  const isUninitialized = useMemo(
+    () =>
+      !currencyA || !currencyB || (formattedData === undefined && !isLoading),
+    [currencyA, currencyB, formattedData, isLoading]
+  );
+
   //TODO
   //Add Icons and get colors from theme
   return (
     <>
       {isUninitialized ? (
-        <InfoBox
-          message={"Your position will appear here."}
-          icon={<div>Inbox</div>}
-        />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            padding: "0 24px",
+            boxSizing: "border-box",
+            height: "fit-content",
+          }}
+        >
+          <BoxSecondary $radius="8px" $padding="12px">
+            <Column
+              style={{
+                alignItems: "flex-start",
+                width: "fit-content",
+                gap: "8px",
+              }}
+            >
+              <ThemedText.SubHeader textColor="text.tertiary">
+                Current Price
+              </ThemedText.SubHeader>
+              <ThemedText.SmallText textColor="text.primary">
+                {formattedPrice}
+              </ThemedText.SmallText>
+            </Column>
+          </BoxSecondary>
+        </div>
       ) : isLoading ? (
         <InfoBox icon={<Loader size="40px" stroke={"#fff"} />} />
       ) : error ? (
@@ -174,19 +210,50 @@ export default function LiquidityChartRangeInput({
       ) : (
         <ChartWrapper>
           <Chart
-            data={{ series: formattedData, current: price }}
-            dimensions={{ width: 560, height: 200 }}
-            margins={{ top: 10, right: 2, bottom: 20, left: 0 }}
+            data={{
+              series: formattedData.reverse(),
+              //TODO: remove this hardcoded data
+              series2: [
+                { time: 1712167200000, price0: 64205 },
+                { time: 1712170800000, price0: 57559 },
+                { time: 1712174400000, price0: 58068 },
+                { time: 1712178000000, price0: 68755 },
+                { time: 1712181600000, price0: 63017 },
+                { time: 1712185200000, price0: 56234 },
+                { time: 1712188800000, price0: 67503 },
+                { time: 1712192400000, price0: 58928 },
+                { time: 1712196000000, price0: 62132 },
+                { time: 1712199600000, price0: 60253 },
+                { time: 1712203200000, price0: 69720 },
+                { time: 1712206800000, price0: 66864 },
+                { time: 1712210400000, price0: 54941 },
+                { time: 1712214000000, price0: 53713 },
+                { time: 1712217600000, price0: 63363 },
+                { time: 1712221200000, price0: 64121 },
+                { time: 1712224800000, price0: 52520 },
+                { time: 1712228400000, price0: 67149 },
+                { time: 1712232000000, price0: 60203 },
+                { time: 1712235600000, price0: 52585 },
+                { time: 1712239200000, price0: 66845 },
+                { time: 1712242800000, price0: 58667 },
+                { time: 1712246400000, price0: 65665 },
+                { time: 1712250000000, price0: price },
+              ],
+              current: price,
+            }}
+            dimensions={{ width: 668, height: 170 }}
+            margins={{ top: 0, right: 90, bottom: 40, left: 0 }}
             styles={{
               area: {
-                selection: "#44FF9A",
+                selection: theme.components.graph.main,
               },
               brush: {
                 handle: {
-                  west: "#FF8A00",
-                  east: "#FF8A00",
+                  east: "#FAB01D",
+                  west: "#627EEA",
                 },
               },
+              divider: theme.borders.dividers,
             }}
             interactive={interactive}
             brushLabels={brushLabelValue}

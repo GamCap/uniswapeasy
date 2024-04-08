@@ -32,6 +32,7 @@ const App = () => {
     <div
       style={{
         display: "flex",
+
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "space-evenly",
@@ -40,7 +41,14 @@ const App = () => {
         height: "100%",
       }}
     >
-      <div style={{ display: "flex", gap: "1rem", flexDirection: "row" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "1rem",
+          flexDirection: "row",
+          flexWrap: "wrap",
+        }}
+      >
         {ThemeNames.map((themeName) => (
           <button
             key={themeName}

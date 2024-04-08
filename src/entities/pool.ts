@@ -33,6 +33,7 @@ export class Pool {
   public readonly token0: Token
   public readonly token1: Token
   public readonly fee: JSBI
+  public readonly hooks: string
   public readonly sqrtRatioX96: JSBI
   public readonly liquidity: JSBI
   public readonly tickSpacing: JSBI
@@ -69,6 +70,7 @@ export class Pool {
     tokenA: Token,
     tokenB: Token,
     fee: BigNumberish,
+    hooks: string,
     sqrtRatioX96: BigintIsh,
     liquidity: BigintIsh,
     tickSpacing: BigNumberish,
@@ -87,6 +89,7 @@ export class Pool {
     // always create a copy of the list since we want the pool's tick list to be immutable
     ;[this.token0, this.token1] = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]
     this.fee = JSBI.BigInt(fee.toString())
+    this.hooks = hooks
     this.sqrtRatioX96 = JSBI.BigInt(sqrtRatioX96)
     this.liquidity = JSBI.BigInt(liquidity)
     this.tickSpacing = JSBI.BigInt(tickSpacing.toString())
@@ -172,7 +175,7 @@ export class Pool {
     const outputToken = zeroForOne ? this.token1 : this.token0
     return [
       CurrencyAmount.fromRawAmount(outputToken, JSBI.multiply(outputAmount, NEGATIVE_ONE)),
-      new Pool(this.token0, this.token1, BigNumber.from(this.fee.toString() ?? "0"), sqrtRatioX96, liquidity,BigNumber.from(this.tickSpacing.toString() ?? "0"), tickCurrent, this.tickDataProvider)
+      new Pool(this.token0, this.token1, BigNumber.from(this.fee.toString() ?? "0"),this.hooks, sqrtRatioX96, liquidity,BigNumber.from(this.tickSpacing.toString() ?? "0"), tickCurrent, this.tickDataProvider)
     ]
   }
 
@@ -198,7 +201,7 @@ export class Pool {
     const inputToken = zeroForOne ? this.token0 : this.token1
     return [
       CurrencyAmount.fromRawAmount(inputToken, inputAmount),
-      new Pool(this.token0, this.token1, BigNumber.from(this.fee.toString() ?? "0"), sqrtRatioX96, liquidity,BigNumber.from(this.tickSpacing.toString() ?? "0"), tickCurrent, this.tickDataProvider)
+      new Pool(this.token0, this.token1, BigNumber.from(this.fee.toString() ?? "0"),this.hooks, sqrtRatioX96, liquidity,BigNumber.from(this.tickSpacing.toString() ?? "0"), tickCurrent, this.tickDataProvider)
     ]
   }
 

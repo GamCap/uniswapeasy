@@ -1,61 +1,72 @@
-import { Bound } from '../../state/v4/actions'
+import { Bound } from "../../state/v4/actions";
 
 export interface ChartEntry {
-  activeLiquidity: number
-  price0: number
+  activeLiquidity: number;
+  price0: number;
+}
+
+export interface Chart2Entry {
+  price0: number;
+  time: number;
 }
 
 interface Dimensions {
-  width: number
-  height: number
+  width: number;
+  height: number;
 }
 
 interface Margins {
-  top: number
-  right: number
-  bottom: number
-  left: number
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
 }
 
 export interface ZoomLevels {
-  initialMin: number
-  initialMax: number
-  min: number
-  max: number
+  initialMin: number;
+  initialMax: number;
+  min: number;
+  max: number;
 }
 
 export interface LiquidityChartRangeInputProps {
   // to distringuish between multiple charts in the DOM
-  id?: string
+  id?: string;
 
   data: {
-    series: ChartEntry[]
-    current: number
-  }
-  ticksAtLimit: { [bound in Bound]?: boolean | undefined }
+    series: ChartEntry[];
+    series2: Chart2Entry[];
+    current: number;
+  };
+  ticksAtLimit: { [bound in Bound]?: boolean | undefined };
 
   styles: {
     area: {
       // color of the ticks in range
-      selection: string
-    }
+      selection: string;
+    };
 
     brush: {
       handle: {
-        west: string
-        east: string
-      }
-    }
-  }
+        west: string;
+        east: string;
+      };
+    };
 
-  dimensions: Dimensions
-  margins: Margins
+    divider: string;
+  };
 
-  interactive?: boolean
+  dimensions: Dimensions;
+  margins: Margins;
 
-  brushLabels: (d: 'w' | 'e', x: number) => string
-  brushDomain?: [number, number]
-  onBrushDomainChange: (domain: [number, number], mode: string | undefined) => void
+  interactive?: boolean;
 
-  zoomLevels: ZoomLevels
+  brushLabels: (d: "s" | "n", x: number) => string;
+  brushDomain?: [number, number];
+  onBrushDomainChange: (
+    domain: [number, number],
+    mode: string | undefined
+  ) => void;
+
+  zoomLevels: ZoomLevels;
 }

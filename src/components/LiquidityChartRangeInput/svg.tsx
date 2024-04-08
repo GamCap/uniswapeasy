@@ -13,23 +13,33 @@
  *
  * https://medium.com/@dennismphil/one-side-rounded-rectangle-using-svg-fb31cf318d90
  */
-export const brushHandlePath = (height: number) =>
+export const brushHandlePath = (width: number) =>
   [
     // handle
-    `M 0 0`, // move to origin
-    `v ${height}`, // vertical line
-    "m 1 0", // move 1px to the right
-    `V 0`, // second vertical line
-    `M 0 1`, // move to origin
+    `M ${Math.floor(width * 0.8)} 0`, // move to origin
+    `H ${width}`, // horizontal line'
+    `m 0 1`, // move 1px down
+    `H ${Math.floor(width * 0.8)}`, // horizontal line back to the start
+    `m 1 0`, // move 1px down
+
+    // `M 0 0`, // move to origin
+    // `h ${width}`, // horizontal line
+    // "m 0 1", // move 1px down
+    // `H 0`, // second horizontal line back to the start
+    // `M 1 0`, // move down slightly from top
 
     // head
-    "h 12", // horizontal line
-    "q 2 0, 2 2", // rounded corner
-    "v 22", // vertical line
-    "q 0 2 -2 2", // rounded corner
-    "h -12", // horizontal line
+    "v -10", // vertical line down
+    "q 0 -2 2 -2", // rounded corner to the right
+    "h 20", // horizontal line right
+    "q 2 0 2 2", // rounded corner upwards
+    "v 10", // vertical line up
     `z`, // close path
   ].join(" ");
+
+export const dashedBrushHandlePath = (width: number) =>
+  //this is just a line with
+  [`M 0 0`, `H ${width}`].join(" ");
 
 export const brushHandleAccentPath = () =>
   [
@@ -51,7 +61,7 @@ export const OffScreenHandle = ({
   margin?: number;
 }) => (
   <polygon
-    points={`0 0, ${size} ${size}, 0 ${size}`}
+    points={`0 0, ${size} 0, 0 ${size}`}
     transform={` translate(${size + margin}, ${margin}) rotate(45) `}
     fill={color}
     stroke={color}

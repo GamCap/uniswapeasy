@@ -7,6 +7,8 @@ import { type BigNumberish } from "ethers";
 import { Pool } from "../../entities/pool";
 import { useTestnetContract } from "../../hooks/web3/useContract";
 import { keccak256, defaultAbiCoder, Result } from "ethers/lib/utils";
+import { usePoolData } from "./usePoolData";
+import useBlockNumber from "./useBlockNumber";
 
 // Classes are expensive to instantiate, so this caches the recently instantiated pools.
 // This avoids re-instantiating pools as the other pools in the same request are loaded.
@@ -47,6 +49,7 @@ class PoolCache {
     tokenA: Token,
     tokenB: Token,
     fee: BigNumberish,
+    hooks: string,
     sqrtPriceX96: BigintIsh,
     liquidity: BigintIsh,
     tickSpacing: BigNumberish,
@@ -61,6 +64,7 @@ class PoolCache {
         pool.token0 === tokenA &&
         pool.token1 === tokenB &&
         JSBI.EQ(pool.fee, fee) &&
+        pool.hooks === hooks &&
         JSBI.EQ(pool.sqrtRatioX96, sqrtPriceX96) &&
         JSBI.EQ(pool.liquidity, liquidity) &&
         pool.tickCurrent === tick
@@ -71,6 +75,7 @@ class PoolCache {
       tokenA,
       tokenB,
       fee,
+      hooks,
       sqrtPriceX96,
       liquidity,
       tickSpacing,
@@ -96,14 +101,6 @@ export function usePool(
   hooks: string | undefined
 ): [PoolState, Pool | null] {
   const { chainId, provider } = useWeb3React();
-
-  const [slot0, setSlot0] = useState<
-    undefined | { result: Result | undefined; loading: boolean; valid: boolean }
-  >(undefined);
-
-  const [liquidity, setLiquidity] = useState<
-    undefined | { result: Result | undefined; loading: boolean; valid: boolean }
-  >(undefined);
 
   const poolToken:
     | [Token, Token, BigNumberish, BigNumberish, string]
@@ -138,64 +135,24 @@ export function usePool(
   }, [poolKey, chainId]);
 
   const poolManagerContract = useTestnetContract();
+  const latestBlock = useBlockNumber();
+  const { slot0, liquidity } = usePoolData(
+    latestBlock,
+    poolManagerContract ?? undefined,
+    provider,
+    chainId,
+    id
+  );
 
   useEffect(() => {
-    if (!poolManagerContract || !id || !provider || !chainId || !poolKey) {
-      setSlot0(undefined);
-      setLiquidity(undefined);
-      return;
-    }
-
-    const slot0Data = poolManagerContract.interface.encodeFunctionData(
-      "getSlot0",
-      [id]
-    );
-    const liquidityData = poolManagerContract.interface.encodeFunctionData(
-      "getLiquidity(bytes32)",
-      [id]
-    );
-
-    setSlot0({ result: undefined, loading: true, valid: true });
-    setLiquidity({ result: undefined, loading: true, valid: true });
-
-    const s0 = provider.call({
-      to: poolManagerContract?.address,
-      data: slot0Data,
-    });
-    const lts = provider.call({
-      to: poolManagerContract?.address,
-      data: liquidityData,
-    });
-
-    Promise.all([s0, lts])
-      .then(([resolvedSlot0, resolvedLiquidity]) => {
-        const resolvedSlot0Decoded =
-          poolManagerContract.interface.decodeFunctionResult(
-            "getSlot0",
-            resolvedSlot0
-          );
-        const resolvedLiquidityDecoded =
-          poolManagerContract?.interface.decodeFunctionResult(
-            "getLiquidity(bytes32)",
-            resolvedLiquidity
-          );
-
-        setSlot0({ result: resolvedSlot0Decoded, loading: false, valid: true });
-        setLiquidity({
-          result: resolvedLiquidityDecoded,
-          loading: false,
-          valid: true,
-        });
-      })
-      .catch((error) => {
-        setSlot0({ result: undefined, loading: false, valid: false });
-        setLiquidity({ result: undefined, loading: false, valid: false });
-      });
-  }, [poolKey, poolManagerContract, provider, chainId]);
+    console.log("poolKey", poolKey);
+    console.log(slot0);
+    console.log(liquidity);
+  }, [poolKey, slot0, liquidity]);
 
   return useMemo(() => {
     if (!poolToken) return [PoolState.INVALID, null];
-    const [token0, token1, fee] = poolToken;
+    const [token0, token1, fee, tickSpacing, hooks] = poolToken;
 
     if (!slot0) return [PoolState.INVALID, null];
     const { result: slot0d, loading: slot0Loading, valid: slot0Valid } = slot0;
@@ -219,9 +176,10 @@ export function usePool(
         token0,
         token1,
         fee,
+        hooks,
         JSBI.BigInt(slot0d.sqrtPriceX96),
         JSBI.BigInt(liquidityd),
-        poolKey?.tickSpacing ?? 60,
+        tickSpacing,
         slot0d.tick
       );
       return [PoolState.EXISTS, pool];
