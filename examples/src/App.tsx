@@ -17,14 +17,6 @@ const App = () => {
   };
 
   const connectors = useRef<HTMLDivElement>(null);
-  // const [isDark, setIsDark] = useState(true);
-
-  // useEffect(() => {
-  //   const body = document.querySelector("body");
-  //   if (body) {
-  //     body.style.backgroundColor = isDark ? "black" : "white";
-  //   }
-  // }, [isDark]);
 
   const provider = useActiveProvider();
   return (
@@ -48,16 +40,6 @@ const App = () => {
           flexWrap: "wrap",
         }}
       >
-        {/* <button
-          style={{
-            padding: "1rem",
-            borderRadius: "1em",
-            cursor: "pointer",
-          }}
-          onClick={() => setIsDark(!isDark)}
-        >
-          Toggle Dark Mode
-        </button> */}
         <input onChange={(e) => onPrimaryTextChange(e.target.value)} />
       </div>
       <div
@@ -70,20 +52,9 @@ const App = () => {
       >
         <Web3Connectors />
       </div>
-      {/* <button
-        style={{
-          padding: "1rem",
-          borderRadius: "1em",
-          cursor: "pointer",
-        }}
-        onClick={focusConnectors}
-      >
-        Connect Wallet
-      </button> */}
       <UniswapEasy
-        theme={theme}
+        theme={{ ...theme, font: { family: "'Times New Roman', serif" } }}
         defaultChainId={1}
-        jsonRpcUrlMap={{}}
         provider={provider}
         poolInfos={poolKeys}
         hookInfos={hookInfos}

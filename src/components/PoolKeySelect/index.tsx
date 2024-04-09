@@ -240,11 +240,6 @@ function PoolKeySelect({
     { key: "Feature", filterMethod: featureFilterMethod },
   ];
 
-  useEffect(() => {
-    console.log("columns", columns);
-    console.log("unifiedData", unifiedData);
-  }, [columns, unifiedData]);
-
   return (
     <RowBetween
       $padding="20px 32px"
@@ -278,7 +273,6 @@ function PoolKeySelect({
                 pool={poolData}
                 currencyIconMap={currencyIconMap || {}}
                 onClick={(poolKey) => {
-                  console.log("onSelect", poolKey);
                   if (onSelect) {
                     onSelect(poolKey);
                   }

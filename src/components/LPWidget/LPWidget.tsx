@@ -375,7 +375,6 @@ const LPWidget = memo(function ({
       const waitForApprovals = await Promise.all(
         approvals.map((a) => a?.wait())
       );
-      console.log("Approvals", waitForApprovals);
       if (waitForApprovals.includes(undefined))
         throw new Error("Approval failed on blockchain side");
 
@@ -396,8 +395,6 @@ const LPWidget = memo(function ({
         );
       setTransactionStatus("inProgress");
       const waitModifyTx = await modifyTxResult.transaction.wait();
-
-      console.log("Modify liquidity transaction", waitModifyTx);
       if (!waitModifyTx)
         throw new Error(
           "Modify liquidity transaction failed on blockchain side"
@@ -687,9 +684,6 @@ const LPWidget = memo(function ({
     errorMessageOpen,
   ]);
 
-  useEffect(() => {
-    console.log("pool", pool);
-  }, [pool]);
   return (
     <>
       {!account ? (

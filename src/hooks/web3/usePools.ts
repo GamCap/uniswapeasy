@@ -144,12 +144,6 @@ export function usePool(
     id
   );
 
-  useEffect(() => {
-    console.log("poolKey", poolKey);
-    console.log(slot0);
-    console.log(liquidity);
-  }, [poolKey, slot0, liquidity]);
-
   return useMemo(() => {
     if (!poolToken) return [PoolState.INVALID, null];
     const [token0, token1, fee, tickSpacing, hooks] = poolToken;

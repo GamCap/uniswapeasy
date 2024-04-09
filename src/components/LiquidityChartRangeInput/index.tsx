@@ -104,8 +104,6 @@ export default function LiquidityChartRangeInput({
     (domain: [number, number], mode: string | undefined) => {
       let leftRangeValue = Number(domain[1]);
       const rightRangeValue = Number(domain[0]);
-      console.log("leftRangeValue", leftRangeValue);
-      console.log("rightRangeValue", rightRangeValue);
       if (leftRangeValue <= 0) {
         leftRangeValue = 1 / 10 ** 6;
       }
