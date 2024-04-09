@@ -7,6 +7,8 @@ import Modal from "../Modal";
 import Table from "../Table";
 import { useCurrencyLogo } from "hooks/useCurrencyLogo";
 import { Currency } from "@uniswap/sdk-core";
+import { getExplorerLink } from "constants/chains";
+import { useWeb3React } from "@web3-react/core";
 
 const NO_HOOK_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -33,7 +35,8 @@ const PoolTitle = styled.div`
   gap: 16px;
 `;
 
-const Badge = styled.div<{ $error?: boolean }>`
+const Badge = styled.a<{ $error?: boolean }>`
+  pointer: cursor;
   width: fit-content;
   display: flex;
   flex-direction: row;
@@ -41,6 +44,7 @@ const Badge = styled.div<{ $error?: boolean }>`
   border-radius: 6px;
   align-items: center;
   justify-content: center;
+  text-decoration: none;
   gap: 2px;
   background-color: ${({ theme, $error: error }) =>
     error
@@ -80,16 +84,22 @@ const BadgeWrapper = styled.div`
 `;
 
 const CurrencyPair = styled.span`
+  pointer: cursor;
   display: inline-flex;
   gap: 8px;
   align-items: center;
 `;
 
 const PoolComponent: React.FC<{
-  pool: { currency0: Currency; currency1: Currency };
+  pool: PoolKey;
   currencyIconMap: Record<string, string>;
-}> = ({ pool, currencyIconMap }) => (
-  <CurrencyPair>
+  onClick: (poolKey: PoolKey) => void;
+}> = ({ pool, currencyIconMap, onClick }) => (
+  <CurrencyPair
+    onClick={() => {
+      onClick(pool);
+    }}
+  >
     <LogoWrapper>
       <CurrencyLogo
         src={useCurrencyLogo(pool?.currency0 ?? "C0", currencyIconMap)}
@@ -125,6 +135,7 @@ const BadgeIcon = styled.svg<{ $error?: boolean }>`
 const FeatureComponent: React.FC<{
   feature: { address: string; abbr: string };
 }> = ({ feature }) => {
+  const { chainId } = useWeb3React();
   return feature.address != NO_HOOK_ADDRESS ? (
     <Badge
       style={{
@@ -132,6 +143,9 @@ const FeatureComponent: React.FC<{
         gap: "8px",
       }}
       $error={feature.abbr === "Unknown"}
+      href={`${getExplorerLink(chainId)}/address/${feature.address}`}
+      target="_blank"
+      rel="noreferrer"
     >
       <BadgeIcon
         xmlns="http://www.w3.org/2000/svg"
@@ -243,18 +257,18 @@ function PoolKeySelect({
               <PoolComponent
                 pool={poolData}
                 currencyIconMap={currencyIconMap || {}}
+                onClick={(poolKey) => {
+                  console.log("onSelect", poolKey);
+                  if (onSelect) {
+                    onSelect(poolKey);
+                  }
+                  setIsOpen(false);
+                }}
               />
             ),
             Feature: (featureData) => (
               <FeatureComponent feature={featureData} />
             ),
-          }}
-          onSelect={(item) => {
-            console.log("onSelect", item);
-            if (onSelect) {
-              onSelect(item.Pool);
-            }
-            setIsOpen(false);
           }}
           searchPlaceholder="Search by token, pool address, or feature"
         />

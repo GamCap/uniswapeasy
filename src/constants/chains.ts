@@ -155,3 +155,8 @@ export const explorerMap: { [key in SupportedChainId]: string } = {
 
   [SupportedChainId.ETHEREUM_SEPOLIA]: "https://sepolia.etherscan.io",
 };
+
+export const getExplorerLink = (chainId: number | undefined): string => {
+  if (!chainId) return "";
+  return explorerMap[chainId as SupportedChainId];
+};
