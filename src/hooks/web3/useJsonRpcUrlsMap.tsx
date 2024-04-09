@@ -62,9 +62,6 @@ function toJsonRpcMap<T>(
     ),
     [SupportedChainId.BNB]: getChainConnections(SupportedChainId.BNB),
     [SupportedChainId.BASE]: getChainConnections(SupportedChainId.BASE),
-    [SupportedChainId.CONDUIT_TESTNET]: getChainConnections(
-      SupportedChainId.CONDUIT_TESTNET
-    ),
     [SupportedChainId.ETHEREUM_SEPOLIA]: getChainConnections(
       SupportedChainId.ETHEREUM_SEPOLIA
     ),

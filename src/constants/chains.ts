@@ -24,7 +24,6 @@ export enum SupportedChainId {
 
   BASE = 8453,
 
-  CONDUIT_TESTNET = 111,
   ETHEREUM_SEPOLIA = 11155111,
 }
 
@@ -44,7 +43,6 @@ export enum ChainName {
   CELO_ALFAJORES = "celo-alfajores",
   BNB = "bnb",
   BASE = "base",
-  CONDUIT_TESTNET = "conduit-testnet",
   ETHEREUM_SEPOLIA = "ethereum-sepolia",
 }
 
@@ -64,7 +62,6 @@ export const CHAIN_NAMES_TO_IDS: { [chainName: string]: SupportedChainId } = {
   [ChainName.CELO_ALFAJORES]: SupportedChainId.CELO_ALFAJORES,
   [ChainName.BNB]: SupportedChainId.BNB,
   [ChainName.BASE]: SupportedChainId.BASE,
-  [ChainName.CONDUIT_TESTNET]: SupportedChainId.CONDUIT_TESTNET,
   [ChainName.ETHEREUM_SEPOLIA]: SupportedChainId.ETHEREUM_SEPOLIA,
 };
 
@@ -112,7 +109,6 @@ export const L2_CHAIN_IDS = [
   SupportedChainId.OPTIMISM,
   SupportedChainId.OPTIMISM_GOERLI,
   SupportedChainId.BASE,
-  SupportedChainId.CONDUIT_TESTNET,
 ] as const;
 
 export type SupportedL2ChainId = (typeof L2_CHAIN_IDS)[number];
@@ -132,3 +128,30 @@ export function isSupportedChainId(
   if (!chainId) return false;
   return ALL_SUPPORTED_CHAIN_IDS.includes(chainId as SupportedChainId);
 }
+
+export const explorerMap: { [key in SupportedChainId]: string } = {
+  [SupportedChainId.MAINNET]: "https://etherscan.io",
+  [SupportedChainId.ROPSTEN]: "https://ropsten.etherscan.io",
+  [SupportedChainId.RINKEBY]: "https://rinkeby.etherscan.io",
+  [SupportedChainId.GOERLI]: "https://goerli.etherscan.io",
+  [SupportedChainId.KOVAN]: "https://kovan.etherscan.io",
+
+  [SupportedChainId.ARBITRUM_ONE]: "https://arbiscan.io",
+  [SupportedChainId.ARBITRUM_RINKEBY]: "https://testnet.arbiscan.io",
+
+  [SupportedChainId.OPTIMISM]: "https://optimistic.etherscan.io",
+  [SupportedChainId.OPTIMISM_GOERLI]: "https://goerli-optimism.etherscan.io",
+
+  [SupportedChainId.POLYGON]: "https://polygonscan.com",
+  [SupportedChainId.POLYGON_MUMBAI]: "https://mumbai.polygonscan.com",
+
+  [SupportedChainId.CELO]: "https://explorer.celo.org",
+  [SupportedChainId.CELO_ALFAJORES]:
+    "https://alfajores-blockscout.celo-testnet.org",
+
+  [SupportedChainId.BNB]: "https://bscscan.com",
+
+  [SupportedChainId.BASE]: "https://basescan.org/",
+
+  [SupportedChainId.ETHEREUM_SEPOLIA]: "https://sepolia.etherscan.io",
+};
