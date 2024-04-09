@@ -1,26 +1,25 @@
 import { max, min, scaleLinear, scaleTime, ZoomTransform } from "d3";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bound } from "../../state/v4/actions";
 import { Area } from "./Area";
 import { AxisRight } from "./AxisRight";
 import { Brush } from "./Brush";
 import { Line } from "./Line";
 import {
-  ChartEntry,
+  TickDataEntry,
   LiquidityChartRangeInputProps,
-  Chart2Entry,
+  PriceHistoryEntry,
 } from "./types";
 import Zoom, { ZoomOverlay } from "./Zoom";
 import { AxisBottom } from "./AxisBottom";
 import { TimePriceLine } from "./LinePath";
 
-const xAccessor = (d: ChartEntry) => d.activeLiquidity;
-const yAccessor = (d: ChartEntry) => d.price0;
-const timeAccessor = (d: Chart2Entry) => d.time;
+const xAccessor = (d: TickDataEntry) => d.activeLiquidity;
+const yAccessor = (d: TickDataEntry) => d.price0;
+const timeAccessor = (d: PriceHistoryEntry) => d.time;
 
 export function Chart({
   id = "liquidityChartRangeInput",
-  data: { series, series2, current },
+  data: { tickData, priceHistory, current },
   ticksAtLimit,
   styles,
   dimensions: { width, height },
@@ -52,12 +51,12 @@ export function Chart({
         ] as number[])
         .range([0, innerHeight]),
       xScale: scaleLinear()
-        .domain([0, max(series, xAccessor)] as number[])
+        .domain([0, max(tickData, xAccessor)] as number[])
         .range([Math.ceil(innerWidth * 0.2), 0]),
       xTimeScale: scaleTime()
         .domain([
-          min(series2, timeAccessor),
-          max(series2, timeAccessor),
+          min(priceHistory, timeAccessor),
+          max(priceHistory, timeAccessor),
         ] as number[])
         .range([0, Math.floor(innerWidth * 0.8) - 20]),
     };
@@ -73,8 +72,8 @@ export function Chart({
     zoomLevels.initialMin,
     zoomLevels.initialMax,
     innerWidth,
-    series,
-    series2,
+    tickData,
+    priceHistory,
     innerHeight,
     zoom,
   ]);
@@ -145,7 +144,7 @@ export function Chart({
               transform={`translate(${Math.floor(innerWidth * 0.8)} , 0 )`}
             >
               <Area
-                series={series}
+                series={tickData}
                 xScale={xScale}
                 yScale={yScale}
                 xValue={xAccessor}
@@ -158,7 +157,7 @@ export function Chart({
                 // duplicate area chart with mask for selected area
                 <g mask={`url(#${id}-chart-area-mask)`}>
                   <Area
-                    series={series}
+                    series={tickData}
                     xScale={xScale}
                     yScale={yScale}
                     xValue={xAccessor}
@@ -182,15 +181,15 @@ export function Chart({
             />
             <g clipPath={`url(#${id}-chart-clip)`}>
               <TimePriceLine
-                series={series2}
+                series={priceHistory}
                 xScale={xTimeScale}
                 yScale={yScale}
                 stroke={styles.area.selection}
               />
               <Line value={current} yScale={yScale} innerWidth={innerWidth} />
               <circle
-                cx={xTimeScale(series2[series2.length - 1].time)}
-                cy={yScale(series2[series2.length - 1].price0)}
+                cx={xTimeScale(priceHistory[priceHistory.length - 1].time)}
+                cy={yScale(priceHistory[priceHistory.length - 1].price0)}
                 r="5"
                 fill={styles.area.selection}
               />

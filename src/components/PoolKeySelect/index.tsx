@@ -5,10 +5,14 @@ import { ThemedText } from "theme/components";
 import { memo, useEffect, useState } from "react";
 import Modal from "../Modal";
 import Table from "../Table";
+import { useCurrencyLogo } from "hooks/useCurrencyLogo";
+import { Currency } from "@uniswap/sdk-core";
+import { getExplorerLink } from "constants/chains";
+import { useWeb3React } from "@web3-react/core";
 
 const NO_HOOK_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-const CurrencyLogo = styled.div`
+const CurrencyLogo = styled.img`
   width: 24px;
   height: 24px;
   border-radius: 100%;
@@ -31,7 +35,8 @@ const PoolTitle = styled.div`
   gap: 16px;
 `;
 
-const Badge = styled.div<{ $error?: boolean }>`
+const Badge = styled.a<{ $error?: boolean }>`
+  pointer: cursor;
   width: fit-content;
   display: flex;
   flex-direction: row;
@@ -39,6 +44,23 @@ const Badge = styled.div<{ $error?: boolean }>`
   border-radius: 6px;
   align-items: center;
   justify-content: center;
+  text-decoration: none;
+  gap: 2px;
+  background-color: ${({ theme, $error: error }) =>
+    error
+      ? theme.components.badge.alertBackground
+      : theme.components.badge.neutralBackground};
+`;
+
+const TitleBadge = styled.span<{ $error?: boolean }>`
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
+  padding: 4px;
+  border-radius: 6px;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   gap: 2px;
   background-color: ${({ theme, $error: error }) =>
     error
@@ -78,21 +100,32 @@ const BadgeWrapper = styled.div`
 `;
 
 const CurrencyPair = styled.span`
+  width: 100%;
+  pointer: cursor;
   display: inline-flex;
   gap: 8px;
   align-items: center;
 `;
 
 const PoolComponent: React.FC<{
-  pool: { currency0: { symbol: string }; currency1: { symbol: string } };
-}> = ({ pool }) => (
-  <CurrencyPair>
+  pool: PoolKey;
+  currencyIconMap: Record<string, string>;
+  onClick: (poolKey: PoolKey) => void;
+}> = ({ pool, currencyIconMap, onClick }) => (
+  <CurrencyPair
+    onClick={() => {
+      onClick(pool);
+    }}
+  >
     <LogoWrapper>
-      <CurrencyLogo />
+      <CurrencyLogo
+        src={useCurrencyLogo(pool?.currency0 ?? "C0", currencyIconMap)}
+      />
       <CurrencyLogo
         style={{
           transform: "translateX(-6px)",
         }}
+        src={useCurrencyLogo(pool?.currency1 ?? "C1", currencyIconMap)}
       />
     </LogoWrapper>
     <ThemedText.ParagraphExtraSmall textColor="text.primary">
@@ -119,6 +152,7 @@ const BadgeIcon = styled.svg<{ $error?: boolean }>`
 const FeatureComponent: React.FC<{
   feature: { address: string; abbr: string };
 }> = ({ feature }) => {
+  const { chainId } = useWeb3React();
   return feature.address != NO_HOOK_ADDRESS ? (
     <Badge
       style={{
@@ -126,6 +160,9 @@ const FeatureComponent: React.FC<{
         gap: "8px",
       }}
       $error={feature.abbr === "Unknown"}
+      href={`${getExplorerLink(chainId)}/address/${feature.address}`}
+      target="_blank"
+      rel="noreferrer"
     >
       <BadgeIcon
         xmlns="http://www.w3.org/2000/svg"
@@ -163,11 +200,13 @@ function PoolKeySelect({
   poolKeys,
   hookAddressToAbbr,
   selectedPoolKey,
+  currencyIconMap,
   onSelect,
 }: {
   poolKeys?: PoolKey[];
   selectedPoolKey?: PoolKey;
-  hookAddressToAbbr?: { [key: string]: string };
+  hookAddressToAbbr?: Record<string, string>;
+  currencyIconMap?: Record<string, string>;
   onSelect?: (poolKey: PoolKey) => void;
 }) {
   const theme = useTheme();
@@ -231,17 +270,22 @@ function PoolKeySelect({
           data={unifiedData || []}
           pageSize={6}
           renderers={{
-            Pool: (poolData) => <PoolComponent pool={poolData} />,
+            Pool: (poolData) => (
+              <PoolComponent
+                pool={poolData}
+                currencyIconMap={currencyIconMap || {}}
+                onClick={(poolKey) => {
+                  console.log("onSelect", poolKey);
+                  if (onSelect) {
+                    onSelect(poolKey);
+                  }
+                  setIsOpen(false);
+                }}
+              />
+            ),
             Feature: (featureData) => (
               <FeatureComponent feature={featureData} />
             ),
-          }}
-          onSelect={(item) => {
-            console.log("onSelect", item);
-            if (onSelect) {
-              onSelect(item.Pool);
-            }
-            setIsOpen(false);
           }}
           searchPlaceholder="Search by token, pool address, or feature"
         />
@@ -268,11 +312,19 @@ function PoolKeySelect({
       {selectedPoolKey && (
         <Row $gap="md">
           <LogoWrapper>
-            {/* 
-        TODO: Replace with actual currency logos
-         */}
-            <CurrencyLogo />
             <CurrencyLogo
+              src={useCurrencyLogo(
+                selectedPoolKey?.currency0 ?? "C0",
+                currencyIconMap ?? {}
+              )}
+              alt={selectedPoolKey?.currency0?.symbol ?? "C0"}
+            />
+            <CurrencyLogo
+              src={useCurrencyLogo(
+                selectedPoolKey?.currency1 ?? "C1",
+                currencyIconMap ?? {}
+              )}
+              alt={selectedPoolKey?.currency1?.symbol ?? "C1"}
               style={{
                 transform: "translateX(-6px)",
               }}
@@ -283,11 +335,29 @@ function PoolKeySelect({
               {`To ${selectedPoolKey?.currency0.symbol}/${selectedPoolKey?.currency1.symbol} Pool`}
             </ThemedText.ParagraphRegular>
             <BadgeWrapper>
-              <Badge>
+              <TitleBadge>
                 <ThemedText.ParagraphExtraSmall textColor="components.badge.neutralForeground">{`${
                   parseFloat(selectedPoolKey?.fee.toString() ?? "3000") / 10_000
                 }% fee tier`}</ThemedText.ParagraphExtraSmall>
-              </Badge>
+              </TitleBadge>
+              {selectedPoolKey.hooks !== NO_HOOK_ADDRESS &&
+                hookAddressToAbbr && (
+                  <Badge
+                    $error={
+                      !hookAddressToAbbr[selectedPoolKey.hooks] ||
+                      hookAddressToAbbr[selectedPoolKey.hooks] === "Unknown"
+                    }
+                    href={`${getExplorerLink(
+                      selectedPoolKey.currency0.chainId
+                    )}/address/${selectedPoolKey.hooks}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <ThemedText.ParagraphExtraSmall textColor="components.badge.neutralForeground">
+                      {hookAddressToAbbr[selectedPoolKey.hooks] || "Unknown"}
+                    </ThemedText.ParagraphExtraSmall>
+                  </Badge>
+                )}
               {/* Other Badges */}
             </BadgeWrapper>
           </PoolTitle>

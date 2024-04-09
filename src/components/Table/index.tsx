@@ -14,7 +14,6 @@ const StyledTh = styled.th`
 `;
 
 const StyledTr = styled.tr`
-  cursor: pointer;
   border-bottom: 1px solid ${({ theme }) => theme.borders.dividers};
   td {
     padding-top: 20px;
@@ -138,7 +137,6 @@ interface TableProps {
   columns: Column[];
   pageSize: number;
   renderers: { [key: string]: (data: any) => JSX.Element };
-  onSelect?: (item: any) => void;
   searchPlaceholder?: string;
 }
 
@@ -147,7 +145,6 @@ const TableComponent: React.FC<TableProps> = ({
   columns,
   pageSize,
   renderers,
-  onSelect,
   searchPlaceholder,
 }) => {
   const theme = useTheme();
@@ -183,12 +180,6 @@ const TableComponent: React.FC<TableProps> = ({
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-
-  const handleRowClick = (item: any) => {
-    if (onSelect) {
-      onSelect(item);
-    }
-  };
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -246,12 +237,7 @@ const TableComponent: React.FC<TableProps> = ({
         </thead>
         <tbody>
           {currentData.map((item, index) => (
-            <StyledTr
-              key={index}
-              onClick={() => {
-                handleRowClick(item);
-              }}
-            >
+            <StyledTr key={index}>
               {columns.map((column) => (
                 <StyledTd key={column.key}>
                   {renderers[column.key] ? (

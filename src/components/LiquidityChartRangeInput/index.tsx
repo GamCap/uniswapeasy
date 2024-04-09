@@ -7,7 +7,7 @@ import styled, { useTheme } from "styled-components";
 import formatDelta from "../../utils/formatDelta";
 
 import { Chart } from "./Chart";
-import { useDensityChartData } from "./hooks";
+import { usePriceHistoryEntry, useTickDataEntry } from "./hooks";
 import { BigNumberish } from "ethers";
 import { BoxSecondary, ThemedText } from "../../theme/components";
 
@@ -77,12 +77,29 @@ export default function LiquidityChartRangeInput({
     currencyB &&
     currencyA?.wrapped.sortsBefore(currencyB?.wrapped);
 
-  const { isLoading, error, formattedData } = useDensityChartData({
+  const {
+    isLoading: isTickDataLoading,
+    error: tickDataError,
+    formattedData: formattedTickData,
+  } = useTickDataEntry({
     currencyA,
     currencyB,
     feeAmount,
     tickSpacing,
     hooks,
+  });
+
+  const {
+    isLoading: isPriceDataLoading,
+    error: priceDataError,
+    formattedData: formattedPriceData,
+  } = usePriceHistoryEntry({
+    currencyA,
+    currencyB,
+    feeAmount,
+    tickSpacing,
+    hooks,
+    currentPrice: price,
   });
 
   const onBrushDomainChangeEnded = useCallback(
@@ -120,7 +137,7 @@ export default function LiquidityChartRangeInput({
     [isSorted, onLeftRangeInput, onRightRangeInput, ticksAtLimit]
   );
 
-  interactive = interactive && Boolean(formattedData?.length);
+  interactive = interactive && Boolean(formattedTickData?.length);
 
   const brushDomain: [number, number] | undefined = useMemo(() => {
     const leftPrice = isSorted ? priceLower : priceUpper?.invert();
@@ -157,8 +174,10 @@ export default function LiquidityChartRangeInput({
 
   const isUninitialized = useMemo(
     () =>
-      !currencyA || !currencyB || (formattedData === undefined && !isLoading),
-    [currencyA, currencyB, formattedData, isLoading]
+      !currencyA ||
+      !currencyB ||
+      (formattedTickData === undefined && !isTickDataLoading),
+    [currencyA, currencyB, formattedTickData, isTickDataLoading]
   );
 
   //TODO
@@ -195,14 +214,14 @@ export default function LiquidityChartRangeInput({
             </Column>
           </BoxSecondary>
         </div>
-      ) : isLoading ? (
+      ) : isTickDataLoading ? (
         <InfoBox icon={<Loader size="40px" stroke={"#fff"} />} />
-      ) : error ? (
+      ) : tickDataError ? (
         <InfoBox
           message={"Liquidity data not available."}
           icon={<div>CloudOff</div>}
         />
-      ) : !formattedData || formattedData.length === 0 || !price ? (
+      ) : !formattedTickData || formattedTickData.length === 0 || !price ? (
         <InfoBox
           message={"There is no liquidity data."}
           icon={<div>BarChart2</div>}
@@ -211,34 +230,9 @@ export default function LiquidityChartRangeInput({
         <ChartWrapper>
           <Chart
             data={{
-              series: formattedData.reverse(),
+              tickData: formattedTickData.reverse(),
               //TODO: remove this hardcoded data
-              series2: [
-                { time: 1712167200000, price0: 64205 },
-                { time: 1712170800000, price0: 57559 },
-                { time: 1712174400000, price0: 58068 },
-                { time: 1712178000000, price0: 68755 },
-                { time: 1712181600000, price0: 63017 },
-                { time: 1712185200000, price0: 56234 },
-                { time: 1712188800000, price0: 67503 },
-                { time: 1712192400000, price0: 58928 },
-                { time: 1712196000000, price0: 62132 },
-                { time: 1712199600000, price0: 60253 },
-                { time: 1712203200000, price0: 69720 },
-                { time: 1712206800000, price0: 66864 },
-                { time: 1712210400000, price0: 54941 },
-                { time: 1712214000000, price0: 53713 },
-                { time: 1712217600000, price0: 63363 },
-                { time: 1712221200000, price0: 64121 },
-                { time: 1712224800000, price0: 52520 },
-                { time: 1712228400000, price0: 67149 },
-                { time: 1712232000000, price0: 60203 },
-                { time: 1712235600000, price0: 52585 },
-                { time: 1712239200000, price0: 66845 },
-                { time: 1712242800000, price0: 58667 },
-                { time: 1712246400000, price0: 65665 },
-                { time: 1712250000000, price0: price },
-              ],
+              priceHistory: formattedPriceData ?? [],
               current: price,
             }}
             dimensions={{ width: 668, height: 170 }}

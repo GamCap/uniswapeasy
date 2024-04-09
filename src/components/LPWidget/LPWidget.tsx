@@ -136,6 +136,7 @@ type HookInfo = {
 export type LPWidgetProps = {
   poolInfos: PoolInfo[];
   hookInfos: HookInfo[];
+  currencyIconMap: Record<string, string>;
 };
 
 export default function LPWidgetWrapper(props: LPWidgetProps) {
@@ -156,7 +157,7 @@ type TransactionStatus =
   | "success"
   | "failed";
 
-function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
+function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
   const { account, chainId, provider } = useWeb3React();
   //TODO: add a check for existing position
   const theme = useTheme();
@@ -755,6 +756,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                   poolKeys={poolKeys}
                   hookAddressToAbbr={hookAddressToAbbr}
                   selectedPoolKey={poolKey}
+                  currencyIconMap={currencyIconMap}
                   onSelect={setPoolKey}
                 />
               </Section>
@@ -948,6 +950,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                       }}
                       showMaxButton={!atMaxAmounts[Field.CURRENCY_0]}
                       currency={currencies[Field.CURRENCY_0] ?? "C0"}
+                      currencyIconMap={currencyIconMap}
                       id="add-liquidity-input-token0"
                       showCommonBases
                       locked={depositADisabled}
@@ -963,6 +966,7 @@ function LPWidget({ poolInfos, hookInfos }: LPWidgetProps) {
                       }}
                       showMaxButton={!atMaxAmounts[Field.CURRENCY_1]}
                       currency={currencies[Field.CURRENCY_1] ?? "C1"}
+                      currencyIconMap={currencyIconMap}
                       id="add-liquidity-input-token1"
                       showCommonBases
                       locked={depositBDisabled}
