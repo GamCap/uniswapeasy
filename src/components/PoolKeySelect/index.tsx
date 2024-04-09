@@ -52,6 +52,22 @@ const Badge = styled.a<{ $error?: boolean }>`
       : theme.components.badge.neutralBackground};
 `;
 
+const TitleBadge = styled.span<{ $error?: boolean }>`
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
+  padding: 4px;
+  border-radius: 6px;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  gap: 2px;
+  background-color: ${({ theme, $error: error }) =>
+    error
+      ? theme.components.badge.alertBackground
+      : theme.components.badge.neutralBackground};
+`;
+
 const ChangeButton = styled.button`
   display: flex;
   padding: 8px 12px;
@@ -84,6 +100,7 @@ const BadgeWrapper = styled.div`
 `;
 
 const CurrencyPair = styled.span`
+  width: 100%;
   pointer: cursor;
   display: inline-flex;
   gap: 8px;
@@ -295,9 +312,6 @@ function PoolKeySelect({
       {selectedPoolKey && (
         <Row $gap="md">
           <LogoWrapper>
-            {/* 
-        TODO: Replace with actual currency logos
-         */}
             <CurrencyLogo
               src={useCurrencyLogo(
                 selectedPoolKey?.currency0 ?? "C0",
@@ -321,11 +335,29 @@ function PoolKeySelect({
               {`To ${selectedPoolKey?.currency0.symbol}/${selectedPoolKey?.currency1.symbol} Pool`}
             </ThemedText.ParagraphRegular>
             <BadgeWrapper>
-              <Badge>
+              <TitleBadge>
                 <ThemedText.ParagraphExtraSmall textColor="components.badge.neutralForeground">{`${
                   parseFloat(selectedPoolKey?.fee.toString() ?? "3000") / 10_000
                 }% fee tier`}</ThemedText.ParagraphExtraSmall>
-              </Badge>
+              </TitleBadge>
+              {selectedPoolKey.hooks !== NO_HOOK_ADDRESS &&
+                hookAddressToAbbr && (
+                  <Badge
+                    $error={
+                      !hookAddressToAbbr[selectedPoolKey.hooks] ||
+                      hookAddressToAbbr[selectedPoolKey.hooks] === "Unknown"
+                    }
+                    href={`${getExplorerLink(
+                      selectedPoolKey.currency0.chainId
+                    )}/address/${selectedPoolKey.hooks}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <ThemedText.ParagraphExtraSmall textColor="components.badge.neutralForeground">
+                      {hookAddressToAbbr[selectedPoolKey.hooks] || "Unknown"}
+                    </ThemedText.ParagraphExtraSmall>
+                  </Badge>
+                )}
               {/* Other Badges */}
             </BadgeWrapper>
           </PoolTitle>
