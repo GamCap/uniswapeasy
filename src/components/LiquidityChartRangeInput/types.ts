@@ -41,19 +41,12 @@ export interface LiquidityChartRangeInputProps {
   ticksAtLimit: { [bound in Bound]?: boolean | undefined };
 
   styles: {
-    area: {
-      // color of the ticks in range
-      selection: string;
-    };
-
     brush: {
       handle: {
         west: string;
         east: string;
       };
     };
-
-    divider: string;
   };
 
   dimensions: Dimensions;

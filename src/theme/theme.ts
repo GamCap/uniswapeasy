@@ -1,17 +1,3 @@
-export interface Colors {
-  primary: string;
-  secondary: string;
-  tertiary: string;
-  background: string;
-  backgroundSecondary: string;
-  backgroundTertiary: string;
-  text: string;
-  textActive: string;
-  textInverted: string;
-  textTertiary: string;
-  border: string;
-}
-
 export interface Gaps {
   xs: string;
   sm: string;
@@ -21,7 +7,7 @@ export interface Gaps {
   xl: string;
 }
 export type Gap = keyof Gaps;
-export type Color = keyof Colors;
+
 export type BorderRadius = {
   xsmall: number;
   small: number;
@@ -31,8 +17,9 @@ export type BorderRadius = {
 export interface Attributes {
   borderRadius: BorderRadius;
   grids: Gaps;
+  font: { family: string };
 }
-export interface ColorsV2 {
+export interface Colors {
   surfacesAndElevation: {
     pageBackground: string;
     elevation1: string;
@@ -241,6 +228,4 @@ export interface ColorsV2 {
   };
 }
 
-export interface ThemeV2 extends Partial<ColorsV2>, Partial<Attributes> {}
-
-export interface Theme extends Partial<Colors>, Partial<Attributes> {}
+export interface Theme extends Colors, Attributes {}

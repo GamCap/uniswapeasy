@@ -1,6 +1,6 @@
-import { ColorsV2 } from "./theme";
+import { Colors } from "./theme";
 
-export const orangeLight: ColorsV2 = {
+export const orangeLight: Colors = {
   surfacesAndElevation: {
     pageBackground: "#F9FAFB",
     elevation1: "#FFFFFF",
@@ -209,7 +209,7 @@ export const orangeLight: ColorsV2 = {
   },
 };
 
-export const orangeDark: ColorsV2 = {
+export const orangeDark: Colors = {
   surfacesAndElevation: {
     pageBackground: "#000103",
     elevation1: "#12131A",

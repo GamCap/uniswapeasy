@@ -1,4 +1,4 @@
-import { styled, useTheme } from "styled-components";
+import { styled } from "styled-components";
 import { PoolKey } from "state/v4/hooks";
 import Row, { RowBetween } from "components/Row";
 import { ThemedText } from "theme/components";
@@ -107,6 +107,10 @@ const CurrencyPair = styled.span`
   align-items: center;
 `;
 
+const ChangeButtonPath = styled.path`
+  stroke: ${({ theme }) => theme.components.icon.icon};
+`;
+
 const PoolComponent: React.FC<{
   pool: PoolKey;
   currencyIconMap: Record<string, string>;
@@ -209,7 +213,6 @@ function PoolKeySelect({
   currencyIconMap?: Record<string, string>;
   onSelect?: (poolKey: PoolKey) => void;
 }) {
-  const theme = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   const unifiedData = poolKeys?.map((poolKey) => ({
@@ -381,16 +384,14 @@ function PoolKeySelect({
               pointerEvents: "none",
             }}
           >
-            <path
+            <ChangeButtonPath
               d="M11.2001 2.1333L13.8667 4.79997M13.8667 4.79997L11.2001 7.46663M13.8667 4.79997H2.1333"
-              stroke={theme.components.icon.icon}
               strokeWidth="0.9"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-            <path
+            <ChangeButtonPath
               d="M2.1333 11.2001L4.79997 8.53345M2.1333 11.2001L4.79997 13.8668M2.1333 11.2001H13.8666"
-              stroke={theme.components.icon.icon}
               strokeWidth="0.9"
               strokeLinecap="round"
               strokeLinejoin="round"

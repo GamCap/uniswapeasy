@@ -12,7 +12,15 @@ import {
 import Zoom, { ZoomOverlay } from "./Zoom";
 import { AxisBottom } from "./AxisBottom";
 import { TimePriceLine } from "./LinePath";
+import styled from "styled-components";
 
+const PriceLine = styled.line`
+  stroke: ${({ theme }) => theme.borders.dividers};
+  stroke-width: 1;
+`;
+const PriceDot = styled.circle`
+  fill: ${({ theme }) => theme.components.graph.main};
+`;
 const xAccessor = (d: TickDataEntry) => d.activeLiquidity;
 const yAccessor = (d: TickDataEntry) => d.price0;
 const timeAccessor = (d: PriceHistoryEntry) => d.time;
@@ -150,7 +158,7 @@ export function Chart({
                 xValue={xAccessor}
                 yValue={yAccessor}
                 //style is area.selection but 30% opacity
-                fill={styles.area.selection + "4D"}
+                opacity={0.3}
               />
 
               {brushDomain && (
@@ -162,7 +170,6 @@ export function Chart({
                     yScale={yScale}
                     xValue={xAccessor}
                     yValue={yAccessor}
-                    fill={styles.area.selection}
                   />
                 </g>
               )}
@@ -184,24 +191,15 @@ export function Chart({
                 series={priceHistory}
                 xScale={xTimeScale}
                 yScale={yScale}
-                stroke={styles.area.selection}
               />
               <Line value={current} yScale={yScale} innerWidth={innerWidth} />
-              <circle
+              <PriceDot
                 cx={xTimeScale(priceHistory[priceHistory.length - 1].time)}
                 cy={yScale(priceHistory[priceHistory.length - 1].price0)}
                 r="5"
-                fill={styles.area.selection}
               />
             </g>
-            <line
-              x1="0"
-              y1={innerHeight}
-              x2={width}
-              y2={innerHeight}
-              stroke={styles.divider}
-              strokeWidth="1"
-            />
+            <PriceLine x1="0" y1={innerHeight} x2={width} y2={innerHeight} />
 
             <ZoomOverlay width={width} height={height} ref={zoomRef} />
 

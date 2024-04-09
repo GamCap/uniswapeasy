@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import {
   PoolKey,
   useRangeHopCallbacks,
@@ -15,7 +15,7 @@ import LiquidityChartRangeInput from "../LiquidityChartRangeInput";
 import Column from "components/Column";
 import { PositionHeader } from "../PositionHeader";
 import Header from "../Header";
-import styled, { useTheme } from "styled-components";
+import styled from "styled-components";
 import Row, { RowBetween } from "components/Row";
 import { BoxSecondary, ThemedText, Section } from "theme/components";
 import PoolKeySelect from "../PoolKeySelect";
@@ -120,12 +120,48 @@ const OverflowContainer = styled.div`
   }
 `;
 
-type PoolInfo = {
+const TransactionIconPath = styled.path<{ $status: TransactionStatus }>`
+  fill: ${({ theme, $status }) => {
+    switch ($status) {
+      case "approve":
+        return theme.text.primary;
+      case "inProgress":
+        return theme.components.graph.main;
+      case "success":
+        return theme.text.gain;
+      case "failed":
+        return theme.text.loss;
+      default:
+        return theme.text.primary;
+    }
+  }};
+`;
+
+const ErrorIconPath = styled.path`
+  fill: ${({ theme }) => theme.components.icon.icon};
+`;
+
+// swapToRatio
+// ? theme.components.toggle.activeDefaultBackground
+// : theme.components.toggle
+//     .inactiveDefaultBackground
+const SwapToRatioIcon = styled.svg<{ $swapToRatio: boolean }>`
+  fill ${({ theme, $swapToRatio }) =>
+    $swapToRatio
+      ? theme.components.toggle.activeDefaultBackground
+      : theme.components.toggle.inactiveDefaultBackground};
+
+  circle {
+    fill: ${({ theme }) => theme.components.toggle.activeDefaultForeground};
+  }
+`;
+
+export type PoolInfo = {
   chainId: number;
   poolKey: PoolKey;
 };
 
-type HookInfo = {
+export type HookInfo = {
   address: string;
   name: string;
   abbr: string;
@@ -139,7 +175,7 @@ export type LPWidgetProps = {
   currencyIconMap: Record<string, string>;
 };
 
-export default function LPWidgetWrapper(props: LPWidgetProps) {
+function LPWidgetWrapper(props: LPWidgetProps) {
   const { chainId } = useWeb3React();
   if (!chainId || chainId !== 11155111)
     return (
@@ -157,10 +193,13 @@ type TransactionStatus =
   | "success"
   | "failed";
 
-function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
+const LPWidget = memo(function ({
+  poolInfos,
+  hookInfos,
+  currencyIconMap,
+}: LPWidgetProps) {
   const { account, chainId, provider } = useWeb3React();
   //TODO: add a check for existing position
-  const theme = useTheme();
 
   const [swapToRatio, setSwapToRatio] = useState(false);
   const [transactionModalOpen, setTransactionModalOpen] = useState(false);
@@ -424,11 +463,11 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
                 viewBox="0 0 41 40"
                 fill="none"
               >
-                <path
+                <TransactionIconPath
                   fillRule="evenodd"
                   clipRule="evenodd"
                   d="M20.5016 4.10107C10.8089 4.10107 4.60156 12.0407 4.60156 20.0011C4.60156 27.9615 10.8089 35.9011 20.5016 35.9011C25.174 35.9011 29.0242 34.0617 31.7661 31.2718C33.2405 29.7716 34.3959 27.9949 35.1845 26.0787C35.2896 25.8233 35.5818 25.7015 35.8372 25.8066C36.0925 25.9117 36.2144 26.2039 36.1093 26.4592C35.2729 28.4914 34.0469 30.3777 32.4793 31.9727C29.5569 34.9463 25.4528 36.9011 20.5016 36.9011C10.1862 36.9011 3.60156 28.4407 3.60156 20.0011C3.60156 11.5615 10.1862 3.10107 20.5016 3.10107C20.7777 3.10107 21.0016 3.32493 21.0016 3.60107C21.0016 3.87722 20.7777 4.10107 20.5016 4.10107Z"
-                  fill={theme.components.graph.main}
+                  $status={transactionStatus}
                 >
                   <animateTransform
                     attributeName="transform"
@@ -439,7 +478,7 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
                     dur="1s"
                     repeatCount="indefinite"
                   />
-                </path>
+                </TransactionIconPath>
               </svg>
             }
             title={"Confirm in your wallet"}
@@ -468,11 +507,11 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
                 viewBox="0 0 41 40"
                 fill="none"
               >
-                <path
+                <TransactionIconPath
                   fillRule="evenodd"
                   clipRule="evenodd"
                   d="M20.5016 4.10107C10.8089 4.10107 4.60156 12.0407 4.60156 20.0011C4.60156 27.9615 10.8089 35.9011 20.5016 35.9011C25.174 35.9011 29.0242 34.0617 31.7661 31.2718C33.2405 29.7716 34.3959 27.9949 35.1845 26.0787C35.2896 25.8233 35.5818 25.7015 35.8372 25.8066C36.0925 25.9117 36.2144 26.2039 36.1093 26.4592C35.2729 28.4914 34.0469 30.3777 32.4793 31.9727C29.5569 34.9463 25.4528 36.9011 20.5016 36.9011C10.1862 36.9011 3.60156 28.4407 3.60156 20.0011C3.60156 11.5615 10.1862 3.10107 20.5016 3.10107C20.7777 3.10107 21.0016 3.32493 21.0016 3.60107C21.0016 3.87722 20.7777 4.10107 20.5016 4.10107Z"
-                  fill={theme.components.graph.main}
+                  $status={transactionStatus}
                 >
                   <animateTransform
                     attributeName="transform"
@@ -483,7 +522,7 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
                     dur="1s"
                     repeatCount="indefinite"
                   />
-                </path>
+                </TransactionIconPath>
               </svg>
             }
             title={"Transaction pending"}
@@ -512,11 +551,11 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
                 viewBox="0 0 41 40"
                 fill="none"
               >
-                <path
+                <TransactionIconPath
                   fillRule="evenodd"
                   clipRule="evenodd"
                   d="M20.4992 3.10522C11.1688 3.10522 3.60498 10.669 3.60498 19.9994C3.60498 29.3298 11.1688 36.8937 20.4992 36.8937C29.8295 36.8937 37.3934 29.3298 37.3934 19.9994C37.3934 10.669 29.8295 3.10522 20.4992 3.10522ZM4.60498 19.9994C4.60498 11.2213 11.7211 4.10522 20.4992 4.10522C29.2773 4.10522 36.3934 11.2213 36.3934 19.9994C36.3934 28.7775 29.2773 35.8937 20.4992 35.8937C11.7211 35.8937 4.60498 28.7775 4.60498 19.9994ZM26.9095 14.2874C27.0684 14.0615 27.0141 13.7496 26.7883 13.5907C26.5625 13.4318 26.2506 13.486 26.0917 13.7119L17.9925 25.2212L14.1907 21.3489C13.9972 21.1519 13.6806 21.149 13.4836 21.3425C13.2865 21.5359 13.2836 21.8525 13.4771 22.0495L17.6993 26.3499C17.8033 26.4558 17.9489 26.51 18.0968 26.4979C18.2447 26.4859 18.3796 26.4087 18.465 26.2874L26.9095 14.2874Z"
-                  fill={theme.text.gain}
+                  $status={transactionStatus}
                 />
               </svg>
             }
@@ -549,11 +588,11 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
                 viewBox="0 0 41 40"
                 fill="none"
               >
-                <path
+                <TransactionIconPath
                   fillRule="evenodd"
                   clipRule="evenodd"
                   d="M21.4451 0.608857C21.0185 -0.106925 19.9819 -0.106923 19.5552 0.608858L0.744674 32.1702C0.30767 32.9035 0.836006 33.8334 1.68958 33.8334H39.3108C40.1644 33.8334 40.6927 32.9035 40.2557 32.1702L21.4451 0.608857ZM20.4143 1.12082C20.453 1.05575 20.5473 1.05575 20.5861 1.12082L39.3967 32.6822C39.4364 32.7489 39.3884 32.8334 39.3108 32.8334H1.68958C1.61198 32.8334 1.56395 32.7489 1.60368 32.6822L20.4143 1.12082ZM18.7052 11.9631C18.6661 10.9447 19.481 10.0978 20.5002 10.0978C21.5193 10.0978 22.3343 10.9447 22.2951 11.9631L21.8847 22.6322C21.8561 23.3761 21.2447 23.9645 20.5002 23.9645C19.7556 23.9645 19.1442 23.3761 19.1156 22.6322L18.7052 11.9631ZM22.4999 27.9361C22.4999 29.0407 21.6044 29.9361 20.4999 29.9361C19.3953 29.9361 18.4999 29.0407 18.4999 27.9361C18.4999 26.8315 19.3953 25.9361 20.4999 25.9361C21.6044 25.9361 22.4999 26.8315 22.4999 27.9361Z"
-                  fill="#FD4040"
+                  $status={transactionStatus}
                 />
               </svg>
             }
@@ -588,11 +627,10 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
                         viewBox="0 0 13 14"
                         fill="none"
                       >
-                        <path
+                        <ErrorIconPath
                           fill-rule="evenodd"
                           clip-rule="evenodd"
                           d="M0.0830081 9.16683C0.0830082 9.85719 0.642652 10.4168 1.33301 10.4168H2.99967V9.5835H1.33301C1.10289 9.5835 0.916342 9.39695 0.916341 9.16683L0.916341 1.8335C0.916341 1.60338 1.10289 1.41683 1.33301 1.41683L8.66634 1.41683C8.89646 1.41683 9.08301 1.60338 9.08301 1.8335V3.5H4.3335C3.59712 3.5 3.00016 4.09695 3.00016 4.83333V12.1667C3.00016 12.903 3.59712 13.5 4.3335 13.5H11.6668C12.4032 13.5 13.0002 12.903 13.0002 12.1667V4.83334C13.0002 4.09696 12.4032 3.5 11.6668 3.5H9.91634V1.8335C9.91634 1.14314 9.3567 0.583496 8.66634 0.583496L1.33301 0.583496C0.642652 0.583496 0.0830078 1.14314 0.0830078 1.8335L0.0830081 9.16683ZM4.00016 4.83333C4.00016 4.64924 4.1494 4.5 4.3335 4.5H11.6668C11.8509 4.5 12.0002 4.64924 12.0002 4.83334V12.1667C12.0002 12.3508 11.8509 12.5 11.6668 12.5H4.3335C4.1494 12.5 4.00016 12.3508 4.00016 12.1667V4.83333Z"
-                          fill={theme.components.icon.icon}
                         />
                       </svg>
                     </StyledButton>
@@ -613,11 +651,10 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
                             : "none",
                         }}
                       >
-                        <path
+                        <ErrorIconPath
                           fill-rule="evenodd"
                           clip-rule="evenodd"
                           d="M3.13523 6.65803C3.3241 6.45657 3.64052 6.44637 3.84197 6.63523L7.5 10.0646L11.158 6.63523C11.3595 6.44637 11.6759 6.45657 11.8648 6.65803C12.0536 6.85949 12.0434 7.17591 11.842 7.36477L7.84197 11.1148C7.64964 11.2951 7.35036 11.2951 7.15803 11.1148L3.15803 7.36477C2.95657 7.17591 2.94637 6.85949 3.13523 6.65803Z"
-                          fill={theme.components.icon.icon}
                         />
                       </svg>
                     </StyledButton>
@@ -645,7 +682,6 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
   }, [
     transactionStatus,
     transactionError,
-    theme,
     txnAddress,
     currencies,
     errorMessageOpen,
@@ -905,24 +941,18 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
                         height="24"
                         viewBox="0 0 40 24"
                       >
-                        <path
+                        <SwapToRatioIcon
                           d="M0 12C0 5.37258 5.37258 0 12 0H28C34.6274 0 40 5.37258 40 12C40 18.6274 34.6274 24 28 24H12C5.37258 24 0 18.6274 0 12Z"
-                          fill={
-                            swapToRatio
-                              ? theme.components.toggle.activeDefaultBackground
-                              : theme.components.toggle
-                                  .inactiveDefaultBackground
-                          }
                           style={{
                             transition: "fill 0.3s ease",
                           }}
+                          $swapToRatio={swapToRatio}
                         />
                         <circle
                           id="toggleCircle"
                           cx={swapToRatio ? "28" : "12"}
                           cy="12"
                           r="8"
-                          fill={theme.components.toggle.activeDefaultForeground}
                           style={{
                             transition: "cx 0.3s ease",
                           }}
@@ -1028,7 +1058,7 @@ function LPWidget({ poolInfos, hookInfos, currencyIconMap }: LPWidgetProps) {
       )}
     </>
   );
-}
+});
 
 interface PoolAndHookManagement {
   poolKey: PoolKey | undefined;
@@ -1066,3 +1096,5 @@ function usePoolAndHookManagement(
 
   return { poolKey, setPoolKey, poolKeys, hookAddressToAbbr, selectedHook };
 }
+
+export default memo(LPWidgetWrapper);

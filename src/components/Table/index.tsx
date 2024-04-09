@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import styled, { useTheme } from "styled-components";
+import styled from "styled-components";
 import { ThemedText } from "theme/components";
 
 const StyledTable = styled.table`
@@ -127,6 +127,10 @@ const PageButton = styled.button`
   }
 `;
 
+const IconPath = styled.path`
+  fill: ${({ theme }) => theme.components.icon.icon};
+`;
+
 interface Column {
   key: string;
   filterMethod?: (item: any, searchTerm: string) => boolean;
@@ -147,7 +151,6 @@ const TableComponent: React.FC<TableProps> = ({
   renderers,
   searchPlaceholder,
 }) => {
-  const theme = useTheme();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -265,11 +268,10 @@ const TableComponent: React.FC<TableProps> = ({
             viewBox="0 0 12 10"
             fill="none"
           >
-            <path
+            <IconPath
               fillRule="evenodd"
               clipRule="evenodd"
               d="M5.35355 0.646447C5.54882 0.841709 5.54882 1.15829 5.35355 1.35355L2.20711 4.5H11C11.2761 4.5 11.5 4.72386 11.5 5C11.5 5.27614 11.2761 5.5 11 5.5H2.20711L5.35355 8.64645C5.54882 8.84171 5.54882 9.15829 5.35355 9.35355C5.15829 9.54882 4.84171 9.54882 4.64645 9.35355L0.646447 5.35355C0.451184 5.15829 0.451184 4.84171 0.646447 4.64645L4.64645 0.646447C4.84171 0.451184 5.15829 0.451184 5.35355 0.646447Z"
-              fill={theme.components.icon.icon}
             />
           </svg>
         </PageButton>
@@ -290,11 +292,10 @@ const TableComponent: React.FC<TableProps> = ({
             fill="none"
             style={{ transform: "rotate(180deg)" }}
           >
-            <path
+            <IconPath
               fillRule="evenodd"
               clipRule="evenodd"
               d="M5.35355 0.646447C5.54882 0.841709 5.54882 1.15829 5.35355 1.35355L2.20711 4.5H11C11.2761 4.5 11.5 4.72386 11.5 5C11.5 5.27614 11.2761 5.5 11 5.5H2.20711L5.35355 8.64645C5.54882 8.84171 5.54882 9.15829 5.35355 9.35355C5.15829 9.54882 4.84171 9.54882 4.64645 9.35355L0.646447 5.35355C0.451184 5.15829 0.451184 4.84171 0.646447 4.64645L4.64645 0.646447C4.84171 0.451184 5.15829 0.451184 5.35355 0.646447Z"
-              fill={theme.components.icon.icon}
             />
           </svg>
         </PageButton>

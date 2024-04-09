@@ -1,9 +1,9 @@
 import { Currency, Price, Token } from "@uniswap/sdk-core";
-import Column, { AutoColumn, ColumnCenter } from "../Column";
+import Column, { ColumnCenter } from "../Column";
 import Loader from "../Icons/LoadingSpinner";
 import { ReactNode, useCallback, useEffect, useMemo } from "react";
 import { Bound } from "../../state/v4/actions";
-import styled, { useTheme } from "styled-components";
+import styled from "styled-components";
 import formatDelta from "../../utils/formatDelta";
 
 import { Chart } from "./Chart";
@@ -66,8 +66,6 @@ export default function LiquidityChartRangeInput({
   onRightRangeInput: (typedValue: string) => void;
   interactive: boolean;
 }) {
-  const theme = useTheme();
-
   // TODO: use token colors
   // const tokenAColor = useColor(currencyA);
   // const tokenBColor = useColor(currencyB);
@@ -238,16 +236,12 @@ export default function LiquidityChartRangeInput({
             dimensions={{ width: 668, height: 170 }}
             margins={{ top: 0, right: 90, bottom: 40, left: 0 }}
             styles={{
-              area: {
-                selection: theme.components.graph.main,
-              },
               brush: {
                 handle: {
                   east: "#FAB01D",
                   west: "#627EEA",
                 },
               },
-              divider: theme.borders.dividers,
             }}
             interactive={interactive}
             brushLabels={brushLabelValue}

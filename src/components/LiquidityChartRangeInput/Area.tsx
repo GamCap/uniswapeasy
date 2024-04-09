@@ -2,12 +2,12 @@ import { area, curveStepAfter, ScaleLinear } from "d3";
 import { useMemo } from "react";
 import styled from "styled-components";
 
-import { ChartEntry } from "./types";
+import { TickDataEntry } from "./types";
 
-const Path = styled.path<{ fill?: string }>`
-  opacity: 0.5;
-  stroke: ${({ fill, theme }) => fill ?? theme.primary};
-  fill: ${({ fill, theme }) => fill ?? theme.primary};
+const Path = styled.path<{ $opacity: number }>`
+  opacity: ${({ $opacity }) => $opacity};
+  stroke: ${({ theme }) => theme.components.graph.main};
+  fill: ${({ theme }) => theme.components.graph.main};
 `;
 
 export const Area = ({
@@ -16,24 +16,24 @@ export const Area = ({
   yScale,
   xValue,
   yValue,
-  fill,
+  opacity,
 }: {
-  series: ChartEntry[];
+  series: TickDataEntry[];
   xScale: ScaleLinear<number, number>;
   yScale: ScaleLinear<number, number>;
-  xValue: (d: ChartEntry) => number;
-  yValue: (d: ChartEntry) => number;
-  fill?: string;
+  xValue: (d: TickDataEntry) => number;
+  yValue: (d: TickDataEntry) => number;
+  opacity?: number;
 }) =>
   useMemo(
     () => (
       <Path
-        fill={fill}
+        $opacity={opacity ?? 1}
         d={
           area()
             .curve(curveStepAfter)
-            .x((d: unknown) => xScale(xValue(d as ChartEntry)))
-            .y1((d: unknown) => yScale(yValue(d as ChartEntry)))
+            .x((d: unknown) => xScale(xValue(d as TickDataEntry)))
+            .y1((d: unknown) => yScale(yValue(d as TickDataEntry)))
             .y0(yScale(0))(
             series.filter((d) => {
               const value = xScale(xValue(d));
@@ -43,5 +43,5 @@ export const Area = ({
         }
       />
     ),
-    [fill, series, xScale, xValue, yScale, yValue]
+    [opacity, series, xScale, xValue, yScale, yValue]
   );
