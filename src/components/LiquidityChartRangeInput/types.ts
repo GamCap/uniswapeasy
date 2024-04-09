@@ -1,11 +1,11 @@
 import { Bound } from "../../state/v4/actions";
 
-export interface ChartEntry {
+export interface TickDataEntry {
   activeLiquidity: number;
   price0: number;
 }
 
-export interface Chart2Entry {
+export interface PriceHistoryEntry {
   price0: number;
   time: number;
 }
@@ -34,8 +34,8 @@ export interface LiquidityChartRangeInputProps {
   id?: string;
 
   data: {
-    series: ChartEntry[];
-    series2: Chart2Entry[];
+    tickData: TickDataEntry[];
+    priceHistory: PriceHistoryEntry[];
     current: number;
   };
   ticksAtLimit: { [bound in Bound]?: boolean | undefined };
