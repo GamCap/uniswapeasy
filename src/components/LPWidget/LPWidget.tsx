@@ -60,12 +60,6 @@ const StyledBoddyWrapper = styled(BodyWrapper)<{
     $hasExistingPosition ? "10px" : "0"};
 `;
 
-const MediumOnly = styled.div`
-  @media (max-width: 960px) {
-    display: none;
-  }
-`;
-
 const TransactionDialogueHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -761,21 +755,19 @@ const LPWidget = memo(function ({
                   $justify="flex-end"
                   style={{ width: "fit-content", minWidth: "fit-content" }}
                 >
-                  <MediumOnly>
-                    <div
-                      onClick={clearAll}
-                      style={{
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <ThemedText.SmallActiveGreen textColor="components.textButton.primary.default">
-                        Clear all
-                      </ThemedText.SmallActiveGreen>
-                    </div>
-                  </MediumOnly>
+                  <div
+                    onClick={clearAll}
+                    style={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ThemedText.SmallActiveGreen textColor="components.textButton.primary.default">
+                      Clear all
+                    </ThemedText.SmallActiveGreen>
+                  </div>
                 </Row>
               )}
             </PositionHeader>

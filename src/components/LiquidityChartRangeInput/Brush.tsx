@@ -13,7 +13,7 @@ const Handle = styled.path<{ color: string }>`
   cursor: ns-resize;
   pointer-events: none;
 
-  stroke-width: 3;
+  strokewidth: 3;
   stroke: ${({ color }) => color};
   fill: ${({ color }) => color};
 `;
@@ -21,7 +21,7 @@ const Handle = styled.path<{ color: string }>`
 const DashedHandle = styled.path<{ color: string }>`
   pointer-events: none;
   stroke-dasharray: 2;
-  stroke-width: 1;
+  strokewidth: 1;
   stroke: ${({ color }) => color};
   fill: ${({ color }) => color};
 `;
@@ -30,7 +30,7 @@ const HandleAccent = styled.path`
   cursor: ew-resize;
   pointer-events: none;
 
-  stroke-width: 1.5;
+  strokewidth: 1.5;
   stroke: ${({ theme }) => theme.primary};
   opacity: ${({ theme }) => 0.5};
 `;
@@ -52,7 +52,7 @@ const Tooltip = styled.text`
 
 const Line = styled.line`
   stroke: ${({ theme }) => theme.text.primary};
-  stroke-width: 1;
+  strokewidth: 1;
 `;
 
 // flips the handles draggers when close to the container edges

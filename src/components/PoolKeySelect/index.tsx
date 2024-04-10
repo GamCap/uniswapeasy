@@ -111,32 +111,69 @@ const ChangeButtonPath = styled.path`
   stroke: ${({ theme }) => theme.components.icon.icon};
 `;
 
+const MediumOnly = styled.div`
+  @media (max-width: 960px) {
+    display: none;
+  }
+`;
+
+const PoolTitleContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  gap: 12px;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+`;
+
+const PoolTitleWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+`;
+
 const PoolComponent: React.FC<{
   pool: PoolKey;
   currencyIconMap: Record<string, string>;
   onClick: (poolKey: PoolKey) => void;
-}> = ({ pool, currencyIconMap, onClick }) => (
-  <CurrencyPair
-    onClick={() => {
-      onClick(pool);
-    }}
-  >
-    <LogoWrapper>
-      <CurrencyLogo
-        src={useCurrencyLogo(pool?.currency0 ?? "C0", currencyIconMap)}
-      />
-      <CurrencyLogo
-        style={{
-          transform: "translateX(-6px)",
-        }}
-        src={useCurrencyLogo(pool?.currency1 ?? "C1", currencyIconMap)}
-      />
-    </LogoWrapper>
-    <ThemedText.ParagraphExtraSmall textColor="text.primary">
-      {pool?.currency0?.symbol} / {pool?.currency1?.symbol}
-    </ThemedText.ParagraphExtraSmall>
-  </CurrencyPair>
-);
+}> = ({ pool, currencyIconMap, onClick }) => {
+  const currency0Logo = useCurrencyLogo(
+    pool?.currency0 ?? "C0",
+    currencyIconMap
+  );
+  const currency1Logo = useCurrencyLogo(
+    pool?.currency1 ?? "C1",
+    currencyIconMap
+  );
+
+  return (
+    <CurrencyPair
+      onClick={() => {
+        onClick(pool);
+      }}
+    >
+      <LogoWrapper>
+        <CurrencyLogo src={currency0Logo} />
+        <CurrencyLogo
+          style={{
+            transform: "translateX(-6px)",
+          }}
+          src={currency1Logo}
+        />
+      </LogoWrapper>
+      <ThemedText.ParagraphExtraSmall textColor="text.primary">
+        {pool?.currency0?.symbol} / {pool?.currency1?.symbol}
+      </ThemedText.ParagraphExtraSmall>
+    </CurrencyPair>
+  );
+};
 
 const BadgeIcon = styled.svg<{ $error?: boolean }>`
   fill: ${({ theme, $error: error }) =>
@@ -214,6 +251,14 @@ function PoolKeySelect({
   onSelect?: (poolKey: PoolKey) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const c0logo = useCurrencyLogo(
+    selectedPoolKey?.currency0 ?? "C0",
+    currencyIconMap ?? {}
+  );
+  const c1logo = useCurrencyLogo(
+    selectedPoolKey?.currency1 ?? "C1",
+    currencyIconMap ?? {}
+  );
 
   const unifiedData = poolKeys?.map((poolKey) => ({
     Pool: poolKey,
@@ -307,58 +352,51 @@ function PoolKeySelect({
         </Row>
       )}
       {selectedPoolKey && (
-        <Row $gap="md">
-          <LogoWrapper>
-            <CurrencyLogo
-              src={useCurrencyLogo(
-                selectedPoolKey?.currency0 ?? "C0",
-                currencyIconMap ?? {}
-              )}
-              alt={selectedPoolKey?.currency0?.symbol ?? "C0"}
-            />
-            <CurrencyLogo
-              src={useCurrencyLogo(
-                selectedPoolKey?.currency1 ?? "C1",
-                currencyIconMap ?? {}
-              )}
-              alt={selectedPoolKey?.currency1?.symbol ?? "C1"}
-              style={{
-                transform: "translateX(-6px)",
-              }}
-            />
-          </LogoWrapper>
-          <PoolTitle>
+        <PoolTitleContainer>
+          <PoolTitleWrapper>
+            <LogoWrapper>
+              <CurrencyLogo
+                src={c0logo}
+                alt={selectedPoolKey?.currency0?.symbol ?? "C0"}
+              />
+              <CurrencyLogo
+                src={c1logo}
+                alt={selectedPoolKey?.currency1?.symbol ?? "C1"}
+                style={{
+                  transform: "translateX(-6px)",
+                }}
+              />
+            </LogoWrapper>
             <ThemedText.ParagraphRegular textColor="text.primary">
               {`To ${selectedPoolKey?.currency0.symbol}/${selectedPoolKey?.currency1.symbol} Pool`}
             </ThemedText.ParagraphRegular>
-            <BadgeWrapper>
-              <TitleBadge>
-                <ThemedText.ParagraphExtraSmall textColor="components.badge.neutralForeground">{`${
-                  parseFloat(selectedPoolKey?.fee.toString() ?? "3000") / 10_000
-                }% fee tier`}</ThemedText.ParagraphExtraSmall>
-              </TitleBadge>
-              {selectedPoolKey.hooks !== NO_HOOK_ADDRESS &&
-                hookAddressToAbbr && (
-                  <Badge
-                    $error={
-                      !hookAddressToAbbr[selectedPoolKey.hooks] ||
-                      hookAddressToAbbr[selectedPoolKey.hooks] === "Unknown"
-                    }
-                    href={`${getExplorerLink(
-                      selectedPoolKey.currency0.chainId
-                    )}/address/${selectedPoolKey.hooks}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <ThemedText.ParagraphExtraSmall textColor="components.badge.neutralForeground">
-                      {hookAddressToAbbr[selectedPoolKey.hooks] || "Unknown"}
-                    </ThemedText.ParagraphExtraSmall>
-                  </Badge>
-                )}
-              {/* Other Badges */}
-            </BadgeWrapper>
-          </PoolTitle>
-        </Row>
+          </PoolTitleWrapper>
+          <BadgeWrapper>
+            <TitleBadge>
+              <ThemedText.ParagraphExtraSmall textColor="components.badge.neutralForeground">{`${
+                parseFloat(selectedPoolKey?.fee.toString() ?? "3000") / 10_000
+              }% fee tier`}</ThemedText.ParagraphExtraSmall>
+            </TitleBadge>
+            {selectedPoolKey.hooks !== NO_HOOK_ADDRESS && hookAddressToAbbr && (
+              <Badge
+                $error={
+                  !hookAddressToAbbr[selectedPoolKey.hooks] ||
+                  hookAddressToAbbr[selectedPoolKey.hooks] === "Unknown"
+                }
+                href={`${getExplorerLink(
+                  selectedPoolKey.currency0.chainId
+                )}/address/${selectedPoolKey.hooks}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ThemedText.ParagraphExtraSmall textColor="components.badge.neutralForeground">
+                  {hookAddressToAbbr[selectedPoolKey.hooks] || "Unknown"}
+                </ThemedText.ParagraphExtraSmall>
+              </Badge>
+            )}
+            {/* Other Badges */}
+          </BadgeWrapper>
+        </PoolTitleContainer>
       )}
       {/* Change Button */}
       {selectedPoolKey && (
@@ -391,9 +429,11 @@ function PoolKeySelect({
               strokeLinejoin="round"
             />
           </svg>
-          <ThemedText.ParagraphExtraSmall textColor="components.button.secondary.foreground">
-            Change
-          </ThemedText.ParagraphExtraSmall>
+          <MediumOnly>
+            <ThemedText.ParagraphExtraSmall textColor="components.button.secondary.foreground">
+              Change
+            </ThemedText.ParagraphExtraSmall>
+          </MediumOnly>
         </ChangeButton>
       )}
     </RowBetween>

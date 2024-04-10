@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 const StyledLine = styled.line`
   opacity: 0.5;
-  stroke-width: 1;
+  strokewidth: 1;
   stroke-dasharray: 2;
   stroke: ${({ theme }) => theme.text.primary};
   fill: none;
