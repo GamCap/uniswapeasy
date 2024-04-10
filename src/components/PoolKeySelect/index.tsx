@@ -2,11 +2,10 @@ import { styled } from "styled-components";
 import { PoolKey } from "state/v4/hooks";
 import Row, { RowBetween } from "components/Row";
 import { ThemedText } from "theme/components";
-import { memo, useEffect, useState } from "react";
+import { memo, useState } from "react";
 import Modal from "../Modal";
 import Table from "../Table";
 import { useCurrencyLogo } from "hooks/useCurrencyLogo";
-import { Currency } from "@uniswap/sdk-core";
 import { getExplorerLink } from "constants/chains";
 import { useWeb3React } from "@web3-react/core";
 
@@ -25,14 +24,6 @@ const LogoWrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-`;
-
-const PoolTitle = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
 `;
 
 const Badge = styled.a<{ $error?: boolean }>`
@@ -112,7 +103,7 @@ const ChangeButtonPath = styled.path`
 `;
 
 const MediumOnly = styled.div`
-  @media (max-width: 960px) {
+  @media (max-width: 768px) {
     display: none;
   }
 `;

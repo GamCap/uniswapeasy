@@ -1,4 +1,3 @@
-import { useWeb3React } from "@web3-react/core";
 import styled from "styled-components";
 import { RowBetween } from "../Row";
 import { Box } from "rebass";
@@ -35,8 +34,6 @@ export function PositionHeader({
   creating: boolean;
   children: React.ReactNode;
 }) {
-  const { chainId } = useWeb3React();
-
   return (
     <Tabs>
       <TitleRow>

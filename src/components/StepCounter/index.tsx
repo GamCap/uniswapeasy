@@ -66,7 +66,7 @@ const StepCounter = ({
   increment,
   decrementDisabled = false,
   incrementDisabled = false,
-  width,
+  // width,
   locked,
   onUserInput,
   title,

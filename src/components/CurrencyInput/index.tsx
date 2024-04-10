@@ -95,7 +95,7 @@ export default function CurrencyInput({
   currencyIconMap,
   id,
   fiatValue,
-  showCommonBases,
+  // showCommonBases,
   locked = false,
   disabled = false,
 }: CurrencyInputProps) {
