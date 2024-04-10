@@ -16,7 +16,7 @@ import styled from "styled-components";
 
 const PriceLine = styled.line`
   stroke: ${({ theme }) => theme.borders.dividers};
-  stroke-width: 1;
+  strokewidth: 1;
 `;
 const PriceDot = styled.circle`
   fill: ${({ theme }) => theme.components.graph.main};

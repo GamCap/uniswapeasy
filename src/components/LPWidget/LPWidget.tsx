@@ -60,12 +60,6 @@ const StyledBoddyWrapper = styled(BodyWrapper)<{
     $hasExistingPosition ? "10px" : "0"};
 `;
 
-const MediumOnly = styled.div`
-  @media (max-width: 960px) {
-    display: none;
-  }
-`;
-
 const TransactionDialogueHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -145,14 +139,23 @@ const ErrorIconPath = styled.path`
 // ? theme.components.toggle.activeDefaultBackground
 // : theme.components.toggle
 //     .inactiveDefaultBackground
-const SwapToRatioIcon = styled.svg<{ $swapToRatio: boolean }>`
-  fill ${({ theme, $swapToRatio }) =>
+const SwapToRatioIcon = styled.path<{ $swapToRatio: boolean }>`
+  fill: ${({ theme, $swapToRatio }) =>
     $swapToRatio
       ? theme.components.toggle.activeDefaultBackground
       : theme.components.toggle.inactiveDefaultBackground};
+`;
 
-  circle {
-    fill: ${({ theme }) => theme.components.toggle.activeDefaultForeground};
+const SwapToRatioCircle = styled.circle`
+  fill: ${({ theme }) => theme.components.toggle.activeDefaultForeground};
+`;
+
+const CurrencyInputWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  @media (min-width: 768px) {
+    flex-direction: row;
   }
 `;
 
@@ -761,21 +764,19 @@ const LPWidget = memo(function ({
                   $justify="flex-end"
                   style={{ width: "fit-content", minWidth: "fit-content" }}
                 >
-                  <MediumOnly>
-                    <div
-                      onClick={clearAll}
-                      style={{
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <ThemedText.SmallActiveGreen textColor="components.textButton.primary.default">
-                        Clear all
-                      </ThemedText.SmallActiveGreen>
-                    </div>
-                  </MediumOnly>
+                  <div
+                    onClick={clearAll}
+                    style={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ThemedText.SmallActiveGreen textColor="components.textButton.primary.default">
+                      Clear all
+                    </ThemedText.SmallActiveGreen>
+                  </div>
                 </Row>
               )}
             </PositionHeader>
@@ -942,7 +943,7 @@ const LPWidget = memo(function ({
                           }}
                           $swapToRatio={swapToRatio}
                         />
-                        <circle
+                        <SwapToRatioCircle
                           id="toggleCircle"
                           cx={swapToRatio ? "28" : "12"}
                           cy="12"
@@ -963,7 +964,7 @@ const LPWidget = memo(function ({
                     boxSizing: "border-box",
                   }}
                 >
-                  <Row $gap="md">
+                  <CurrencyInputWrapper>
                     <CurrencyInput
                       value={formattedAmounts[Field.CURRENCY_0]}
                       onUserInput={onFieldAInput}
@@ -996,7 +997,7 @@ const LPWidget = memo(function ({
                       locked={depositBDisabled}
                       disabled={!poolKey || invalidPool}
                     />
-                  </Row>
+                  </CurrencyInputWrapper>
                   {/*TODO: Swap to Ratio info text */}
                 </Column>
               </Section>

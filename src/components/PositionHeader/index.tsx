@@ -19,6 +19,13 @@ const TitleText = styled.div`
   margin: auto;
 `;
 
+const TitleRow = styled(RowBetween)`
+  padding: 0 24px;
+  @media (min-width: 768px) {
+    padding: 0;
+  }
+`;
+
 export function PositionHeader({
   adding,
   creating,
@@ -32,7 +39,7 @@ export function PositionHeader({
 
   return (
     <Tabs>
-      <RowBetween $align="center">
+      <TitleRow>
         <TitleText
           style={{
             textAlign: "left",
@@ -45,7 +52,7 @@ export function PositionHeader({
             : "Remove liquidity"}
         </TitleText>
         {children && <Box>{children}</Box>}
-      </RowBetween>
+      </TitleRow>
     </Tabs>
   );
 }

@@ -22,7 +22,7 @@ const StyledGroup = styled.g`
     rect {
       fill: ${({ theme }) => theme.surfacesAndElevation.elevation2};
       stroke: ${({ theme }) => theme.borders.borders};
-      stroke-width: 1;
+      strokewidth: 1;
       border-radius: 4px;
       z-index: 2;
     }
