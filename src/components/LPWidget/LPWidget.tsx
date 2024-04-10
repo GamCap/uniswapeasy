@@ -1,8 +1,7 @@
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import {
   PoolKey,
   useRangeHopCallbacks,
-  useV4MintState,
   useV4PoolActionHandlers,
   useV4PoolInfo,
 } from "../../state/v4/hooks";
@@ -135,10 +134,6 @@ const ErrorIconPath = styled.path`
   fill: ${({ theme }) => theme.components.icon.icon};
 `;
 
-// swapToRatio
-// ? theme.components.toggle.activeDefaultBackground
-// : theme.components.toggle
-//     .inactiveDefaultBackground
 const SwapToRatioIcon = styled.path<{ $swapToRatio: boolean }>`
   fill: ${({ theme, $swapToRatio }) =>
     $swapToRatio
@@ -222,22 +217,19 @@ const LPWidget = memo(function ({
 
   const { values } = useFormState();
 
-  const { independentField, typedValue, startPriceTypedValue } =
-    useV4MintState();
-
   const {
     pool,
     ticks,
-    dependentField,
+    // dependentField,
     price,
     formattedPrice,
     formattedAmounts,
     maxAmounts,
     atMaxAmounts,
     pricesAtTicks,
-    pricesAtLimit,
+    // pricesAtLimit,
     parsedAmounts,
-    currencyBalances,
+    // currencyBalances,
     position,
     noLiquidity,
     currencies,
@@ -261,7 +253,7 @@ const LPWidget = memo(function ({
     onFieldBInput,
     onLeftRangeInput,
     onRightRangeInput,
-    onStartPriceInput,
+    // onStartPriceInput,
   } = useV4PoolActionHandlers(noLiquidity);
 
   const isValid = !errorMessage && !invalidRange;
@@ -440,7 +432,7 @@ const LPWidget = memo(function ({
     getIncrementLower,
     getDecrementUpper,
     getIncrementUpper,
-    getSetFullRange,
+    // getSetFullRange,
   } = useRangeHopCallbacks(
     currencies.CURRENCY_0,
     currencies.CURRENCY_1,
