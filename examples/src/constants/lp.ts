@@ -1,4 +1,5 @@
 import { Token } from "@uniswap/sdk-core";
+import { HookInfo } from "uniswapeasy";
 
 const poolKeys = [
   {
@@ -262,7 +263,7 @@ const poolKeys = [
     chainId: 11155111,
   },
 ];
-const hookInfos = [
+const hookInfos: HookInfo[] = [
   {
     address: "0x0000000000000000000000000000000000000003",
     name: "Test Hook",

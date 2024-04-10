@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { UniswapEasy, orangeDark, defaultTheme } from "uniswapeasy";
+import { UniswapEasy, orangeDark, defaultTheme, PoolKey } from "uniswapeasy";
 import { useActiveProvider } from "./connectors";
 import Web3Connectors from "./components/Web3Connectors";
 import { currencyIconMap, hookInfos, poolKeys } from "./constants/lp";
 const App = () => {
   const [theme, setTheme] = useState(defaultTheme);
-
+  const [hookData, setHookData] = useState("");
   const onPrimaryTextChange = (text: string) => {
     setTheme((prev) => ({
       ...prev,
@@ -14,6 +14,10 @@ const App = () => {
         primary: text,
       },
     }));
+  };
+
+  const onPoolSelect = (poolKey: PoolKey) => {
+    console.log("Selected pool");
   };
 
   const connectors = useRef<HTMLDivElement>(null);
@@ -41,6 +45,7 @@ const App = () => {
         }}
       >
         <input onChange={(e) => onPrimaryTextChange(e.target.value)} />
+        <input onChange={(e) => setHookData(e.target.value)} />
       </div>
       <div
         style={{
@@ -58,7 +63,9 @@ const App = () => {
         provider={provider}
         poolInfos={poolKeys}
         hookInfos={hookInfos}
+        onPoolSelect={onPoolSelect}
         currencyIconMap={currencyIconMap}
+        hookData={hookData}
       />
     </div>
   );

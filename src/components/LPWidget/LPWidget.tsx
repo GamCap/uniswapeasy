@@ -170,12 +170,15 @@ export type HookInfo = {
   abbr: string;
   desc: string;
   inputFields: InputField[];
+  overrideInputFields?: boolean;
 };
 
 export type LPWidgetProps = {
   poolInfos: PoolInfo[];
   hookInfos: HookInfo[];
   currencyIconMap: Record<string, string>;
+  onPoolSelect?: (poolKey: PoolKey) => void;
+  hookData?: string;
 };
 
 function LPWidgetWrapper(props: LPWidgetProps) {
@@ -200,6 +203,8 @@ const LPWidget = memo(function ({
   poolInfos,
   hookInfos,
   currencyIconMap,
+  onPoolSelect,
+  hookData: hookDataProp,
 }: LPWidgetProps) {
   const { account, chainId, provider } = useWeb3React();
   //TODO: add a check for existing position
@@ -213,7 +218,7 @@ const LPWidget = memo(function ({
   const [txnAddress, setTxnAddress] = useState<string>("");
 
   const { poolKey, setPoolKey, poolKeys, hookAddressToAbbr, selectedHook } =
-    usePoolAndHookManagement(poolInfos, hookInfos, chainId);
+    usePoolAndHookManagement(poolInfos, hookInfos, chainId, onPoolSelect);
 
   const { values } = useFormState();
 
@@ -313,12 +318,13 @@ const LPWidget = memo(function ({
     };
   }
 
-  const getHookData = () => {
+  const getHookData = useCallback(() => {
     if (!selectedHook) return "0x";
+    if (selectedHook.overrideInputFields) return hookDataProp ?? "0x";
     const types = mapInputFieldTypesToAbiTypes(selectedHook.inputFields);
     const vals = mapValuesToEncodedFormat(values, selectedHook.inputFields);
     return defaultAbiCoder.encode(types, vals);
-  };
+  }, [selectedHook, values, defaultAbiCoder, hookDataProp]);
 
   //TODO
   //Look into native currency handling
@@ -1004,7 +1010,7 @@ const LPWidget = memo(function ({
               {/* Transaction Info */}
 
               {/* Pool Feature Settings */}
-              {selectedHook && (
+              {selectedHook && !selectedHook.overrideInputFields && (
                 <Section
                   $padding="0 0 24px"
                   $disabled={!poolKey || invalidPool}
@@ -1057,7 +1063,7 @@ const LPWidget = memo(function ({
 
 interface PoolAndHookManagement {
   poolKey: PoolKey | undefined;
-  setPoolKey: React.Dispatch<React.SetStateAction<PoolKey | undefined>>;
+  setPoolKey: (poolKey: PoolKey) => void;
   poolKeys: PoolKey[];
   hookAddressToAbbr: { [address: string]: string };
   selectedHook: HookInfo | undefined;
@@ -1066,7 +1072,8 @@ interface PoolAndHookManagement {
 function usePoolAndHookManagement(
   poolInfos: PoolInfo[],
   hookInfos: HookInfo[],
-  chainId: number | undefined
+  chainId: number | undefined,
+  onPoolSelect?: (poolKey: PoolKey) => void
 ): PoolAndHookManagement {
   const [poolKey, setPoolKey] = useState<PoolKey | undefined>(undefined);
 
@@ -1089,7 +1096,16 @@ function usePoolAndHookManagement(
     return hookInfos.find((hookInfo) => hookInfo.address === poolKey?.hooks);
   }, [hookInfos, poolKey]);
 
-  return { poolKey, setPoolKey, poolKeys, hookAddressToAbbr, selectedHook };
+  return {
+    poolKey,
+    setPoolKey: (poolKey: PoolKey) => {
+      setPoolKey(poolKey);
+      onPoolSelect?.(poolKey);
+    },
+    poolKeys,
+    hookAddressToAbbr,
+    selectedHook,
+  };
 }
 
 export default memo(LPWidgetWrapper);

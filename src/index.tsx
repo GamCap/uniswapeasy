@@ -28,11 +28,7 @@ export type UniswapEasyProps = WidgetProps & LPWidgetProps;
 export function UniswapEasy(props: UniswapEasyProps) {
   return (
     <Widget {...(props as WidgetProps)}>
-      <LPWidget
-        poolInfos={props.poolInfos}
-        hookInfos={props.hookInfos}
-        currencyIconMap={props.currencyIconMap}
-      />
+      <LPWidget {...(props as LPWidgetProps)} />
     </Widget>
   );
 }
