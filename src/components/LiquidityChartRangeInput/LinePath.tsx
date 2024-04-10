@@ -7,7 +7,7 @@ import { PriceHistoryEntry } from "./types";
 const Path = styled.path<{ stroke?: string }>`
   fill: none;
   stroke: ${({ stroke, theme }) => stroke ?? theme.primary};
-  stroke-width: 2;
+  strokewidth: 2;
   opacity: 0.8;
 `;
 

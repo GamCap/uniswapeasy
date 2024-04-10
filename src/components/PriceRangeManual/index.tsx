@@ -1,9 +1,24 @@
 import { Currency, Price, Token } from "@uniswap/sdk-core";
-import Row from "components/Row";
 import { Bound } from "state/v4/actions";
 import StepCounter from "../StepCounter";
 import { BigNumberish } from "ethers";
+import { styled } from "styled-components";
 // currencyA is the base token
+
+const StepCounterWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding: 0 24px;
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+`;
+
 export default function RangeSelector({
   priceLower,
   priceUpper,
@@ -41,7 +56,7 @@ export default function RangeSelector({
   const rightPrice = isSorted ? priceUpper : priceLower?.invert();
 
   return (
-    <Row $gap="md" $padding="0px 24px">
+    <StepCounterWrapper>
       <StepCounter
         value={
           ticksAtLimit[isSorted ? Bound.LOWER : Bound.UPPER]
@@ -90,6 +105,6 @@ export default function RangeSelector({
         title={`High price`}
         locked={disabled}
       />
-    </Row>
+    </StepCounterWrapper>
   );
 }

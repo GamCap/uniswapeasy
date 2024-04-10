@@ -39,7 +39,7 @@ export function PositionHeader({
 
   return (
     <Tabs>
-      <RowBetween $align="center">
+      <TitleRow>
         <TitleText
           style={{
             textAlign: "left",
@@ -52,7 +52,7 @@ export function PositionHeader({
             : "Remove liquidity"}
         </TitleText>
         {children && <Box>{children}</Box>}
-      </RowBetween>
+      </TitleRow>
     </Tabs>
   );
 }
