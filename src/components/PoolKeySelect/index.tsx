@@ -112,7 +112,7 @@ const ChangeButtonPath = styled.path`
 `;
 
 const MediumOnly = styled.div`
-  @media (max-width: 960px) {
+  @media (max-width: 768px) {
     display: none;
   }
 `;
