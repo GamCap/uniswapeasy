@@ -139,7 +139,7 @@ const ErrorIconPath = styled.path`
 // ? theme.components.toggle.activeDefaultBackground
 // : theme.components.toggle
 //     .inactiveDefaultBackground
-const SwapToRatioIcon = styled.svg<{ $swapToRatio: boolean }>`
+const SwapToRatioIcon = styled.path<{ $swapToRatio: boolean }>`
   fill: ${({ theme, $swapToRatio }) =>
     $swapToRatio
       ? theme.components.toggle.activeDefaultBackground
