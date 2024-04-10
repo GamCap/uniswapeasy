@@ -100,15 +100,6 @@ export function usePoolData(
     }
   }, [poolManagerContract, id, provider, chainId, latestBlock]);
 
-  //console last data, current data, last fetched block and latest block
-
-  useEffect(() => {
-    console.log("lastData", lastData.current);
-    console.log("data", data);
-    console.log("lastFetchedBlock", lastFetchedBlock.current);
-    console.log("latestBlock", latestBlock);
-  }, [data, latestBlock, lastFetchedBlock, lastData]);
-
   // Return the latest data, falling back to the ref if the state hasn't updated, showing the lastData while loading to prevent flickering
   return {
     slot0:

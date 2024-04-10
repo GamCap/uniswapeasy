@@ -7,7 +7,7 @@ import {
 import { BrushBehavior, brushY, D3BrushEvent, ScaleLinear, select } from "d3";
 import usePrevious from "../../hooks/usePrevious";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import styled, { useTheme } from "styled-components";
+import styled from "styled-components";
 
 const Handle = styled.path<{ color: string }>`
   cursor: ns-resize;
@@ -48,6 +48,11 @@ const Tooltip = styled.text`
   text-anchor: middle;
   font-size: 12px;
   fill: ${({ theme }) => theme.primary};
+`;
+
+const Line = styled.line`
+  stroke: ${({ theme }) => theme.text.primary};
+  stroke-width: 1;
 `;
 
 // flips the handles draggers when close to the container edges
@@ -219,7 +224,6 @@ export const Brush = ({
     yScale(localBrushExtent[1]) >= 0 &&
     yScale(localBrushExtent[1]) <= innerHeight;
 
-  const theme = useTheme();
   return useMemo(
     () => (
       <>
@@ -274,24 +278,20 @@ export const Brush = ({
                   />
                   <HandleAccent d={brushHandleAccentPath()} />
                 </g>
-                <line
+                <Line
                   x1="0"
                   y1="0"
                   x2="12"
                   y2="0"
-                  stroke={theme.text.primary}
-                  strokeWidth="1"
                   transform={`translate(${
                     Math.floor(innerWidth * 0.8) + 7
                   }, -3.5)`}
                 />
-                <line
+                <Line
                   x1="0"
                   y1="0"
                   x2="12"
                   y2="0"
-                  stroke={theme.text.primary}
-                  strokeWidth="1"
                   transform={`translate(${
                     Math.floor(innerWidth * 0.8) + 7
                   }, -7)`}
@@ -320,24 +320,20 @@ export const Brush = ({
                   />
                   <HandleAccent d={brushHandleAccentPath()} />
                 </g>
-                <line
+                <Line
                   x1="0"
                   y1="0"
                   x2="12"
                   y2="0"
-                  stroke={theme.text.primary}
-                  strokeWidth="1"
                   transform={`translate(${
                     Math.floor(innerWidth * 0.8) + 7
                   }, -3.5)`}
                 />
-                <line
+                <Line
                   x1="0"
                   y1="0"
                   x2="12"
                   y2="0"
-                  stroke={theme.text.primary}
-                  strokeWidth="1"
                   transform={`translate(${
                     Math.floor(innerWidth * 0.8) + 7
                   }, -7)`}

@@ -1,5 +1,5 @@
 import { ReactNode, useCallback, useEffect, useState } from "react";
-import styled, { useTheme } from "styled-components";
+import styled from "styled-components";
 import { type BigNumberish } from "ethers";
 import { BoxSecondary, ThemedText } from "../../theme/components";
 import { AutoColumn } from "../Column";
@@ -40,6 +40,10 @@ const SmallButton = styled.button`
   cursor: pointer;
 `;
 
+const IconPath = styled.path`
+  fill: ${({ theme }) => theme.components.button.secondary.foreground};
+`;
+
 interface StepCounterProps {
   value: string;
   onUserInput: (value: string) => void;
@@ -72,7 +76,6 @@ const StepCounter = ({
   // let user type value and only update parent value on blur
   const [localValue, setLocalValue] = useState("");
   const [useLocalValue, setUseLocalValue] = useState(false);
-  const theme = useTheme();
 
   const handleOnFocus = () => {
     setUseLocalValue(true);
@@ -139,10 +142,7 @@ const StepCounter = ({
             >
               {/* plus icon with size 12px */}
               <svg width="12" height="12" viewBox="0 0 12 12">
-                <path
-                  d="M11.5 5.5H6.5V0.5C6.5 0.224 6.276 0 6 0C5.724 0 5.5 0.224 5.5 0.5V5.5H0.5C0.224 5.5 0 5.724 0 6C0 6.276 0.224 6.5 0.5 6.5H5.5V11.5C5.5 11.776 5.724 12 6 12C6.276 12 6.5 11.776 6.5 11.5V6.5H11.5C11.776 6.5 12 6.276 12 6C12 5.724 11.776 5.5 11.5 5.5Z"
-                  fill={theme.components.button.secondary.foreground}
-                />
+                <IconPath d="M11.5 5.5H6.5V0.5C6.5 0.224 6.276 0 6 0C5.724 0 5.5 0.224 5.5 0.5V5.5H0.5C0.224 5.5 0 5.724 0 6C0 6.276 0.224 6.5 0.5 6.5H5.5V11.5C5.5 11.776 5.724 12 6 12C6.276 12 6.5 11.776 6.5 11.5V6.5H11.5C11.776 6.5 12 6.276 12 6C12 5.724 11.776 5.5 11.5 5.5Z" />
               </svg>
             </SmallButton>
           )}
@@ -154,10 +154,7 @@ const StepCounter = ({
             >
               {/* minus icon with size 12x12px */}
               <svg width="12" height="12" viewBox="0 0 12 12">
-                <path
-                  d="M11.5 5.5H0.5C0.224 5.5 0 5.724 0 6C0 6.276 0.224 6.5 0.5 6.5H11.5C11.776 6.5 12 6.276 12 6C12 5.724 11.776 5.5 11.5 5.5Z"
-                  fill={theme.components.button.secondary.foreground}
-                />
+                <IconPath d="M11.5 5.5H0.5C0.224 5.5 0 5.724 0 6C0 6.276 0.224 6.5 0.5 6.5H11.5C11.776 6.5 12 6.276 12 6C12 5.724 11.776 5.5 11.5 5.5Z" />
               </svg>
             </SmallButton>
           )}

@@ -1,32 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { UniswapEasy } from "uniswapeasy";
+import { useEffect, useRef, useState } from "react";
+import { UniswapEasy, orangeDark, defaultTheme } from "uniswapeasy";
 import { useActiveProvider } from "./connectors";
-import { JSON_RPC_URL } from "./constants";
 import Web3Connectors from "./components/Web3Connectors";
-import { Token } from "@uniswap/sdk-core";
 import { currencyIconMap, hookInfos, poolKeys } from "./constants/lp";
-
-const ThemeNames = [
-  "tealDark",
-  "tealLight",
-  "orangeDark",
-  "orangeLight",
-] as const;
 const App = () => {
+  const [theme, setTheme] = useState(defaultTheme);
+
+  const onPrimaryTextChange = (text: string) => {
+    setTheme((prev) => ({
+      ...prev,
+      text: {
+        ...prev.text,
+        primary: text,
+      },
+    }));
+  };
+
   const connectors = useRef<HTMLDivElement>(null);
-  const focusConnectors = useCallback(() => connectors.current?.focus(), []);
-  const [themeName, setThemeName] = useState<
-    "tealDark" | "tealLight" | "orangeDark" | "orangeLight"
-  >("tealDark");
-  useEffect(() => {
-    const body = document.querySelector("body");
-    if (body) {
-      body.style.backgroundColor =
-        themeName == "tealDark" || themeName == "orangeDark"
-          ? "black"
-          : "white";
-    }
-  }, [themeName]);
 
   const provider = useActiveProvider();
   return (
@@ -50,19 +40,7 @@ const App = () => {
           flexWrap: "wrap",
         }}
       >
-        {ThemeNames.map((themeName) => (
-          <button
-            key={themeName}
-            style={{
-              padding: "1rem",
-              borderRadius: "1em",
-              cursor: "pointer",
-            }}
-            onClick={() => setThemeName(themeName)}
-          >
-            {themeName}
-          </button>
-        ))}
+        <input onChange={(e) => onPrimaryTextChange(e.target.value)} />
       </div>
       <div
         style={{
@@ -74,20 +52,9 @@ const App = () => {
       >
         <Web3Connectors />
       </div>
-      {/* <button
-        style={{
-          padding: "1rem",
-          borderRadius: "1em",
-          cursor: "pointer",
-        }}
-        onClick={focusConnectors}
-      >
-        Connect Wallet
-      </button> */}
       <UniswapEasy
-        theme={themeName}
+        theme={{ ...theme, font: { family: "'Times New Roman', serif" } }}
         defaultChainId={1}
-        jsonRpcUrlMap={{}}
         provider={provider}
         poolInfos={poolKeys}
         hookInfos={hookInfos}

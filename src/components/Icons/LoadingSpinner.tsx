@@ -1,5 +1,3 @@
-import { useTheme } from "styled-components";
-
 import { StyledRotatingSVG } from "./shared";
 
 /**
@@ -19,14 +17,13 @@ export default function Loader({
   strokeWidth?: number;
   [k: string]: any;
 }) {
-  const theme = useTheme();
   return (
     <StyledRotatingSVG
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       $size={size}
-      stroke={stroke ?? theme.text.primary}
+      stroke={stroke}
       {...rest}
     >
       <path
