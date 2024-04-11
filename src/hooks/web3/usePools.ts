@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PoolKeyStruct } from "../../abis/types/PoolManager";
 import { type BigNumberish } from "ethers";
 import { Pool } from "../../entities/pool";
-import { useTestnetContract } from "../../hooks/web3/useContract";
+import { usePoolManagerContract } from "../../hooks/web3/useContract";
 import { keccak256, defaultAbiCoder, Result } from "ethers/lib/utils";
 import { usePoolData } from "./usePoolData";
 import useBlockNumber from "./useBlockNumber";
@@ -134,7 +134,7 @@ export function usePool(
     return toId(poolKey);
   }, [poolKey, chainId]);
 
-  const poolManagerContract = useTestnetContract();
+  const poolManagerContract = usePoolManagerContract();
   const latestBlock = useBlockNumber();
   const { slot0, liquidity } = usePoolData(
     latestBlock,

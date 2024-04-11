@@ -126,8 +126,82 @@ export function isSupportedChainId(
   chainId: number | undefined
 ): chainId is SupportedChainId {
   if (!chainId) return false;
-  return ALL_SUPPORTED_CHAIN_IDS.includes(chainId as SupportedChainId);
+  //TODO: Remove this once contracts are deployed on other chains
+  return chainId === 11155111;
+  // return ALL_SUPPORTED_CHAIN_IDS.includes(chainId as SupportedChainId);
 }
+
+export const poolContractMap: {
+  [key in SupportedChainId]: {
+    poolManager: string;
+    poolModifyLiquidity: string;
+  };
+} = {
+  [SupportedChainId.ETHEREUM_SEPOLIA]: {
+    poolManager: "0xf7a031A182aFB3061881156df520FE7912A51617",
+    poolModifyLiquidity: "0x140C64C63c52cE05138E21564b72b0B2Dff9B67f",
+  },
+  [SupportedChainId.MAINNET]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.ROPSTEN]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.RINKEBY]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.GOERLI]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.KOVAN]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.ARBITRUM_ONE]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.ARBITRUM_RINKEBY]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.OPTIMISM]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.OPTIMISM_GOERLI]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.POLYGON]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.POLYGON_MUMBAI]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.CELO]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.CELO_ALFAJORES]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.BNB]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+  [SupportedChainId.BASE]: {
+    poolManager: "",
+    poolModifyLiquidity: "",
+  },
+};
 
 export const explorerMap: { [key in SupportedChainId]: string } = {
   [SupportedChainId.MAINNET]: "https://etherscan.io",

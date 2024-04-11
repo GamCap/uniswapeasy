@@ -1,5 +1,5 @@
 import { SupportedChainId } from "./chains";
-import { StaticJsonRpcProvider } from "@ethersproject/providers";
+// import { StaticJsonRpcProvider } from "@ethersproject/providers";
 
 /**
  * Fallback JSON RPC endpoints.
@@ -107,12 +107,12 @@ export const JSON_RPC_FALLBACK_ENDPOINTS: Record<SupportedChainId, string[]> = {
 };
 //map every supported chain id to StaticJsonRpcProvider instance (first endpoint in the array is used as the provider URL)
 // type should be Record<SupportedChainId, StaticJsonRpcProvider>
-export const JSON_RPC_FALLBACK_PROVIDERS: Record<
-  SupportedChainId,
-  StaticJsonRpcProvider
-> = Object.fromEntries(
-  Object.entries(JSON_RPC_FALLBACK_ENDPOINTS).map(([chainId, endpoints]) => [
-    Number(chainId) as SupportedChainId,
-    new StaticJsonRpcProvider(endpoints[0]),
-  ])
-) as Record<SupportedChainId, StaticJsonRpcProvider>;
+// export const JSON_RPC_FALLBACK_PROVIDERS: Record<
+//   SupportedChainId,
+//   StaticJsonRpcProvider
+// > = Object.fromEntries(
+//   Object.entries(JSON_RPC_FALLBACK_ENDPOINTS).map(([chainId, endpoints]) => [
+//     Number(chainId) as SupportedChainId,
+//     new StaticJsonRpcProvider(endpoints[0]),
+//   ])
+// ) as Record<SupportedChainId, StaticJsonRpcProvider>;

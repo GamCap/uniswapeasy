@@ -1,6 +1,6 @@
 import { ChainId } from "@uniswap/sdk-core";
 import { useWeb3React } from "@web3-react/core";
-import { JSON_RPC_FALLBACK_PROVIDERS } from "../../constants/jsonRpcEndpoints";
+// import { JSON_RPC_FALLBACK_PROVIDERS } from "../../constants/jsonRpcEndpoints";
 import useIsWindowVisible from "../useIsWindowVisible";
 import {
   PropsWithChildren,
@@ -95,7 +95,7 @@ export function BlockNumberProvider({ children }: PropsWithChildren) {
     return;
   }, [activeChainId, provider, windowVisible, onChainBlock]);
 
-  // Poll once for the mainnet block number using the network provider.
+  //TODO: Poll for block number using json rpc provider initially
   useEffect(() => {
     if (!provider || !activeChainId) {
       return;

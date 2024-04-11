@@ -7,8 +7,6 @@ import {
 } from "../../state/v4/hooks";
 import { useWeb3React } from "@web3-react/core";
 import { BigNumber } from "ethers";
-import usePoolManager from "../../hooks/web3/usePoolManager";
-import usePoolModifyLiquidity from "../../hooks/web3/usePoolModifiyPosition";
 import { Bound, Field } from "../../state/v4/actions";
 import LiquidityChartRangeInput from "../LiquidityChartRangeInput";
 import Column from "components/Column";
@@ -35,6 +33,11 @@ import {
   sendModifyLiquidityTransaction,
   approveAndSendTransaction,
 } from "./utils";
+import {
+  usePoolManagerContract,
+  usePoolModifyLiquidityContract,
+} from "hooks/web3/useContract";
+import { isSupportedChainId } from "constants/chains";
 
 interface BodyWrapperProps {
   $maxWidth?: string;
@@ -178,7 +181,7 @@ export type LPWidgetProps = {
 
 function LPWidgetWrapper(props: LPWidgetProps) {
   const { chainId } = useWeb3React();
-  if (!chainId || chainId !== 11155111)
+  if (!isSupportedChainId(chainId))
     return (
       <ThemedText.MediumHeader textColor="text.primary">
         Unsupported Chain
@@ -246,7 +249,7 @@ const LPWidget = memo(function ({
     //existingPosition
   );
 
-  const { poolModifyLiquidity } = usePoolModifyLiquidity();
+  const poolModifyLiquidity = usePoolModifyLiquidityContract();
 
   const {
     onFieldAInput,
@@ -258,7 +261,7 @@ const LPWidget = memo(function ({
 
   const isValid = !errorMessage && !invalidRange;
 
-  const { poolManager } = usePoolManager();
+  const poolManager = usePoolManagerContract();
 
   //TODO: transaction approval callbacks
   const c0contract = useTokenContract(
