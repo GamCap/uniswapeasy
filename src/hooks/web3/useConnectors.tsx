@@ -11,8 +11,8 @@ import { WalletConnectQR } from "utils/WalletConnect";
 export interface Connectors {
   user: EIP1193 | JsonRpcConnector | undefined;
   metaMask: MetaMask;
-  // walletConnect: WalletConnect;
-  // walletConnectQR: WalletConnectQR;
+  walletConnect: WalletConnect;
+  walletConnectQR: WalletConnectQR;
   network: Network;
 }
 
