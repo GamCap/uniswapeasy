@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import {
   PoolKey,
   useRangeHopCallbacks,
@@ -180,7 +180,13 @@ export type LPWidgetProps = {
 };
 
 function LPWidgetWrapper(props: LPWidgetProps) {
-  const { chainId } = useWeb3React();
+  const { chainId, provider } = useWeb3React();
+  if (!provider || !chainId)
+    return (
+      <ThemedText.MediumHeader textColor="text.primary">
+        Connect Wallet
+      </ThemedText.MediumHeader>
+    );
   if (!isSupportedChainId(chainId))
     return (
       <ThemedText.MediumHeader textColor="text.primary">

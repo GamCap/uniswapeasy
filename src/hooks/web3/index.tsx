@@ -32,8 +32,8 @@ type Web3ReactConnector<T extends Connector = Connector> = [T, Web3ReactHooks];
 interface Web3ReactConnectors {
   user: Web3ReactConnector<EIP1193 | JsonRpcConnector> | undefined;
   metaMask: Web3ReactConnector<MetaMask>;
-  // walletConnect: Web3ReactConnector<WalletConnect>;
-  // walletConnectQR: Web3ReactConnector<WalletConnectQR>;
+  walletConnect: Web3ReactConnector<WalletConnect>;
+  walletConnectQR: Web3ReactConnector<WalletConnectQR>;
   network: Web3ReactConnector<Network>;
 }
 
@@ -96,8 +96,8 @@ export function Provider({
     const prioritizedConnectors: (Web3ReactConnector | null | undefined)[] = [
       web3ReactConnectors.user,
       web3ReactConnectors.metaMask,
-      // web3ReactConnectors.walletConnect,
-      // web3ReactConnectors.walletConnectQR,
+      web3ReactConnectors.walletConnect,
+      web3ReactConnectors.walletConnectQR,
       web3ReactConnectors.network,
     ];
     return prioritizedConnectors.filter(
@@ -109,8 +109,8 @@ export function Provider({
     () => ({
       user: web3ReactConnectors.user?.[0],
       metaMask: web3ReactConnectors.metaMask[0],
-      // walletConnect: web3ReactConnectors.walletConnect[0],
-      // walletConnectQR: web3ReactConnectors.walletConnectQR[0],
+      walletConnect: web3ReactConnectors.walletConnect[0],
+      walletConnectQR: web3ReactConnectors.walletConnectQR[0],
       network: web3ReactConnectors.network[0],
     }),
     [web3ReactConnectors]
@@ -123,9 +123,7 @@ export function Provider({
       connectors.user.activate().catch(() => undefined);
       return;
     } else if (shouldEagerlyConnect) {
-      const eagerConnectors = [
-        connectors.metaMask /* connectors.walletConnect*/,
-      ];
+      const eagerConnectors = [connectors.metaMask, connectors.walletConnect];
       eagerConnectors.forEach((connector) =>
         connector.connectEagerly().catch(() => undefined)
       );
@@ -133,9 +131,9 @@ export function Provider({
     connectors.network.activate().catch(() => undefined);
   }, [
     connectors.metaMask,
-    connectors.network,
     connectors.user,
-    // connectors.walletConnect,
+    connectors.walletConnect,
+    connectors.network,
     shouldEagerlyConnect,
   ]);
 
@@ -255,6 +253,7 @@ function useWeb3ReactConnectors({
       }),
     [defaultChainId, walletConnectDefaultOptions]
   );
+
   const network = useMemo(
     () =>
       initializeWeb3ReactConnector(Network, {
@@ -268,8 +267,8 @@ function useWeb3ReactConnectors({
     () => ({
       user,
       metaMask,
-      // walletConnect,
-      // walletConnectQR,
+      walletConnect,
+      walletConnectQR,
       network,
     }),
     [metaMask, network, user, walletConnect, walletConnectQR]

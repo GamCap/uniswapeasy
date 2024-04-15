@@ -1,28 +1,52 @@
-import { useEffect, useRef, useState } from "react";
-import { UniswapEasy, orangeDark, defaultTheme, PoolKey } from "uniswapeasy";
-import { useActiveProvider } from "./connectors";
-import Web3Connectors from "./components/Web3Connectors";
+import { useState } from "react";
+import { UniswapEasy, defaultTheme, PoolKey } from "uniswapeasy";
 import { currencyIconMap, hookInfos, poolKeys } from "./constants/lp";
+
+import {
+  createWeb3Modal,
+  defaultConfig,
+  useWeb3ModalProvider,
+} from "@web3modal/ethers5/react";
+import { Web3Provider } from "@ethersproject/providers";
+
+const projectId = "c6c9bacd35afa3eb9e6cccf6d8464395";
+
+const sepolia = {
+  chainId: 11155111,
+  name: "Ethereum Sepolia",
+  currency: "ETH",
+  explorerUrl: "https://sepolia.etherscan.io",
+  rpcUrl: "https://sepolia.drpc.org",
+};
+
+const metadata = {
+  name: "UniswapEasy",
+  description: "UniswapEasy Widget Builder",
+  url: "https://mywebsite.com",
+  icons: ["https://avatars.mywebsite.com/"],
+};
+
+const ethersConfig = defaultConfig({
+  metadata,
+});
+
+createWeb3Modal({
+  ethersConfig,
+  chains: [sepolia],
+  projectId,
+  enableAnalytics: false,
+});
+
 const App = () => {
   const [theme, setTheme] = useState(defaultTheme);
   const [hookData, setHookData] = useState("");
-  const onPrimaryTextChange = (text: string) => {
-    setTheme((prev) => ({
-      ...prev,
-      text: {
-        ...prev.text,
-        primary: text,
-      },
-    }));
-  };
 
   const onPoolSelect = (poolKey: PoolKey) => {
     console.log("Selected pool");
   };
 
-  const connectors = useRef<HTMLDivElement>(null);
+  const { walletProvider } = useWeb3ModalProvider();
 
-  const provider = useActiveProvider();
   return (
     <div
       style={{
@@ -44,23 +68,12 @@ const App = () => {
           flexWrap: "wrap",
         }}
       >
-        <input onChange={(e) => onPrimaryTextChange(e.target.value)} />
         <input onChange={(e) => setHookData(e.target.value)} />
       </div>
-      <div
-        style={{
-          alignSelf: "center",
-          borderRadius: "1em",
-        }}
-        ref={connectors}
-        tabIndex={-1}
-      >
-        <Web3Connectors />
-      </div>
+      <w3m-button />
       <UniswapEasy
-        theme={{ ...theme, font: { family: "'Times New Roman', serif" } }}
-        defaultChainId={1}
-        provider={provider}
+        theme={{ ...theme }}
+        provider={walletProvider ? new Web3Provider(walletProvider) : undefined}
         poolInfos={poolKeys}
         hookInfos={hookInfos}
         onPoolSelect={onPoolSelect}
