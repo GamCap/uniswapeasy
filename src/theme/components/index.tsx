@@ -133,13 +133,10 @@ export const Section = styled.div<{ $padding?: string; $disabled?: boolean }>`
   flex-direction: column;
   align-items: flex-start;
   align-self: stretch;
-  gap: 12px;
+  gap: 24px;
   border: 1px solid ${({ theme }) => theme.borders.borders};
   border-radius: 24px;
   padding: ${({ $padding }) => $padding ?? "0"};
   background: ${({ theme }) => theme.surfacesAndElevation.elevation1};
   opacity: ${({ $disabled: disabled }) => (disabled ? 0.5 : 1)};
-  @media (mix-width: 768px) {
-    gap: 24px;
-  }
 `;
