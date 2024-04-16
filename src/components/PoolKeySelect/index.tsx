@@ -72,7 +72,10 @@ const BadgeWrapper = styled.div`
 const CurrencyPair = styled.span`
   width: 100%;
   pointer: cursor;
-  display: inline-flex;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
   gap: 8px;
   align-items: center;
 `;
