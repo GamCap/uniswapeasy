@@ -188,7 +188,7 @@ export default function LiquidityChartRangeInput({
             alignItems: "center",
             justifyContent: "center",
             width: "100%",
-            padding: "0 24px",
+            padding: "0 32px",
             boxSizing: "border-box",
             height: "fit-content",
           }}
