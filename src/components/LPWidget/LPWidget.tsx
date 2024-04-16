@@ -38,6 +38,7 @@ import {
   usePoolModifyLiquidityContract,
 } from "hooks/web3/useContract";
 import { isSupportedChainId } from "constants/chains";
+import { Button } from "components/Button";
 
 interface BodyWrapperProps {
   $maxWidth?: string;
@@ -318,6 +319,21 @@ const LPWidget = memo(function ({
       parsedAmount1: parsedAmounts[Field.CURRENCY_1],
     };
   }
+
+  const isValidValues = useMemo(() => {
+    console.log("selectedHook", selectedHook);
+    console.log("values", values);
+    if (!selectedHook || selectedHook.overrideInputFields) return true;
+    const checkValues = (values: any): boolean => {
+      if (values === undefined || values === null) return false;
+      if (typeof values === "object") {
+        return Object.values(values).every((v) => checkValues(v));
+      }
+      if (values === "") return false;
+      return true;
+    };
+    return checkValues(values);
+  }, [selectedHook, values]);
 
   const getHookData = useCallback(() => {
     if (!selectedHook) return "0x";
@@ -807,99 +823,102 @@ const LPWidget = memo(function ({
                   title="Price Range"
                   info="Placeholder Price Range Info"
                 />
-                <LiquidityChartRangeInput
-                  currencyA={currencies.CURRENCY_0}
-                  currencyB={currencies.CURRENCY_1}
-                  feeAmount={
-                    pool?.fee
-                      ? BigNumber.from(pool?.fee.toString() ?? "0")
-                      : undefined
-                  }
-                  tickSpacing={
-                    pool?.tickSpacing
-                      ? BigNumber.from(pool?.tickSpacing.toString() ?? "0")
-                      : undefined
-                  }
-                  hooks={pool?.hooks}
-                  price={
-                    price
-                      ? parseFloat(
-                          (invertPrice ? price.invert() : price).toSignificant(
-                            6
+                <Column $gap="md" style={{ width: "100%" }}>
+                  <LiquidityChartRangeInput
+                    currencyA={currencies.CURRENCY_0}
+                    currencyB={currencies.CURRENCY_1}
+                    feeAmount={
+                      pool?.fee
+                        ? BigNumber.from(pool?.fee.toString() ?? "0")
+                        : undefined
+                    }
+                    tickSpacing={
+                      pool?.tickSpacing
+                        ? BigNumber.from(pool?.tickSpacing.toString() ?? "0")
+                        : undefined
+                    }
+                    hooks={pool?.hooks}
+                    price={
+                      price
+                        ? parseFloat(
+                            (invertPrice
+                              ? price.invert()
+                              : price
+                            ).toSignificant(6)
                           )
-                        )
-                      : undefined
-                  }
-                  formattedPrice={formattedPrice}
-                  priceLower={priceLower}
-                  priceUpper={priceUpper}
-                  ticksAtLimit={ticksAtLimit}
-                  onLeftRangeInput={onLeftRangeInput}
-                  onRightRangeInput={onRightRangeInput}
-                  interactive={true}
-                />
+                        : undefined
+                    }
+                    formattedPrice={formattedPrice}
+                    priceLower={priceLower}
+                    priceUpper={priceUpper}
+                    ticksAtLimit={ticksAtLimit}
+                    onLeftRangeInput={onLeftRangeInput}
+                    onRightRangeInput={onRightRangeInput}
+                    interactive={true}
+                  />
 
-                {/* Price Range Component (Manual) */}
-                <PriceRangeManual
-                  priceLower={priceLower}
-                  priceUpper={priceUpper}
-                  getDecrementLower={getDecrementLower}
-                  getIncrementLower={getIncrementLower}
-                  getDecrementUpper={getDecrementUpper}
-                  getIncrementUpper={getIncrementUpper}
-                  onLeftRangeInput={onLeftRangeInput}
-                  onRightRangeInput={onRightRangeInput}
-                  currencyA={currencies.CURRENCY_0}
-                  currencyB={currencies.CURRENCY_1}
-                  feeAmount={
-                    pool?.fee
-                      ? BigNumber.from(pool?.fee.toString() ?? "0")
-                      : undefined
-                  }
-                  ticksAtLimit={ticksAtLimit}
-                  disabled={!poolKey || invalidPool}
-                />
-                {outOfRange && (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "100%",
-                      padding: "0 24px",
-                      boxSizing: "border-box",
-                      height: "fit-content",
-                    }}
-                  >
-                    <BoxSecondary $radius="15px" $padding="8px 16px">
-                      <ThemedText.SmallText textColor="text.loss">
-                        Your position will not earn fees or be used in trades
-                        until the market price moves into your range.
-                      </ThemedText.SmallText>
-                    </BoxSecondary>
-                  </div>
-                )}
+                  {/* Price Range Component (Manual) */}
+                  <PriceRangeManual
+                    priceLower={priceLower}
+                    priceUpper={priceUpper}
+                    getDecrementLower={getDecrementLower}
+                    getIncrementLower={getIncrementLower}
+                    getDecrementUpper={getDecrementUpper}
+                    getIncrementUpper={getIncrementUpper}
+                    onLeftRangeInput={onLeftRangeInput}
+                    onRightRangeInput={onRightRangeInput}
+                    currencyA={currencies.CURRENCY_0}
+                    currencyB={currencies.CURRENCY_1}
+                    feeAmount={
+                      pool?.fee
+                        ? BigNumber.from(pool?.fee.toString() ?? "0")
+                        : undefined
+                    }
+                    ticksAtLimit={ticksAtLimit}
+                    disabled={!poolKey || invalidPool}
+                  />
+                  {outOfRange && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "100%",
+                        padding: "0 32px",
+                        boxSizing: "border-box",
+                        height: "fit-content",
+                      }}
+                    >
+                      <BoxSecondary $radius="15px" $padding="8px 16px">
+                        <ThemedText.SmallText textColor="text.loss">
+                          Your position will not earn fees or be used in trades
+                          until the market price moves into your range.
+                        </ThemedText.SmallText>
+                      </BoxSecondary>
+                    </div>
+                  )}
 
-                {invalidRange && (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "100%",
-                      padding: "0 24px",
-                      boxSizing: "border-box",
-                      height: "fit-content",
-                    }}
-                  >
-                    <BoxSecondary $radius="15px" $padding="8px 16px">
-                      <ThemedText.SmallText textColor="text.loss">
-                        Invalid range selected. The min price must be lower than
-                        the max price.
-                      </ThemedText.SmallText>
-                    </BoxSecondary>
-                  </div>
-                )}
+                  {invalidRange && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "100%",
+                        padding: "0 32px",
+                        boxSizing: "border-box",
+                        height: "fit-content",
+                      }}
+                    >
+                      <BoxSecondary $radius="15px" $padding="8px 16px">
+                        <ThemedText.SmallText textColor="text.loss">
+                          Invalid range selected. The min price must be lower
+                          than the max price.
+                        </ThemedText.SmallText>
+                      </BoxSecondary>
+                    </div>
+                  )}
+                </Column>
               </Section>
               {/* Deposit Amounts */}
               <Section $padding="0 0 24px" $disabled={!poolKey || invalidPool}>
@@ -912,6 +931,7 @@ const LPWidget = memo(function ({
                         justifyContent: "center",
                         alignItems: "center",
                         gap: "2px",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       <ThemedText.ParagraphExtraSmall textColor="text.primary">
@@ -966,7 +986,7 @@ const LPWidget = memo(function ({
                 <Column
                   $gap="lgplus"
                   style={{
-                    padding: "0 24px",
+                    padding: "0 32px",
                     width: "100%",
                     boxSizing: "border-box",
                   }}
@@ -1027,8 +1047,9 @@ const LPWidget = memo(function ({
                 </Section>
               )}
               {/*Placeholder Buttons */}
-              <Section $disabled={!poolKey || invalidPool}>
-                <StyledButton
+              <Section $disabled={!poolKey || invalidPool} $padding="20px 32px">
+                <Button
+                  type="primary"
                   onClick={onAdd}
                   disabled={
                     !isValid ||
@@ -1040,19 +1061,19 @@ const LPWidget = memo(function ({
                     !chainId ||
                     !position ||
                     transactionStatus === "inProgress" ||
-                    transactionStatus === "approve"
+                    transactionStatus === "approve" ||
+                    !isValidValues
                   }
-                  style={{
-                    backgroundColor: "transparent",
-                    width: "100%",
-                    borderRadius: "1000px",
-                    padding: "12px",
-                  }}
-                >
-                  <ThemedText.ParagraphRegular textColor="text.primary">
-                    Add Liquidity
-                  </ThemedText.ParagraphRegular>
-                </StyledButton>
+                  buttonSize="medium"
+                  label={
+                    !isValid
+                      ? errorMessage
+                      : !isValidValues
+                      ? "Invalid feature values"
+                      : "Add liquidity"
+                  }
+                  width="100%"
+                />
               </Section>
             </ContentColumn>
           </Column>

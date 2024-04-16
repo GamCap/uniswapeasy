@@ -27,7 +27,7 @@ const DynamicFeatureForm: React.FC<DynamicFeatureFormProps> = ({
     <Column
       $gap="xl"
       style={{
-        padding: "0 24px",
+        padding: "0 32px",
         width: "100%",
         boxSizing: "border-box",
       }}

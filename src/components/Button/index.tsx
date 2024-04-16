@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from "react";
+import React, { CSSProperties, HTMLAttributes, HTMLProps } from "react";
 import { styled } from "styled-components";
 import { Colors } from "../../theme/theme";
 
@@ -6,9 +6,9 @@ type ButtonType = keyof Colors["components"]["button"];
 
 type ButtonSize = "xsmall" | "small" | "medium";
 
-interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<HTMLProps<HTMLButtonElement>, "ref"> {
   type: ButtonType;
-  size: ButtonSize;
+  buttonSize: ButtonSize;
   label?: string;
   icononly?: boolean;
   leadingicon?: JSX.Element;
@@ -17,11 +17,19 @@ interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
 
 interface StyledButtonProps {
   type: ButtonType;
-  size: ButtonSize;
+  buttonSize: ButtonSize;
   icononly: boolean;
 }
 
-const ButtonStyled = styled.button<StyledButtonProps>`
+interface ButtonStyledProps extends StyledButtonProps, CSSProperties {}
+
+const ButtonStyled = styled.button.attrs<ButtonStyledProps>(
+  ({ type, buttonSize, icononly, ...rest }) => ({
+    style: {
+      ...rest,
+    },
+  })
+)<StyledButtonProps>`
   background-color: ${({ theme, type }) =>
     type === "ghost"
       ? "transparent"
@@ -31,11 +39,12 @@ const ButtonStyled = styled.button<StyledButtonProps>`
       ? theme.components.button[type].background
       : theme.components.button[type].foreground};
   border: ${({ theme, type }) =>
-    type === "secondary" &&
-    `1px solid ${theme.components.button[type].border}`};
+    type === "secondary"
+      ? `1px solid ${theme.components.button[type].border}`
+      : "none"};
   border-radius: 1000px;
-  padding: ${({ size, icononly }) => {
-    switch (size) {
+  padding: ${({ buttonSize, icononly }) => {
+    switch (buttonSize) {
       case "medium":
         return icononly ? "12px" : "12px 16px";
       case "small":
@@ -81,8 +90,8 @@ const ButtonStyled = styled.button<StyledButtonProps>`
     cursor: not-allowed;
   }
 
-  font-size: ${({ size }) => {
-    switch (size) {
+  font-size: ${({ buttonSize }) => {
+    switch (buttonSize) {
       case "medium":
         return "16px";
       case "small":
@@ -91,8 +100,8 @@ const ButtonStyled = styled.button<StyledButtonProps>`
     }
   }};
 
-  font-weight: ${({ size }) => {
-    switch (size) {
+  font-weight: ${({ buttonSize }) => {
+    switch (buttonSize) {
       case "medium":
         return "600";
       case "small":
@@ -101,8 +110,8 @@ const ButtonStyled = styled.button<StyledButtonProps>`
     }
   }};
 
-  line-height: ${({ size }) => {
-    switch (size) {
+  line-height: ${({ buttonSize }) => {
+    switch (buttonSize) {
       case "medium":
         return "24px";
       case "small":
@@ -111,9 +120,13 @@ const ButtonStyled = styled.button<StyledButtonProps>`
     }
   }};
 
+  p {
+    margin: 0;
+  }
+
   svg {
-    width: ${({ size }) => {
-      switch (size) {
+    width: ${({ buttonSize }) => {
+      switch (buttonSize) {
         case "medium":
           return "20px";
         case "small":
@@ -122,8 +135,8 @@ const ButtonStyled = styled.button<StyledButtonProps>`
           return "12px";
       }
     }};
-    height: ${({ size }) => {
-      switch (size) {
+    height: ${({ buttonSize }) => {
+      switch (buttonSize) {
         case "medium":
           return "20px";
         case "small":
@@ -137,7 +150,7 @@ const ButtonStyled = styled.button<StyledButtonProps>`
 
 export function Button({
   type,
-  size,
+  buttonSize,
   label,
   icononly = false,
   leadingicon,
@@ -145,9 +158,14 @@ export function Button({
   ...rest
 }: ButtonProps) {
   return (
-    <ButtonStyled type={type} size={size} icononly={icononly} {...rest}>
+    <ButtonStyled
+      type={type}
+      buttonSize={buttonSize}
+      icononly={icononly}
+      {...rest}
+    >
       {leadingicon}
-      {label}
+      {label && <p>{label}</p>}
       {trailingicon}
     </ButtonStyled>
   );

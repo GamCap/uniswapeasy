@@ -52,4 +52,38 @@ function Cross(props: HTMLAttributes<SVGElement>) {
   );
 }
 
-export { Switch, Cross };
+function Plus(props: HTMLAttributes<SVGElement>) {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      style={{ pointerEvents: "none" }}
+      {...props}
+    >
+      <path
+        d="M11.5 5.5H6.5V0.5C6.5 0.224 6.276 0 6 0C5.724 0 5.5 0.224 5.5 0.5V5.5H0.5C0.224 5.5 0 5.724 0 6C0 6.276 0.224 6.5 0.5 6.5H5.5V11.5C5.5 11.776 5.724 12 6 12C6.276 12 6.5 11.776 6.5 11.5V6.5H11.5C11.776 6.5 12 6.276 12 6C12 5.724 11.776 5.5 11.5 5.5Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function Minus(props: HTMLAttributes<SVGElement>) {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      style={{ pointerEvents: "none" }}
+      {...props}
+    >
+      <path
+        d="M11.5 5.5H0.5C0.224 5.5 0 5.724 0 6C0 6.276 0.224 6.5 0.5 6.5H11.5C11.776 6.5 12 6.276 12 6C12 5.724 11.776 5.5 11.5 5.5Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export { Switch, Cross, Plus, Minus };

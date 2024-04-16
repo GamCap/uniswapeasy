@@ -29,7 +29,7 @@ const LogoWrapper = styled.div`
 `;
 
 const Badge = styled.a<{ $error?: boolean }>`
-  pointer: cursor;
+  cursor: pointer;
   width: fit-content;
   display: flex;
   flex-direction: row;
@@ -71,7 +71,7 @@ const BadgeWrapper = styled.div`
 
 const CurrencyPair = styled.span`
   width: 100%;
-  pointer: cursor;
+  cursor: pointer;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -311,7 +311,7 @@ function PoolKeySelect({
       {!selectedPoolKey && (
         <Row $gap="md">
           <Button
-            size="medium"
+            buttonSize="medium"
             type="primary"
             label="Select a pool"
             onClick={() => setIsOpen(true)}
@@ -373,17 +373,19 @@ function PoolKeySelect({
         <>
           <DesktopOnly>
             <Button
-              size="small"
+              buttonSize="small"
               type="secondary"
               leadingicon={<Switch />}
               label="Change"
+              onClick={() => setIsOpen(true)}
             />
           </DesktopOnly>
           <MobileOnly>
             <Button
-              size="small"
+              buttonSize="small"
               type="secondary"
               leadingicon={<Switch />}
+              onClick={() => setIsOpen(true)}
               icononly
             />
           </MobileOnly>

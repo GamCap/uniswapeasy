@@ -114,7 +114,7 @@ const Modal: React.FC<ModalProps> = ({
               {title}
             </ThemedText.ParagraphRegular>
             <Button
-              size="small"
+              buttonSize="small"
               type="ghost"
               onClick={onClose}
               leadingicon={<Cross />}
