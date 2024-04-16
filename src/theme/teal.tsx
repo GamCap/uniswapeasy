@@ -31,19 +31,19 @@ export const tealLight: Colors = {
       primary: {
         background: "#12131A",
         foreground: "#FFFFFF",
-        // hoverAndFocusBackground: "#181B24",
-        // hoverAndFocusForeground: "#FFFFFF",
-        // disabledBackground: "#F3F4F6",
-        // disabledForeground: "#D1D5DB",
+        hoverAndFocusBackground: "#181B24",
+        hoverAndFocusForeground: "#FFFFFF",
+        disabledBackground: "#F3F4F6",
+        disabledForeground: "#D1D5DB",
       },
       secondary: {
         foreground: "#4B5563",
-        // hoverAndFocusBackground: "#F3F4F6",
-        // hoverAndFocusForeground: "#4B5563",
-        // disabledBorder: "#E5E7EB",
-        // disabledForeground: "#D1D5DB",
+        hoverAndFocusBackground: "#F3F4F6",
+        hoverAndFocusForeground: "#4B5563",
+        disabledBorder: "#E5E7EB",
+        disabledForeground: "#D1D5DB",
         border: "#D1D5DB",
-        // hoverAndFocusBorder: "#E5E7EB",
+        hoverAndFocusBorder: "#E5E7EB",
         background: "#F9FAFB",
       },
       // tertiary: {
@@ -54,12 +54,12 @@ export const tealLight: Colors = {
       //   foreground: "#4B5563",
       //   hoverAndFocusForeground: "#4B5563",
       // },
-      // ghost: {
-      //   background: "#4B5563",
-      //   hoverAndFocusBackground: "#F3F4F6",
-      //   hoverAndFocusForeground: "#4B5563",
-      //   disabledBackground: "#D1D5DB",
-      // },
+      ghost: {
+        background: "#4B5563",
+        hoverAndFocusBackground: "#F3F4F6",
+        hoverAndFocusForeground: "#4B5563",
+        disabledBackground: "#D1D5DB",
+      },
       // alert: {
       //   background: "#EB1717",
       //   foreground: "#FFF1F1",
@@ -69,9 +69,9 @@ export const tealLight: Colors = {
       //   disabledBackground: "#F3F4F6",
       // },
     },
-    // focusRing: {
-    //   focusRing: "#AFEBF2",
-    // },
+    focusRing: {
+      focusRing: "#AFEBF2",
+    },
     badge: {
       // primaryBackground: "#64D5E4",
       // primaryForefround: "#FFFFFF",
@@ -240,19 +240,19 @@ export const tealDark: Colors = {
       primary: {
         background: "#F3F4F6",
         foreground: "#12131A",
-        // hoverAndFocusBackground: "#FFFFFF",
-        // hoverAndFocusForeground: "#12131A",
-        // disabledBackground: "#273345",
-        // disabledForeground: "#6B7280",
+        hoverAndFocusBackground: "#FFFFFF",
+        hoverAndFocusForeground: "#12131A",
+        disabledBackground: "#273345",
+        disabledForeground: "#6B7280",
       },
       secondary: {
         foreground: "#D1D5DB",
-        // hoverAndFocusBackground: "#273345",
-        // hoverAndFocusForeground: "#D1D5DB",
-        // disabledBorder: "#273345",
-        // disabledForeground: "#4B5563",
+        hoverAndFocusBackground: "#273345",
+        hoverAndFocusForeground: "#D1D5DB",
+        disabledBorder: "#273345",
+        disabledForeground: "#4B5563",
         border: "#273345",
-        // hoverAndFocusBorder: "#273345",
+        hoverAndFocusBorder: "#273345",
         background: "#181B24",
       },
       // tertiary: {
@@ -263,12 +263,12 @@ export const tealDark: Colors = {
       //   foreground: "#D1D5DB",
       //   hoverAndFocusForeground: "#D1D5DB",
       // },
-      // ghost: {
-      //   background: "#D1D5DB",
-      //   hoverAndFocusBackground: "#273345",
-      //   hoverAndFocusForeground: "#D1D5DB",
-      //   disabledBackground: "#6B7280",
-      // },
+      ghost: {
+        background: "#D1D5DB",
+        hoverAndFocusBackground: "#273345",
+        hoverAndFocusForeground: "#D1D5DB",
+        disabledBackground: "#6B7280",
+      },
       // alert: {
       //   background: "#A31111",
       //   foreground: "#FFE0E0",
@@ -278,9 +278,9 @@ export const tealDark: Colors = {
       //   disabledBackground: "#273345",
       // },
     },
-    // focusRing: {
-    //   focusRing: "#AFEBF2",
-    // },
+    focusRing: {
+      focusRing: "#AFEBF2",
+    },
     badge: {
       // primaryBackground: "#64D5E4",
       // primaryForefround: "#FFFFFF",

@@ -5,6 +5,8 @@ type TextProps = Omit<TextPropsOriginal, "css">;
 
 interface ThemedTextProps extends TextProps {
   textColor: string;
+  hoverColor?: string;
+  disabledColor?: string;
 }
 
 const getColorFromTheme = (color: string, theme: any) => {
