@@ -4,6 +4,8 @@ import { type BigNumberish } from "ethers";
 import { BoxSecondary, ThemedText } from "../../theme/components";
 import { AutoColumn } from "../Column";
 import { Input as NumericalInput } from "../NumericalInput";
+import { Button } from "components/Button";
+import { Minus, Plus } from "components/Icons";
 
 const InputRow = styled.div`
   display: flex;
@@ -135,28 +137,34 @@ const StepCounter = ({
 
         <AutoColumn $gap="sm">
           {!locked && (
-            <SmallButton
-              data-testid="increment-price-range"
+            // <SmallButton
+            //   data-testid="increment-price-range"
+            //   onClick={handleIncrement}
+            //   disabled={incrementDisabled}
+            // >
+            //   {/* plus icon with size 12px */}
+            //   <svg width="12" height="12" viewBox="0 0 12 12">
+            //     <IconPath d="M11.5 5.5H6.5V0.5C6.5 0.224 6.276 0 6 0C5.724 0 5.5 0.224 5.5 0.5V5.5H0.5C0.224 5.5 0 5.724 0 6C0 6.276 0.224 6.5 0.5 6.5H5.5V11.5C5.5 11.776 5.724 12 6 12C6.276 12 6.5 11.776 6.5 11.5V6.5H11.5C11.776 6.5 12 6.276 12 6C12 5.724 11.776 5.5 11.5 5.5Z" />
+            //   </svg>
+            // </SmallButton>
+            <Button
+              type="secondary"
+              buttonSize="xsmall"
               onClick={handleIncrement}
               disabled={incrementDisabled}
-            >
-              {/* plus icon with size 12px */}
-              <svg width="12" height="12" viewBox="0 0 12 12">
-                <IconPath d="M11.5 5.5H6.5V0.5C6.5 0.224 6.276 0 6 0C5.724 0 5.5 0.224 5.5 0.5V5.5H0.5C0.224 5.5 0 5.724 0 6C0 6.276 0.224 6.5 0.5 6.5H5.5V11.5C5.5 11.776 5.724 12 6 12C6.276 12 6.5 11.776 6.5 11.5V6.5H11.5C11.776 6.5 12 6.276 12 6C12 5.724 11.776 5.5 11.5 5.5Z" />
-              </svg>
-            </SmallButton>
+              leadingicon={<Plus />}
+              icononly
+            />
           )}
           {!locked && (
-            <SmallButton
-              data-testid="decrement-price-range"
+            <Button
+              type="secondary"
+              buttonSize="xsmall"
               onClick={handleDecrement}
               disabled={decrementDisabled}
-            >
-              {/* minus icon with size 12x12px */}
-              <svg width="12" height="12" viewBox="0 0 12 12">
-                <IconPath d="M11.5 5.5H0.5C0.224 5.5 0 5.724 0 6C0 6.276 0.224 6.5 0.5 6.5H11.5C11.776 6.5 12 6.276 12 6C12 5.724 11.776 5.5 11.5 5.5Z" />
-              </svg>
-            </SmallButton>
+              leadingicon={<Minus />}
+              icononly
+            />
           )}
         </AutoColumn>
       </InputRow>

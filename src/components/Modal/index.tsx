@@ -1,3 +1,5 @@
+import { Button } from "components/Button";
+import { Cross } from "components/Icons";
 import { useRef, useEffect } from "react";
 import { styled } from "styled-components";
 import { ThemedText } from "theme/components";
@@ -111,7 +113,13 @@ const Modal: React.FC<ModalProps> = ({
             <ThemedText.ParagraphRegular textColor="text.primary">
               {title}
             </ThemedText.ParagraphRegular>
-            <CloseButton onClick={onClose}>X</CloseButton>
+            <Button
+              buttonSize="small"
+              type="ghost"
+              onClick={onClose}
+              leadingicon={<Cross />}
+              icononly
+            />
           </Header>
         )}
         {children}

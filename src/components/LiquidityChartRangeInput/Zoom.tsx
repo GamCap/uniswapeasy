@@ -30,6 +30,7 @@ const Wrapper = styled.div<{ $count: number }>`
 `;
 
 const Button = styled.button`
+  cursor: pointer;
   border-radius: 1000px;
   width: 16px;
   height: 16px;
@@ -40,6 +41,20 @@ const Button = styled.button`
   background: ${({ theme }) => theme.components.button.secondary.background};
   border: 1px solid ${({ theme }) => theme.components.button.secondary.border};
   color: ${({ theme }) => theme.components.button.secondary.foreground};
+
+  &:hover {
+    background: ${({ theme }) =>
+      theme.components.button.secondary.hoverAndFocusBackground};
+    color: ${({ theme }) =>
+      theme.components.button.secondary.hoverAndFocusForeground};
+    border: 1px solid
+      ${({ theme }) => theme.components.button.secondary.hoverAndFocusBorder};
+  }
+
+  &:focus {
+    ring: 1;
+    ringcolor: ${({ theme }) => theme.components.focusRing.focusRing};
+  }
 `;
 
 export const ZoomOverlay = styled.rect`

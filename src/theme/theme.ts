@@ -50,35 +50,35 @@ export interface Colors {
       primary: {
         background: string;
         foreground: string;
-        // hoverAndFocusBackground: string;
-        // hoverAndFocusForeground: string;
-        // disabledBackground: string;
-        // disabledForeground: string;
+        hoverAndFocusBackground: string;
+        hoverAndFocusForeground: string;
+        disabledBackground: string;
+        disabledForeground: string;
       };
       secondary: {
         foreground: string;
-        // hoverAndFocusBackground: string;
-        // hoverAndFocusForeground: string;
-        // disabledBorder: string;
-        // disabledForeground: string;
+        hoverAndFocusBackground: string;
+        hoverAndFocusForeground: string;
+        disabledBorder: string;
+        disabledForeground: string;
         border: string;
-        // hoverAndFocusBorder: string;
+        hoverAndFocusBorder: string;
         background: string;
       };
       // tertiary: {
       //   background: string;
+      //   foreground: string;
       //   hoverAndFocusBackground: string;
+      //   hoverAndFocusForeground: string;
       //   disabledForeground: string;
       //   disabledBackground: string;
-      //   foreground: string;
-      //   hoverAndFocusForeground: string;
       // };
-      // ghost: {
-      //   background: string;
-      //   hoverAndFocusBackground: string;
-      //   hoverAndFocusForeground: string;
-      //   disabledBackground: string;
-      // };
+      ghost: {
+        background: string;
+        hoverAndFocusBackground: string;
+        hoverAndFocusForeground: string;
+        disabledBackground: string;
+      };
       // alert: {
       //   background: string;
       //   foreground: string;
@@ -88,9 +88,9 @@ export interface Colors {
       //   disabledBackground: string;
       // };
     };
-    // focusRing: {
-    //   focusRing: string;
-    // };
+    focusRing: {
+      focusRing: string;
+    };
     badge: {
       // primaryBackground: string;
       // primaryForefround: string;

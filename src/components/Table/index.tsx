@@ -15,6 +15,7 @@ const StyledTh = styled.th`
 
 const StyledTr = styled.tr`
   border-bottom: 1px solid ${({ theme }) => theme.borders.dividers};
+
   td {
     padding-top: 20px;
     padding-bottom: 20px;

@@ -132,7 +132,7 @@ export function useV4PoolInfo(
   parsedAmounts: { [field in Field]?: CurrencyAmount<Currency> };
   position?: Position;
   noLiquidity?: boolean;
-  errorMessage?: ReactNode;
+  errorMessage?: string;
   invalidPool: boolean;
   outOfRange: boolean;
   invalidRange: boolean;
@@ -593,7 +593,7 @@ export function useV4PoolInfo(
     tickUpper,
   ]);
 
-  let errorMessage: ReactNode | undefined;
+  let errorMessage: string | undefined;
   if (!account) {
     errorMessage = "Connect wallet";
   }

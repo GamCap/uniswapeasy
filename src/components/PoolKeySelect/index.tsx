@@ -8,6 +8,8 @@ import Table from "../Table";
 import { useCurrencyLogo } from "hooks/useCurrencyLogo";
 import { getExplorerLink } from "constants/chains";
 import { useWeb3React } from "@web3-react/core";
+import { Button } from "components/Button";
+import { Switch } from "components/Icons";
 
 const NO_HOOK_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -27,7 +29,7 @@ const LogoWrapper = styled.div`
 `;
 
 const Badge = styled.a<{ $error?: boolean }>`
-  pointer: cursor;
+  cursor: pointer;
   width: fit-content;
   display: flex;
   flex-direction: row;
@@ -59,29 +61,6 @@ const TitleBadge = styled.span<{ $error?: boolean }>`
       : theme.components.badge.neutralBackground};
 `;
 
-const ChangeButton = styled.button`
-  display: flex;
-  padding: 8px 12px;
-  justify-content: center;
-  align-items: center;
-  gap: 2px;
-  border-radius: 1000px;
-  border: ${({ theme }) =>
-    `1px solid ${theme.components.button.secondary.border}`};
-  background: ${({ theme }) => theme.components.button.secondary.background};
-  cursor: pointer;
-`;
-
-const SelectButton = styled.button`
-  display: flex;
-  padding: 12px 16px;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  border-radius: 1000px;
-  background: ${({ theme }) => theme.components.button.primary.background};
-`;
-
 const BadgeWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -92,19 +71,25 @@ const BadgeWrapper = styled.div`
 
 const CurrencyPair = styled.span`
   width: 100%;
-  pointer: cursor;
-  display: inline-flex;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
   gap: 8px;
   align-items: center;
 `;
 
-const ChangeButtonPath = styled.path`
-  stroke: ${({ theme }) => theme.components.icon.icon};
-`;
-
-const MediumOnly = styled.div`
+const DesktopOnly = styled.div`
   @media (max-width: 768px) {
     display: none;
+  }
+`;
+
+const MobileOnly = styled.div`
+  display: none;
+  @media (max-width: 768px) {
+    display: block;
   }
 `;
 
@@ -325,18 +310,12 @@ function PoolKeySelect({
       </Modal>
       {!selectedPoolKey && (
         <Row $gap="md">
-          <SelectButton
-            onClick={() => {
-              setIsOpen(true);
-            }}
-          >
-            <ThemedText.ParagraphRegular
-              textColor="components.button.primary.foreground"
-              fontWeight={600}
-            >
-              Select a pool
-            </ThemedText.ParagraphRegular>
-          </SelectButton>
+          <Button
+            buttonSize="medium"
+            type="primary"
+            label="Select a pool"
+            onClick={() => setIsOpen(true)}
+          />
           <ThemedText.ParagraphRegular textColor="text.primary">
             to begin
           </ThemedText.ParagraphRegular>
@@ -391,41 +370,26 @@ function PoolKeySelect({
       )}
       {/* Change Button */}
       {selectedPoolKey && (
-        <ChangeButton
-          disabled={false}
-          onClick={() => {
-            setIsOpen(true);
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            style={{
-              pointerEvents: "none",
-            }}
-          >
-            <ChangeButtonPath
-              d="M11.2001 2.1333L13.8667 4.79997M13.8667 4.79997L11.2001 7.46663M13.8667 4.79997H2.1333"
-              strokeWidth="0.9"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+        <>
+          <DesktopOnly>
+            <Button
+              buttonSize="small"
+              type="secondary"
+              leadingicon={<Switch />}
+              label="Change"
+              onClick={() => setIsOpen(true)}
             />
-            <ChangeButtonPath
-              d="M2.1333 11.2001L4.79997 8.53345M2.1333 11.2001L4.79997 13.8668M2.1333 11.2001H13.8666"
-              strokeWidth="0.9"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          </DesktopOnly>
+          <MobileOnly>
+            <Button
+              buttonSize="small"
+              type="secondary"
+              leadingicon={<Switch />}
+              onClick={() => setIsOpen(true)}
+              icononly
             />
-          </svg>
-          <MediumOnly>
-            <ThemedText.ParagraphExtraSmall textColor="components.button.secondary.foreground">
-              Change
-            </ThemedText.ParagraphExtraSmall>
-          </MediumOnly>
-        </ChangeButton>
+          </MobileOnly>
+        </>
       )}
     </RowBetween>
   );

@@ -6,6 +6,7 @@ import { useWeb3React } from "@web3-react/core";
 import { supportedChainId } from "utils/supportedChainId";
 import useCurrencyBalance from "hooks/web3/useCurrencyBalances";
 import { useCurrencyLogo } from "hooks/useCurrencyLogo";
+
 const StyledNumericalInput = styled(NumericalInput)<{ $loading: boolean }>`
   background-color: transparent;
   text-align: left;

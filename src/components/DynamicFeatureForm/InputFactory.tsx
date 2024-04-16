@@ -73,7 +73,7 @@ const BigNumberInput = ({
 }) => (
   <RowBetween>
     <Column
-      $gap="md"
+      $gap="sm"
       style={{
         alignItems: "flex-start",
       }}
@@ -115,7 +115,7 @@ const BooleanInput = ({
 }) => (
   <RowBetween>
     <Column
-      $gap="md"
+      $gap="sm"
       style={{
         alignItems: "flex-start",
       }}
@@ -154,7 +154,7 @@ const TextInput = ({
 }) => (
   <RowBetween>
     <Column
-      $gap="md"
+      $gap="sm"
       style={{
         alignItems: "flex-start",
       }}
@@ -169,7 +169,7 @@ const TextInput = ({
     <StyledInput
       type="text"
       name={field.name}
-      value={value}
+      value={value ?? ""}
       pattern={field.restrictions?.pattern}
       required={field.restrictions?.required}
       onChange={(e) => onChange(path, e.target.value)}
@@ -193,7 +193,7 @@ const ByteArrayInput = ({
 }) => (
   <RowBetween>
     <Column
-      $gap="md"
+      $gap="sm"
       style={{
         alignItems: "flex-start",
       }}
@@ -232,7 +232,7 @@ const TupleInput = ({
   disabled?: boolean;
 }) => {
   return (
-    <Column $gap="md">
+    <Column $gap="sm">
       <Row
         $gap="md"
         style={{
