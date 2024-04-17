@@ -1,7 +1,7 @@
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { type BigNumberish } from "ethers";
-import { BoxSecondary, ThemedText } from "../../theme/components";
+import { InputBox, ThemedText } from "../../theme/components";
 import { AutoColumn } from "../Column";
 import { Input as NumericalInput } from "../NumericalInput";
 import { Button } from "components/Button";
@@ -27,23 +27,6 @@ const StyledInput = styled(NumericalInput)<{ $usePercent?: boolean }>`
   font-size: 16px;
   line-height: 24px;
   width: 100%;
-`;
-
-//TODO: replace with an icon button
-const SmallButton = styled.button`
-  border-radius: 100%;
-  background-color: ${({ theme }) =>
-    theme.components.button.secondary.background};
-  border: 1px solid ${({ theme }) => theme.components.button.secondary.border};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 4px;
-  cursor: pointer;
-`;
-
-const IconPath = styled.path`
-  fill: ${({ theme }) => theme.components.button.secondary.foreground};
 `;
 
 interface StepCounterProps {
@@ -106,7 +89,7 @@ const StepCounter = ({
   }, [localValue, useLocalValue, value]);
 
   return (
-    <BoxSecondary
+    <InputBox
       $radius="8px"
       $padding="12px"
       onFocus={handleOnFocus}
@@ -168,7 +151,7 @@ const StepCounter = ({
           )}
         </AutoColumn>
       </InputRow>
-    </BoxSecondary>
+    </InputBox>
   );
 };
 

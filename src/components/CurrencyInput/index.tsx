@@ -1,4 +1,4 @@
-import { BoxSecondary, ThemedText } from "../../theme/components";
+import { InputBox, ThemedText } from "../../theme/components";
 import { Currency } from "@uniswap/sdk-core";
 import { Input as NumericalInput } from "../NumericalInput";
 import { styled } from "styled-components";
@@ -111,7 +111,7 @@ export default function CurrencyInput({
   const chainAllowed = supportedChainId(chainId) !== undefined;
 
   return (
-    <BoxSecondary
+    <InputBox
       id={id}
       $radius="8px"
       $padding="12px"
@@ -166,6 +166,6 @@ export default function CurrencyInput({
           )}
         </CustomContainer>
       </CustomContainer>
-    </BoxSecondary>
+    </InputBox>
   );
 }

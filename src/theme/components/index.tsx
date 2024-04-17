@@ -128,6 +128,11 @@ export const BoxSecondary = styled(Box)`
   background: ${({ theme }) => theme.surfacesAndElevation.elevation2};
 `;
 
+export const InputBox = styled(Box)`
+  background: ${({ theme }) =>
+    theme.components.inputFieldCurrencyField.filledBackground};
+`;
+
 export const Section = styled.div<{ $padding?: string; $disabled?: boolean }>`
   display: flex;
   flex-direction: column;
