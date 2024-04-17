@@ -117,13 +117,13 @@ export interface Colors {
       filledForeground: string;
       // filledBorder: string;
     };
-    // dropdown: {
-    //   background: string;
-    //   foreground: string;
-    //   disabledForeground: string;
-    //   hoverForeground: string;
-    //   hoverBackground: string;
-    // };
+    dropdown: {
+      background: string;
+      foreground: string;
+      // disabledForeground: string;
+      hoverForeground: string;
+      hoverBackground: string;
+    };
     chip: {
       background: string;
       foreground: string;

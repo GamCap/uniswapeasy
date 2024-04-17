@@ -1,3 +1,4 @@
+import { ArrowDown } from "components/Icons";
 import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { ThemedText } from "theme/components";
@@ -69,7 +70,8 @@ const SearchBoxWrapper = styled.div`
   gap: 12px;
   align-items: center;
   justify-content: center;
-  width: 50%;
+  width: 100%;
+  flex: 1 1 auto;
   border-radius: 8px;
   border: 1px solid
     ${({ theme }) => theme.components.inputFieldCurrencyField.border};
@@ -94,14 +96,15 @@ const SearchInput = styled.input`
   font-weight: 500;
   color: ${({ theme }) =>
     theme.components.inputFieldCurrencyField.typeAndActiveForeground};
-  &::placeholder: ${({ theme }) =>
-    theme.components.inputFieldCurrencyField.foreground};
+  &:placeholder: {
+    color: ${({ theme }) =>
+      theme.components.inputFieldCurrencyField.foreground};
+  }
   outline: none;
   box-sizing: border-box;
   &:focus {
     outline: none;
   }
-
 `;
 
 const PaginationWrapper = styled.div`
@@ -139,18 +142,26 @@ const IconPath = styled.path`
   fill: ${({ theme }) => theme.components.icon.icon};
 `;
 
-//select dropdown for token selection
-// placeholder text is "Select a token" and color is theme.components.inputFieldCurrencyField.foreground
-// background color is theme.components.inputFieldCurrencyField.background
-// border radius is 8px
-// padding is 12px
+const SearchContainer = styled.div`
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 20px 24px;
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+`;
 
-const TokenSelectDropdown = styled.select`
-  background-color: ${({ theme }) =>
-    theme.components.inputFieldCurrencyField.background};
-  border-radius: 8px;
-  padding: 12px;
-  color: ${({ theme }) => theme.components.inputFieldCurrencyField.foreground};
+const SearchDropdowns = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 auto;
+  width: 100%;
+  gap: 16px;
+  align-items: center;
 `;
 
 interface Column {
@@ -236,26 +247,21 @@ const TableComponent: React.FC<TableProps> = ({
 
   return (
     <TableWrapper>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          padding: "24px",
-          gap: "16px",
-        }}
-      >
-        <CustomDropdown
-          tokens={tokenList ?? {}}
-          setToken={setToken0}
-          selectedToken={token0}
-          otherToken={token1}
-        />
-        <CustomDropdown
-          tokens={tokenList ?? {}}
-          setToken={setToken1}
-          selectedToken={token1}
-          otherToken={token0}
-        />
+      <SearchContainer>
+        <SearchDropdowns>
+          <CustomDropdown
+            tokens={tokenList ?? {}}
+            setToken={setToken0}
+            selectedToken={token0}
+            otherToken={token1}
+          />
+          <CustomDropdown
+            tokens={tokenList ?? {}}
+            setToken={setToken1}
+            selectedToken={token1}
+            otherToken={token0}
+          />
+        </SearchDropdowns>
         <SearchBoxWrapper>
           <StyledIcon
             xmlns="http://www.w3.org/2000/svg"
@@ -280,7 +286,7 @@ const TableComponent: React.FC<TableProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </SearchBoxWrapper>
-      </div>
+      </SearchContainer>
       <StyledTable>
         <thead>
           <StyledTr>
@@ -361,17 +367,101 @@ const TableComponent: React.FC<TableProps> = ({
 
 export default TableComponent;
 
-//a custom dropdown component
-//takes in list of tokens, setToken function, and selectedToken, as well as other selected token
-//placeholder text is "Select a token" and color is theme.components.inputFieldCurrencyField.foreground
-// background color is theme.components.inputFieldCurrencyField.background
-// border radius is 8px
-// padding is 12px
-// the other token should not be selectable in the dropdown
-// logo + token inside option, value is token symbol which is the key, should filter other token
-// the selected token should be displayed in the dropdown as the selected option with the logo and token
-// should use div and some state management to handle the dropdown
-// because select and option do not allow for custom styling
+const Option = styled.button`
+  white-space: nowrap;
+  width: 100%;
+  box-sizing: border-box;
+  appearance: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-start;
+  padding: 12px;
+  background-color: ${({ theme }) => theme.components.dropdown.background};
+  color: ${({ theme }) => theme.components.dropdown.foreground};
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${({ theme }) =>
+      theme.components.dropdown.hoverBackground};
+    color: ${({ theme }) => theme.components.dropdown.hoverForeground};
+  }
+
+  &:focus {
+    ring: 1;
+    ring-color: ${({ theme }) => theme.components.focusRing.focusRing};
+  }
+
+  img {
+    width: 16px;
+    height: 16px;
+  }
+
+  span {
+    font-size: 14px;
+    font-weight: 500;
+  }
+`;
+
+const DropdownContainer = styled.div`
+  position: absolute;
+  overflow: hidden;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: ${({ theme }) => theme.components.dropdown.background};
+  border-radius: 0 0 8px 8px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+`;
+
+const SelectButton = styled.button<{ $isOpen?: boolean }>`
+  white-space: nowrap;
+  appearance: none;
+  border: none;
+  background-color: ${({ theme }) =>
+    theme.components.inputFieldCurrencyField.background};
+  border-radius: ${({ $isOpen }) => ($isOpen ? "8px 8px 0 0" : "8px")};
+  box-sizing: border-box;
+  padding: 12px;
+  color: ${({ theme }) => theme.components.inputFieldCurrencyField.foreground};
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    color: ${({ theme }) =>
+      theme.components.inputFieldCurrencyField.filledForeground};
+
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  svg {
+    color: ${({ theme }) => theme.components.icon.icon};
+    width: 20px;
+    height: 20px;
+  }
+
+  flex: 1 0 auto;
+  width: 100%;
+  @media (min-width: 768px) {
+    min-width: 180px;
+  }
+`;
 const CustomDropdown: React.FC<{
   tokens: Record<string, any>;
   setToken: (token: string) => void;
@@ -388,41 +478,22 @@ const CustomDropdown: React.FC<{
         width: "100%",
       }}
     >
-      <div
-        style={{
-          padding: "12px",
-          borderRadius: "8px",
-          border: "1px solid black",
-          backgroundColor: "white",
-          cursor: "pointer",
-        }}
-        onClick={() => setIsOpen((prev) => !prev)}
-      >
+      <SelectButton onClick={() => setIsOpen((prev) => !prev)} $isOpen={isOpen}>
         {selectedToken === "" ? (
-          "Select a token"
+          <span>Select a token</span>
         ) : (
           <div>
             <img src={tokens[selectedToken]} alt={selectedToken} />
             <span>{selectedToken}</span>
           </div>
         )}
-      </div>
+        <ArrowDown />
+      </SelectButton>
       {isOpen && (
-        <div
-          style={{
-            position: "absolute",
-            top: "100%",
-            left: 0,
-            width: "100%",
-            backgroundColor: "white",
-            border: "1px solid black",
-            borderRadius: "8px",
-            zIndex: 100,
-          }}
-        >
-          <div
+        <DropdownContainer>
+          <Option
             style={{
-              visibility: selectedToken === "" ? "hidden" : "visible",
+              display: selectedToken === "" ? "none" : "flex",
             }}
             onClick={() => {
               setToken("");
@@ -430,11 +501,11 @@ const CustomDropdown: React.FC<{
             }}
           >
             Select a token
-          </div>
+          </Option>
           {Object.keys(tokens)
             .filter((token) => token !== otherToken && token !== selectedToken)
             .map((token) => (
-              <div
+              <Option
                 key={token}
                 onClick={() => {
                   setToken(token);
@@ -443,9 +514,9 @@ const CustomDropdown: React.FC<{
               >
                 <img src={tokens[token]} alt={token} />
                 <span>{token}</span>
-              </div>
+              </Option>
             ))}
-        </div>
+        </DropdownContainer>
       )}
     </div>
   );

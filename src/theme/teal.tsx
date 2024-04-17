@@ -98,13 +98,13 @@ export const tealLight: Colors = {
       filledForeground: "#181B24",
       // filledBorder: "#E5E7EB",
     },
-    // dropdown: {
-    //   background: "#FFFFFF",
-    //   foreground: "#4B5563",
-    //   disabledForeground: "#D1D5DB",
-    //   hoverForeground: "#181B24",
-    //   hoverBackground: "#F9FAFB",
-    // },
+    dropdown: {
+      background: "#FFFFFF",
+      foreground: "#4B5563",
+      // disabledForeground: "#D1D5DB",
+      hoverForeground: "#181B24",
+      hoverBackground: "#F9FAFB",
+    },
     chip: {
       background: "#F3F4F6",
       foreground: "#4B5563",
@@ -307,13 +307,13 @@ export const tealDark: Colors = {
       filledForeground: "#FFFFFF",
       // filledBorder: "#181B24",
     },
-    // dropdown: {
-    //   background: "#181B24",
-    //   foreground: "#D1D5DB",
-    //   disabledForeground: "#6B7280",
-    //   hoverForeground: "#FFFFFF",
-    //   hoverBackground: "#181B24",
-    // },
+    dropdown: {
+      background: "#181B24",
+      foreground: "#D1D5DB",
+      // disabledForeground: "#6B7280",
+      hoverForeground: "#FFFFFF",
+      hoverBackground: "#181B24",
+    },
     chip: {
       background: "#273345",
       foreground: "#D1D5DB",
