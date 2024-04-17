@@ -269,6 +269,25 @@ function PoolKeySelect({
     { key: "Feature", filterMethod: featureFilterMethod },
   ];
 
+  //list of unique token symbols and their logos
+  const uniqueTokens = poolKeys?.reduce((acc, poolKey) => {
+    if (poolKey.currency0.symbol && poolKey.currency1.symbol) {
+      if (!acc[poolKey.currency0.symbol]) {
+        acc[poolKey.currency0.symbol] = useCurrencyLogo(
+          poolKey.currency0,
+          currencyIconMap ?? {}
+        );
+      }
+      if (!acc[poolKey.currency1.symbol]) {
+        acc[poolKey.currency1.symbol] = useCurrencyLogo(
+          poolKey.currency1,
+          currencyIconMap ?? {}
+        );
+      }
+    }
+    return acc;
+  }, {} as Record<string, any>);
+
   return (
     <RowBetween
       $padding="20px 32px"
@@ -314,6 +333,7 @@ function PoolKeySelect({
             ),
           }}
           searchPlaceholder="Search by token, pool address, or feature"
+          tokenList={uniqueTokens}
         />
       </Modal>
       {!selectedPoolKey && (

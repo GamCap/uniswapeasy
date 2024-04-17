@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { ThemedText } from "theme/components";
 
@@ -139,6 +139,20 @@ const IconPath = styled.path`
   fill: ${({ theme }) => theme.components.icon.icon};
 `;
 
+//select dropdown for token selection
+// placeholder text is "Select a token" and color is theme.components.inputFieldCurrencyField.foreground
+// background color is theme.components.inputFieldCurrencyField.background
+// border radius is 8px
+// padding is 12px
+
+const TokenSelectDropdown = styled.select`
+  background-color: ${({ theme }) =>
+    theme.components.inputFieldCurrencyField.background};
+  border-radius: 8px;
+  padding: 12px;
+  color: ${({ theme }) => theme.components.inputFieldCurrencyField.foreground};
+`;
+
 interface Column {
   key: string;
   filterMethod?: (item: any, searchTerm: string) => boolean;
@@ -150,6 +164,7 @@ interface TableProps {
   pageSize: number;
   renderers: { [key: string]: (data: any) => JSX.Element };
   searchPlaceholder?: string;
+  tokenList?: Record<string, any>;
 }
 
 const TableComponent: React.FC<TableProps> = ({
@@ -158,9 +173,30 @@ const TableComponent: React.FC<TableProps> = ({
   pageSize,
   renderers,
   searchPlaceholder,
+  tokenList,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [token0, setToken0] = useState("");
+  const [token1, setToken1] = useState("");
+
+  //filter data by first column (Pool) using token0 and token1
+  const filteredByToken = useMemo(() => {
+    if (token0 === "" && token1 === "") {
+      return data;
+    }
+    return data.filter((item) => {
+      if (token0 === "" && token1 === "") return true;
+      const p = item["Pool"];
+      const itemString = p?.currency0?.symbol + " / " + p?.currency1?.symbol;
+      return (
+        (token0 === "" ||
+          itemString.toLowerCase().includes(token0.toLowerCase())) &&
+        (token1 === "" ||
+          itemString.toLowerCase().includes(token1.toLowerCase()))
+      );
+    });
+  }, [data, token0, token1]);
 
   const genericFilterer = (
     data: any[],
@@ -184,8 +220,8 @@ const TableComponent: React.FC<TableProps> = ({
   };
 
   const filteredData = searchTerm
-    ? genericFilterer(data, searchTerm, columns)
-    : data;
+    ? genericFilterer(filteredByToken, searchTerm, columns)
+    : filteredByToken;
   const totalPages = Math.max(1, Math.ceil(filteredData.length / pageSize));
   const currentData = filteredData.slice(
     (currentPage - 1) * pageSize,
@@ -203,12 +239,23 @@ const TableComponent: React.FC<TableProps> = ({
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
           alignItems: "center",
           padding: "24px",
           gap: "16px",
         }}
       >
+        <CustomDropdown
+          tokens={tokenList ?? {}}
+          setToken={setToken0}
+          selectedToken={token0}
+          otherToken={token1}
+        />
+        <CustomDropdown
+          tokens={tokenList ?? {}}
+          setToken={setToken1}
+          selectedToken={token1}
+          otherToken={token0}
+        />
         <SearchBoxWrapper>
           <StyledIcon
             xmlns="http://www.w3.org/2000/svg"
@@ -313,3 +360,93 @@ const TableComponent: React.FC<TableProps> = ({
 };
 
 export default TableComponent;
+
+//a custom dropdown component
+//takes in list of tokens, setToken function, and selectedToken, as well as other selected token
+//placeholder text is "Select a token" and color is theme.components.inputFieldCurrencyField.foreground
+// background color is theme.components.inputFieldCurrencyField.background
+// border radius is 8px
+// padding is 12px
+// the other token should not be selectable in the dropdown
+// logo + token inside option, value is token symbol which is the key, should filter other token
+// the selected token should be displayed in the dropdown as the selected option with the logo and token
+// should use div and some state management to handle the dropdown
+// because select and option do not allow for custom styling
+const CustomDropdown: React.FC<{
+  tokens: Record<string, any>;
+  setToken: (token: string) => void;
+  selectedToken: string;
+  otherToken: string;
+}> = ({ tokens, setToken, selectedToken, otherToken }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        display: "inline-block",
+        width: "100%",
+      }}
+    >
+      <div
+        style={{
+          padding: "12px",
+          borderRadius: "8px",
+          border: "1px solid black",
+          backgroundColor: "white",
+          cursor: "pointer",
+        }}
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        {selectedToken === "" ? (
+          "Select a token"
+        ) : (
+          <div>
+            <img src={tokens[selectedToken]} alt={selectedToken} />
+            <span>{selectedToken}</span>
+          </div>
+        )}
+      </div>
+      {isOpen && (
+        <div
+          style={{
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            width: "100%",
+            backgroundColor: "white",
+            border: "1px solid black",
+            borderRadius: "8px",
+            zIndex: 100,
+          }}
+        >
+          <div
+            style={{
+              visibility: selectedToken === "" ? "hidden" : "visible",
+            }}
+            onClick={() => {
+              setToken("");
+              setIsOpen(false);
+            }}
+          >
+            Select a token
+          </div>
+          {Object.keys(tokens)
+            .filter((token) => token !== otherToken && token !== selectedToken)
+            .map((token) => (
+              <div
+                key={token}
+                onClick={() => {
+                  setToken(token);
+                  setIsOpen(false);
+                }}
+              >
+                <img src={tokens[token]} alt={token} />
+                <span>{token}</span>
+              </div>
+            ))}
+        </div>
+      )}
+    </div>
+  );
+};
