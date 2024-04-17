@@ -1054,7 +1054,7 @@ const LPWidget = memo(function ({
                 >
                   <Header
                     title="Pool feature settings"
-                    info="This form is generated dynamically based on the fields provided."
+                    info="Configure hook data for custom pool features."
                   />
                   <DynamicFeatureForm
                     fields={selectedHook.inputFields}

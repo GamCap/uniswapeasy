@@ -58,9 +58,7 @@ const StyledTd = styled.td`
   text-align: left;
 `;
 
-const TableWrapper = styled.div`
-  overflow-x: auto;
-`;
+const TableWrapper = styled.div``;
 
 //top-bottom 12px left-right 8px padding
 const SearchBoxWrapper = styled.div`
@@ -398,6 +396,8 @@ const Option = styled.button`
 const DropdownContainer = styled.div`
   position: absolute;
   overflow: hidden;
+  overflow-y: auto;
+  max-height: 163px;
   top: 100%;
   left: 0;
   width: 100%;
@@ -406,6 +406,20 @@ const DropdownContainer = styled.div`
   z-index: 100;
   display: flex;
   flex-direction: column;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    padding-right: 12px;
+    background: transparent;
+  }
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.surfacesAndElevation.elevation3};
+    border-radius: 50px;
+    background-clip: padding-box;
+  }
 `;
 
 const SelectButton = styled.button<{ $isOpen?: boolean }>`
@@ -460,7 +474,14 @@ const CustomDropdown: React.FC<{
   otherToken: string;
 }> = ({ tokens, setToken, selectedToken, otherToken }) => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const allOptions = useMemo(() => Object.keys(tokens), [tokens]);
+  const filteredOptions = useMemo(
+    () =>
+      allOptions.filter(
+        (token) => token !== otherToken && token !== selectedToken
+      ),
+    [allOptions, otherToken, selectedToken]
+  );
   return (
     <div
       style={{
@@ -493,20 +514,18 @@ const CustomDropdown: React.FC<{
           >
             Select a token
           </Option>
-          {Object.keys(tokens)
-            .filter((token) => token !== otherToken && token !== selectedToken)
-            .map((token) => (
-              <Option
-                key={token}
-                onClick={() => {
-                  setToken(token);
-                  setIsOpen(false);
-                }}
-              >
-                <img src={tokens[token]} alt={token} />
-                <span>{token}</span>
-              </Option>
-            ))}
+          {filteredOptions.map((token) => (
+            <Option
+              key={token}
+              onClick={() => {
+                setToken(token);
+                setIsOpen(false);
+              }}
+            >
+              <img src={tokens[token]} alt={token} />
+              <span>{token}</span>
+            </Option>
+          ))}
         </DropdownContainer>
       )}
     </div>
