@@ -41,7 +41,7 @@ export default function Header({
           {title}
         </ThemedText.ParagraphRegular>
         {info && (
-          <Tooltip content={info}>
+          <Tooltip content={info} defaultPosition="right">
             <div
               style={{
                 display: "flex",
