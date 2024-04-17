@@ -148,10 +148,10 @@ export const tealLight: Colors = {
     //   baseInactiveForeground: "#9CA3AF",
     //   border: "#E5E7EB",
     // },
-    // tooltip: {
-    //   background: "#181B24",
-    //   foreground: "#FFFFFF",
-    // },
+    tooltip: {
+      background: "#181B24",
+      foreground: "#FFFFFF",
+    },
     // radioButton: {
     //   selectedDefaultBackground: "#64D5E4",
     //   selectedDefaultForeground: "#FFFFFF",
@@ -357,10 +357,10 @@ export const tealDark: Colors = {
     //   baseInactiveForeground: "#9CA3AF",
     //   border: "#181B24",
     // },
-    // tooltip: {
-    //   background: "#273345",
-    //   foreground: "#FFFFFF",
-    // },
+    tooltip: {
+      background: "#273345",
+      foreground: "#FFFFFF",
+    },
     // radioButton: {
     //   selectedDefaultBackground: "#64D5E4",
     //   selectedDefaultForeground: "#FFFFFF",

@@ -837,7 +837,7 @@ const LPWidget = memo(function ({
               >
                 <Header
                   title="Price Range"
-                  info="Placeholder Price Range Info"
+                  info="Select the price bounds within which you'll earn fees."
                 />
                 <Column $gap="md" style={{ width: "100%" }}>
                   <LiquidityChartRangeInput

@@ -167,10 +167,10 @@ export interface Colors {
     //   baseInactiveForeground: string;
     //   border: string;
     // };
-    // tooltip: {
-    //   background: string;
-    //   foreground: string;
-    // };
+    tooltip: {
+      background: string;
+      foreground: string;
+    };
     // radioButton: {
     //   selectedDefaultBackground: string;
     //   selectedDefaultForeground: string;

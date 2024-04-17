@@ -148,10 +148,10 @@ export const orangeLight: Colors = {
     //   baseInactiveForeground: "#9CA3AF",
     //   border: "#E5E7EB",
     // },
-    // tooltip: {
-    //   background: "#181B24",
-    //   foreground: "#FFFFFF",
-    // },
+    tooltip: {
+      background: "#181B24",
+      foreground: "#FFFFFF",
+    },
     // radioButton: {
     //   selectedDefaultBackground: "#FF8C21",
     //   selectedDefaultForeground: "#FFFFFF",
@@ -357,10 +357,10 @@ export const orangeDark: Colors = {
     //   baseInactiveForeground: "#9CA3AF",
     //   border: "#374151",
     // },
-    // tooltip: {
-    //   background: "#273345",
-    //   foreground: "#FFFFFF",
-    // },
+    tooltip: {
+      background: "#273345",
+      foreground: "#FFFFFF",
+    },
     // radioButton: {
     //   selectedDefaultBackground: "#FF8C21",
     //   selectedDefaultForeground: "#FFFFFF",
