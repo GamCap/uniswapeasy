@@ -69,9 +69,9 @@ export const tealLight: Colors = {
       //   disabledBackground: "#F3F4F6",
       // },
     },
-    focusRing: {
-      focusRing: "#AFEBF2",
-    },
+    // focusRing: {
+    //   focusRing: "#AFEBF2",
+    // },
     badge: {
       // primaryBackground: "#64D5E4",
       // primaryForefround: "#FFFFFF",
@@ -278,9 +278,9 @@ export const tealDark: Colors = {
       //   disabledBackground: "#273345",
       // },
     },
-    focusRing: {
-      focusRing: "#AFEBF2",
-    },
+    // focusRing: {
+    //   focusRing: "#AFEBF2",
+    // },
     badge: {
       // primaryBackground: "#64D5E4",
       // primaryForefround: "#FFFFFF",

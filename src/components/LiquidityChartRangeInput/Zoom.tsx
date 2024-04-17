@@ -50,11 +50,6 @@ const Button = styled.button`
     border: 1px solid
       ${({ theme }) => theme.components.button.secondary.hoverAndFocusBorder};
   }
-
-  &:focus {
-    ring: 1;
-    ringcolor: ${({ theme }) => theme.components.focusRing.focusRing};
-  }
 `;
 
 export const ZoomOverlay = styled.rect`

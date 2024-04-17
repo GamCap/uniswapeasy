@@ -82,10 +82,6 @@ const CurrencyPair = styled.button`
   gap: 8px;
   align-items: center;
   border-radius: 8px;
-  &:focus {
-    ring: 1;
-    ring-color: ${({ theme }) => theme.components.focusRing.focusRing};
-  }
 `;
 
 const DesktopOnly = styled.div`

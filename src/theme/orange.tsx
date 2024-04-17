@@ -69,9 +69,9 @@ export const orangeLight: Colors = {
       //   disabledBackground: "#F3F4F6",
       // },
     },
-    focusRing: {
-      focusRing: "#FFC470",
-    },
+    // focusRing: {
+    //   focusRing: "#FFC470",
+    // },
     badge: {
       // primaryBackground: "#FF8C21",
       // primaryForefround: "#FFFFFF",
@@ -278,9 +278,9 @@ export const orangeDark: Colors = {
       //   disabledBackground: "#273345",
       // },
     },
-    focusRing: {
-      focusRing: "#FFC470",
-    },
+    // focusRing: {
+    //   focusRing: "#FFC470",
+    // },
     badge: {
       // primaryBackground: "#FF8C21",
       // primaryForefround: "#FFFFFF",

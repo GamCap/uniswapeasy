@@ -194,7 +194,7 @@ function LPWidgetWrapper(props: LPWidgetProps) {
     });
 
     return () => {
-      provider.removeAllListeners();
+      p.removeAllListeners();
     };
   }, [provider]);
 

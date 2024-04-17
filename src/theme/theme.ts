@@ -88,9 +88,9 @@ export interface Colors {
       //   disabledBackground: string;
       // };
     };
-    focusRing: {
-      focusRing: string;
-    };
+    // focusRing: {
+    //   focusRing: string;
+    // };
     badge: {
       // primaryBackground: string;
       // primaryForefround: string;

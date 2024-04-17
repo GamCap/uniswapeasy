@@ -16,34 +16,34 @@ interface ButtonProps extends Omit<HTMLProps<HTMLButtonElement>, "ref"> {
 }
 
 interface StyledButtonProps {
-  type: ButtonType;
-  buttonSize: ButtonSize;
-  icononly: boolean;
+  $type: ButtonType;
+  $buttonSize: ButtonSize;
+  $icononly: boolean;
 }
 
 interface ButtonStyledProps extends StyledButtonProps, CSSProperties {}
 
 const ButtonStyled = styled.button.attrs<ButtonStyledProps>(
-  ({ type, buttonSize, icononly, ...rest }) => ({
+  ({ $type: type, $buttonSize: buttonSize, $icononly: icononly, ...rest }) => ({
     style: {
       ...rest,
     },
   })
 )<StyledButtonProps>`
-  background-color: ${({ theme, type }) =>
+  background-color: ${({ theme, $type: type }) =>
     type === "ghost"
       ? "transparent"
       : theme.components.button[type].background};
-  color: ${({ theme, type }) =>
+  color: ${({ theme, $type: type }) =>
     type === "ghost"
       ? theme.components.button[type].background
       : theme.components.button[type].foreground};
-  border: ${({ theme, type }) =>
+  border: ${({ theme, $type: type }) =>
     type === "secondary"
       ? `1px solid ${theme.components.button[type].border}`
       : "none"};
   border-radius: 1000px;
-  padding: ${({ buttonSize, icononly }) => {
+  padding: ${({ $buttonSize: buttonSize, $icononly: icononly }) => {
     switch (buttonSize) {
       case "medium":
         return icononly ? "12px" : "12px 16px";
@@ -61,36 +61,31 @@ const ButtonStyled = styled.button.attrs<ButtonStyledProps>(
   justify-content: center;
 
   &:hover {
-    background-color: ${({ theme, type }) =>
+    background-color: ${({ theme, $type: type }) =>
       theme.components.button[type].hoverAndFocusBackground};
-    color: ${({ theme, type }) =>
+    color: ${({ theme, $type: type }) =>
       theme.components.button[type].hoverAndFocusForeground};
-    border: ${({ theme, type }) =>
+    border: ${({ theme, $type: type }) =>
       type === "secondary" &&
       `1px solid ${theme.components.button[type].hoverAndFocusBorder}`};
   }
 
-  &:focus {
-    ring: 1;
-    ringcolor: ${({ theme }) => theme.components.focusRing.focusRing};
-  }
-
   &:disabled {
-    background-color: ${({ theme, type }) =>
+    background-color: ${({ theme, $type: type }) =>
       type === "secondary" || type === "ghost"
         ? "transparent"
         : theme.components.button[type].disabledBackground};
-    color: ${({ theme, type }) =>
+    color: ${({ theme, $type: type }) =>
       type === "ghost"
         ? theme.components.button[type].disabledBackground
         : theme.components.button[type].disabledForeground};
-    border: ${({ theme, type }) =>
+    border: ${({ theme, $type: type }) =>
       type === "secondary" &&
       `1px solid ${theme.components.button[type].disabledBorder}`};
     cursor: not-allowed;
   }
 
-  font-size: ${({ buttonSize }) => {
+  font-size: ${({ $buttonSize: buttonSize }) => {
     switch (buttonSize) {
       case "medium":
         return "16px";
@@ -100,7 +95,7 @@ const ButtonStyled = styled.button.attrs<ButtonStyledProps>(
     }
   }};
 
-  font-weight: ${({ buttonSize }) => {
+  font-weight: ${({ $buttonSize: buttonSize }) => {
     switch (buttonSize) {
       case "medium":
         return "600";
@@ -110,7 +105,7 @@ const ButtonStyled = styled.button.attrs<ButtonStyledProps>(
     }
   }};
 
-  line-height: ${({ buttonSize }) => {
+  line-height: ${({ $buttonSize: buttonSize }) => {
     switch (buttonSize) {
       case "medium":
         return "24px";
@@ -125,7 +120,7 @@ const ButtonStyled = styled.button.attrs<ButtonStyledProps>(
   }
 
   svg {
-    width: ${({ buttonSize }) => {
+    width: ${({ $buttonSize: buttonSize }) => {
       switch (buttonSize) {
         case "medium":
           return "20px";
@@ -135,7 +130,7 @@ const ButtonStyled = styled.button.attrs<ButtonStyledProps>(
           return "12px";
       }
     }};
-    height: ${({ buttonSize }) => {
+    height: ${({ $buttonSize: buttonSize }) => {
       switch (buttonSize) {
         case "medium":
           return "20px";
@@ -159,9 +154,9 @@ export function Button({
 }: ButtonProps) {
   return (
     <ButtonStyled
-      type={type}
-      buttonSize={buttonSize}
-      icononly={icononly}
+      $type={type}
+      $buttonSize={buttonSize}
+      $icononly={icononly}
       {...rest}
     >
       {leadingicon}

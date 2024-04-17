@@ -132,10 +132,6 @@ const PageButton = styled.button`
     background-color: transparent;
     opacity: 0;
   }
-  &:focus {
-    ring: 1;
-    ring-color: ${({ theme }) => theme.components.focusRing.focusRing};
-  }
 `;
 
 const IconPath = styled.path`
@@ -386,11 +382,6 @@ const Option = styled.button`
     background-color: ${({ theme }) =>
       theme.components.dropdown.hoverBackground};
     color: ${({ theme }) => theme.components.dropdown.hoverForeground};
-  }
-
-  &:focus {
-    ring: 1;
-    ring-color: ${({ theme }) => theme.components.focusRing.focusRing};
   }
 
   img {
