@@ -69,9 +69,9 @@ export const tealLight: Colors = {
       //   disabledBackground: "#F3F4F6",
       // },
     },
-    focusRing: {
-      focusRing: "#AFEBF2",
-    },
+    // focusRing: {
+    //   focusRing: "#AFEBF2",
+    // },
     badge: {
       // primaryBackground: "#64D5E4",
       // primaryForefround: "#FFFFFF",
@@ -98,13 +98,13 @@ export const tealLight: Colors = {
       filledForeground: "#181B24",
       // filledBorder: "#E5E7EB",
     },
-    // dropdown: {
-    //   background: "#FFFFFF",
-    //   foreground: "#4B5563",
-    //   disabledForeground: "#D1D5DB",
-    //   hoverForeground: "#181B24",
-    //   hoverBackground: "#F9FAFB",
-    // },
+    dropdown: {
+      background: "#FFFFFF",
+      foreground: "#4B5563",
+      // disabledForeground: "#D1D5DB",
+      hoverForeground: "#181B24",
+      hoverBackground: "#F9FAFB",
+    },
     chip: {
       background: "#F3F4F6",
       foreground: "#4B5563",
@@ -148,10 +148,10 @@ export const tealLight: Colors = {
     //   baseInactiveForeground: "#9CA3AF",
     //   border: "#E5E7EB",
     // },
-    // tooltip: {
-    //   background: "#181B24",
-    //   foreground: "#FFFFFF",
-    // },
+    tooltip: {
+      background: "#181B24",
+      foreground: "#FFFFFF",
+    },
     // radioButton: {
     //   selectedDefaultBackground: "#64D5E4",
     //   selectedDefaultForeground: "#FFFFFF",
@@ -278,9 +278,9 @@ export const tealDark: Colors = {
       //   disabledBackground: "#273345",
       // },
     },
-    focusRing: {
-      focusRing: "#AFEBF2",
-    },
+    // focusRing: {
+    //   focusRing: "#AFEBF2",
+    // },
     badge: {
       // primaryBackground: "#64D5E4",
       // primaryForefround: "#FFFFFF",
@@ -307,13 +307,13 @@ export const tealDark: Colors = {
       filledForeground: "#FFFFFF",
       // filledBorder: "#181B24",
     },
-    // dropdown: {
-    //   background: "#181B24",
-    //   foreground: "#D1D5DB",
-    //   disabledForeground: "#6B7280",
-    //   hoverForeground: "#FFFFFF",
-    //   hoverBackground: "#181B24",
-    // },
+    dropdown: {
+      background: "#181B24",
+      foreground: "#D1D5DB",
+      // disabledForeground: "#6B7280",
+      hoverForeground: "#FFFFFF",
+      hoverBackground: "#181B24",
+    },
     chip: {
       background: "#273345",
       foreground: "#D1D5DB",
@@ -357,10 +357,10 @@ export const tealDark: Colors = {
     //   baseInactiveForeground: "#9CA3AF",
     //   border: "#181B24",
     // },
-    // tooltip: {
-    //   background: "#273345",
-    //   foreground: "#FFFFFF",
-    // },
+    tooltip: {
+      background: "#273345",
+      foreground: "#FFFFFF",
+    },
     // radioButton: {
     //   selectedDefaultBackground: "#64D5E4",
     //   selectedDefaultForeground: "#FFFFFF",

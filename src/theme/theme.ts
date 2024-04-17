@@ -88,9 +88,9 @@ export interface Colors {
       //   disabledBackground: string;
       // };
     };
-    focusRing: {
-      focusRing: string;
-    };
+    // focusRing: {
+    //   focusRing: string;
+    // };
     badge: {
       // primaryBackground: string;
       // primaryForefround: string;
@@ -117,13 +117,13 @@ export interface Colors {
       filledForeground: string;
       // filledBorder: string;
     };
-    // dropdown: {
-    //   background: string;
-    //   foreground: string;
-    //   disabledForeground: string;
-    //   hoverForeground: string;
-    //   hoverBackground: string;
-    // };
+    dropdown: {
+      background: string;
+      foreground: string;
+      // disabledForeground: string;
+      hoverForeground: string;
+      hoverBackground: string;
+    };
     chip: {
       background: string;
       foreground: string;
@@ -167,10 +167,10 @@ export interface Colors {
     //   baseInactiveForeground: string;
     //   border: string;
     // };
-    // tooltip: {
-    //   background: string;
-    //   foreground: string;
-    // };
+    tooltip: {
+      background: string;
+      foreground: string;
+    };
     // radioButton: {
     //   selectedDefaultBackground: string;
     //   selectedDefaultForeground: string;

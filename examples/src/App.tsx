@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { UniswapEasy, defaultTheme, PoolKey } from "uniswapeasy";
 import { currencyIconMap, hookInfos, poolKeys } from "./constants/lp";
 
@@ -46,7 +46,11 @@ const App = () => {
   };
 
   const { walletProvider } = useWeb3ModalProvider();
-
+  const provider = useMemo(
+    () =>
+      walletProvider ? new Web3Provider(walletProvider, "any") : undefined,
+    [walletProvider]
+  );
   return (
     <div
       style={{
@@ -73,7 +77,7 @@ const App = () => {
       <w3m-button />
       <UniswapEasy
         theme={{ ...theme }}
-        provider={walletProvider ? new Web3Provider(walletProvider) : undefined}
+        provider={provider}
         poolInfos={poolKeys}
         hookInfos={hookInfos}
         onPoolSelect={onPoolSelect}

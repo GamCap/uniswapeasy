@@ -39,6 +39,7 @@ import {
 } from "hooks/web3/useContract";
 import { isSupportedChainId } from "constants/chains";
 import { Button } from "components/Button";
+import { Web3Provider } from "@ethersproject/providers";
 
 interface BodyWrapperProps {
   $maxWidth?: string;
@@ -182,6 +183,21 @@ export type LPWidgetProps = {
 
 function LPWidgetWrapper(props: LPWidgetProps) {
   const { chainId, provider } = useWeb3React();
+  useEffect(() => {
+    if (!provider || !provider.provider) return;
+    //making sure network is set to any to be able to listen to network changes
+    const p = new Web3Provider(provider.provider, "any");
+
+    p.on("network", (newNetwork, prevNetwork) => {
+      if (newNetwork && prevNetwork && newNetwork !== prevNetwork)
+        window?.location?.reload?.();
+    });
+
+    return () => {
+      p.removeAllListeners();
+    };
+  }, [provider]);
+
   if (!provider || !chainId)
     return (
       <ThemedText.MediumHeader textColor="text.primary">
@@ -821,7 +837,7 @@ const LPWidget = memo(function ({
               >
                 <Header
                   title="Price Range"
-                  info="Placeholder Price Range Info"
+                  info="Select the price bounds within which you'll earn fees."
                 />
                 <Column $gap="md" style={{ width: "100%" }}>
                   <LiquidityChartRangeInput

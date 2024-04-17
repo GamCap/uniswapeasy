@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { ArrowDown } from "components/Icons";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { ThemedText } from "theme/components";
 
@@ -15,7 +16,9 @@ const StyledTh = styled.th`
 
 const StyledTr = styled.tr`
   border-bottom: 1px solid ${({ theme }) => theme.borders.dividers};
-
+  &:hover {
+    background-color: ${({ theme }) => theme.surfacesAndElevation.elevation2};
+  }
   td {
     padding-top: 20px;
     padding-bottom: 20px;
@@ -67,7 +70,8 @@ const SearchBoxWrapper = styled.div`
   gap: 12px;
   align-items: center;
   justify-content: center;
-  width: 50%;
+  width: 100%;
+  flex: 1 1 auto;
   border-radius: 8px;
   border: 1px solid
     ${({ theme }) => theme.components.inputFieldCurrencyField.border};
@@ -92,14 +96,15 @@ const SearchInput = styled.input`
   font-weight: 500;
   color: ${({ theme }) =>
     theme.components.inputFieldCurrencyField.typeAndActiveForeground};
-  &::placeholder: ${({ theme }) =>
-    theme.components.inputFieldCurrencyField.foreground};
+  &:placeholder: {
+    color: ${({ theme }) =>
+      theme.components.inputFieldCurrencyField.foreground};
+  }
   outline: none;
   box-sizing: border-box;
   &:focus {
     outline: none;
   }
-
 `;
 
 const PaginationWrapper = styled.div`
@@ -120,8 +125,9 @@ const PageButton = styled.button`
   appearance: none;
   border: none;
   cursor: pointer;
+  transition: opacity 0.3s ease-in-out;
   color: ${({ theme }) => theme.components.icon.icon};
-  :disabled {
+  &:disabled {
     color: ${({ theme }) => theme.components.icon.icon};
     background-color: transparent;
     opacity: 0;
@@ -130,6 +136,28 @@ const PageButton = styled.button`
 
 const IconPath = styled.path`
   fill: ${({ theme }) => theme.components.icon.icon};
+`;
+
+const SearchContainer = styled.div`
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 20px 24px;
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+`;
+
+const SearchDropdowns = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 auto;
+  width: 100%;
+  gap: 16px;
+  align-items: center;
 `;
 
 interface Column {
@@ -143,6 +171,7 @@ interface TableProps {
   pageSize: number;
   renderers: { [key: string]: (data: any) => JSX.Element };
   searchPlaceholder?: string;
+  tokenList?: Record<string, any>;
 }
 
 const TableComponent: React.FC<TableProps> = ({
@@ -151,9 +180,30 @@ const TableComponent: React.FC<TableProps> = ({
   pageSize,
   renderers,
   searchPlaceholder,
+  tokenList,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [token0, setToken0] = useState("");
+  const [token1, setToken1] = useState("");
+
+  //filter data by first column (Pool) using token0 and token1
+  const filteredByToken = useMemo(() => {
+    if (token0 === "" && token1 === "") {
+      return data;
+    }
+    return data.filter((item) => {
+      if (token0 === "" && token1 === "") return true;
+      const p = item["Pool"];
+      const itemString = p?.currency0?.symbol + " / " + p?.currency1?.symbol;
+      return (
+        (token0 === "" ||
+          itemString.toLowerCase().includes(token0.toLowerCase())) &&
+        (token1 === "" ||
+          itemString.toLowerCase().includes(token1.toLowerCase()))
+      );
+    });
+  }, [data, token0, token1]);
 
   const genericFilterer = (
     data: any[],
@@ -177,8 +227,8 @@ const TableComponent: React.FC<TableProps> = ({
   };
 
   const filteredData = searchTerm
-    ? genericFilterer(data, searchTerm, columns)
-    : data;
+    ? genericFilterer(filteredByToken, searchTerm, columns)
+    : filteredByToken;
   const totalPages = Math.max(1, Math.ceil(filteredData.length / pageSize));
   const currentData = filteredData.slice(
     (currentPage - 1) * pageSize,
@@ -193,15 +243,21 @@ const TableComponent: React.FC<TableProps> = ({
 
   return (
     <TableWrapper>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          padding: "24px",
-          gap: "16px",
-        }}
-      >
+      <SearchContainer>
+        <SearchDropdowns>
+          <CustomDropdown
+            tokens={tokenList ?? {}}
+            setToken={setToken0}
+            selectedToken={token0}
+            otherToken={token1}
+          />
+          <CustomDropdown
+            tokens={tokenList ?? {}}
+            setToken={setToken1}
+            selectedToken={token1}
+            otherToken={token0}
+          />
+        </SearchDropdowns>
         <SearchBoxWrapper>
           <StyledIcon
             xmlns="http://www.w3.org/2000/svg"
@@ -226,7 +282,7 @@ const TableComponent: React.FC<TableProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </SearchBoxWrapper>
-      </div>
+      </SearchContainer>
       <StyledTable>
         <thead>
           <StyledTr>
@@ -306,3 +362,153 @@ const TableComponent: React.FC<TableProps> = ({
 };
 
 export default TableComponent;
+
+const Option = styled.button`
+  white-space: nowrap;
+  width: 100%;
+  box-sizing: border-box;
+  appearance: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-start;
+  padding: 12px;
+  background-color: ${({ theme }) => theme.components.dropdown.background};
+  color: ${({ theme }) => theme.components.dropdown.foreground};
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${({ theme }) =>
+      theme.components.dropdown.hoverBackground};
+    color: ${({ theme }) => theme.components.dropdown.hoverForeground};
+  }
+
+  img {
+    width: 16px;
+    height: 16px;
+  }
+
+  span {
+    font-size: 14px;
+    font-weight: 500;
+  }
+`;
+
+const DropdownContainer = styled.div`
+  position: absolute;
+  overflow: hidden;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: ${({ theme }) => theme.components.dropdown.background};
+  border-radius: 0 0 8px 8px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+`;
+
+const SelectButton = styled.button<{ $isOpen?: boolean }>`
+  white-space: nowrap;
+  appearance: none;
+  border: none;
+  background-color: ${({ theme }) =>
+    theme.components.inputFieldCurrencyField.background};
+  border-radius: ${({ $isOpen }) => ($isOpen ? "8px 8px 0 0" : "8px")};
+  box-sizing: border-box;
+  padding: 12px;
+  color: ${({ theme }) => theme.components.inputFieldCurrencyField.foreground};
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    color: ${({ theme }) =>
+      theme.components.inputFieldCurrencyField.filledForeground};
+
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  svg {
+    color: ${({ theme }) => theme.components.icon.icon};
+    width: 20px;
+    height: 20px;
+  }
+
+  flex: 1 0 auto;
+  width: 100%;
+  @media (min-width: 768px) {
+    min-width: 180px;
+  }
+`;
+const CustomDropdown: React.FC<{
+  tokens: Record<string, any>;
+  setToken: (token: string) => void;
+  selectedToken: string;
+  otherToken: string;
+}> = ({ tokens, setToken, selectedToken, otherToken }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        display: "inline-block",
+        width: "100%",
+      }}
+    >
+      <SelectButton onClick={() => setIsOpen((prev) => !prev)} $isOpen={isOpen}>
+        {selectedToken === "" ? (
+          <span>Select a token</span>
+        ) : (
+          <div>
+            <img src={tokens[selectedToken]} alt={selectedToken} />
+            <span>{selectedToken}</span>
+          </div>
+        )}
+        <ArrowDown />
+      </SelectButton>
+      {isOpen && (
+        <DropdownContainer>
+          <Option
+            style={{
+              display: selectedToken === "" ? "none" : "flex",
+            }}
+            onClick={() => {
+              setToken("");
+              setIsOpen(false);
+            }}
+          >
+            Select a token
+          </Option>
+          {Object.keys(tokens)
+            .filter((token) => token !== otherToken && token !== selectedToken)
+            .map((token) => (
+              <Option
+                key={token}
+                onClick={() => {
+                  setToken(token);
+                  setIsOpen(false);
+                }}
+              >
+                <img src={tokens[token]} alt={token} />
+                <span>{token}</span>
+              </Option>
+            ))}
+        </DropdownContainer>
+      )}
+    </div>
+  );
+};
