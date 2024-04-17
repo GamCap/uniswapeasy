@@ -37,10 +37,8 @@ const Content = styled.div<{
   background: ${({ theme }) => theme.surfacesAndElevation.elevation1};
   border: 1px solid ${({ theme }) => theme.borders.borders};
   width: 100%;
-  min-height: 300px;
   border-radius: 24px;
   z-index: 1000;
-  overflow: hidden;
   ${({ $breakpoints: breakpoints }) =>
     breakpoints &&
     breakpoints.map(
@@ -58,14 +56,6 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.borders.dividers};
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  padding: 8px;
-  border: none;
-  color: ${({ theme }) => theme.components.icon.icon};
-  cursor: pointer;
 `;
 
 const Modal: React.FC<ModalProps> = ({
