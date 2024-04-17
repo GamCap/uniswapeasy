@@ -15,7 +15,9 @@ const StyledTh = styled.th`
 
 const StyledTr = styled.tr`
   border-bottom: 1px solid ${({ theme }) => theme.borders.dividers};
-
+  &:hover {
+    background-color: ${({ theme }) => theme.surfacesAndElevation.elevation2};
+  }
   td {
     padding-top: 20px;
     padding-bottom: 20px;
@@ -120,11 +122,16 @@ const PageButton = styled.button`
   appearance: none;
   border: none;
   cursor: pointer;
+  transition: opacity 0.3s ease-in-out;
   color: ${({ theme }) => theme.components.icon.icon};
-  :disabled {
+  &:disabled {
     color: ${({ theme }) => theme.components.icon.icon};
     background-color: transparent;
     opacity: 0;
+  }
+  &:focus {
+    ring: 1;
+    ring-color: ${({ theme }) => theme.components.focusRing.focusRing};
   }
 `;
 

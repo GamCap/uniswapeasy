@@ -69,7 +69,10 @@ const BadgeWrapper = styled.div`
   gap: 8px;
 `;
 
-const CurrencyPair = styled.span`
+const CurrencyPair = styled.button`
+  appearance: none;
+  border: none;
+  background-color: transparent;
   width: 100%;
   cursor: pointer;
   display: flex;
@@ -78,6 +81,11 @@ const CurrencyPair = styled.span`
   justify-content: start;
   gap: 8px;
   align-items: center;
+  border-radius: 8px;
+  &:focus {
+    ring: 1;
+    ring-color: ${({ theme }) => theme.components.focusRing.focusRing};
+  }
 `;
 
 const DesktopOnly = styled.div`
