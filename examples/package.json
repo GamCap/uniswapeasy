@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
-    "@gamcaplabs/uniswapeasy": "^0.1.0-beta",
+    "@gamcaplabs/uniswapeasy": "^0.1.0-beta.2",
     "@web3modal/ethers5": "^4.1.7",
     "ethers": "^5.7.2",
     "react": "^18.2.0",

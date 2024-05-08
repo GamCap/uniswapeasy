@@ -1,6 +1,6 @@
 {
   "name": "@gamcaplabs/uniswapeasy",
-  "version": "0.1.0-beta",
+  "version": "0.1.0-beta.2",
   "description": "Uniswap V4 Liquidity Provider",
   "repository": {
     "type": "git",
