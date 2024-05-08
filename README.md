@@ -26,9 +26,9 @@ UniswapEasy is a React widget designed to simplify liquidity management on the U
 ## Installation
 
 ```bash
-npm install uniswapeasy
+npm install @gamcaplabs/uniswapeasy
 # or
-yarn add uniswapeasy
+yarn add @gamcaplabs/uniswapeasy
 ```
 
 ## Building from Source
@@ -65,13 +65,17 @@ To build the package from source:
    ```bash
    yarn build
    ```
+6. Generate a gzip archive of the package for local development:
+  ```bash
+  yarn pack
+  ```
 
 ## Usage
 
 Import `UniswapEasy` from the package and use it in your React application with the following props for extensive customization:
 
 ```jsx
-import {UniswapEasy, defaultTheme} from 'uniswapeasy';
+import {UniswapEasy, defaultTheme} from '@gamcaplabs/uniswapeasy';
 
 <UniswapEasy
   theme={defaultTheme}

@@ -1,5 +1,5 @@
 import { Token } from "@uniswap/sdk-core";
-import { HookInfo } from "uniswapeasy";
+import type { HookInfo } from "@gamcaplabs/uniswapeasy";
 
 const poolKeys = [
   {

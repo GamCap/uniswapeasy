@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { UniswapEasy, defaultTheme, PoolKey } from "uniswapeasy";
+import { UniswapEasy, defaultTheme, PoolKey } from "@gamcaplabs/uniswapeasy";
 import { currencyIconMap, hookInfos, poolKeys } from "./constants/lp";
 
 import {
