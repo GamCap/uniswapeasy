@@ -1,7 +1,22 @@
 {
   "name": "uniswapeasy",
-  "version": "0.0.278",
+  "version": "0.1.0",
   "description": "Uniswap V4 Liquidity Provider",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GamCap/uniswapeasy.git"
+  },
+  "keywords": [
+    "uniswap",
+    "uniswap-v4",
+    "liquidity",
+    "ethereum",
+    "react",
+    "widget",
+    "defi",
+    "decentralized-finance",
+    "cryptocurrency"
+  ],
   "files": [
     "dist"
   ],
@@ -21,7 +36,6 @@
     "build": "npm run build:dts && rollup -c",
     "prebuild": "npm run compile:abis"
   },
-  "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {
